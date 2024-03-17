@@ -173,14 +173,9 @@ lemma norm_mem (l : Line α) (x : α × α × α) (h₂ : x.2.2 ≠ 0) : x ∈ (
 lemma vnorm_eq_vnorm (x y : α × α × α) (h : Vnorm x = Vnorm y) (h₂ : x.2.2 ≠ 0) (h₃ : y.2.2 ≠ 0) : ∃ r : α, r • x = y := by
   exists y.2.2/x.2.2
   simp [Vnorm] at h
-  have ⟨h1, h2⟩ := h
-  aesop
   field_simp at *
-  rw [mul_comm]
-  exact h1
-  field_simp at *
-  rw [mul_comm]
-  exact h2
+  ext
+  repeat field_simp [h.1, h.2, mul_comm]
 
 
 lemma mem_line1 (i j : α × α) (h : i ≠ j) : i ∈ (Line.of i j h) := by
