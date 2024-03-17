@@ -19,10 +19,6 @@ open Classical Real BigOps Finset Pointwise
 variable {α : Type*} [Field α] [Fintype α]
   (A B : Finset α)
 
-lemma add_neg_eq_sub : A + (-B) = A - B := by
-  rw [add_def, sub_def, neg_def]
-  sorry
-
 theorem card_sq_div_add_card_le_energy :
     (A.card^2 * B.card^2 / (A + B).card ≤ additiveEnergy A B) := by
   -- apply Nat.div_le_of_le_mul
@@ -202,27 +198,7 @@ lemma sub_le_add : (A - B).card ≤ ((A + B).card^3 / (A.card * B.card) : ℚ) :
     _ = ((A + B).card^3 / (A.card * B.card) : ℚ) := by field_simp; ring_nf
   · simp_all
   · simp_all
-  -- by_cases A.Nonempty
-  -- by_cases B.card ≠ 0
-  -- · sorry
-    -- calc ((A - B).card : ℚ)
-    --   _ ≤ ((A + B).card^3 / (A.card * B.card)) := sorry
-      -- _ = ((A - B).card * B.card) / B.card := by field_simp
-      -- _ ≤ ((A + B).card * (B + B).card) / B.card := by
-      --   gcongr ?a / ?b
-      --   norm_cast
-      --   apply card_sub_mul_le_card_add_mul_card_add
-      --   simp
-      -- _ = ((A + B).card * (2 • B).card) / B.card := by rw [two_smul]
-      -- _ ≤ ((A + B).card * (((A+B).card / A.card)^2 * A.card)) / B.card := by
-      --   gcongr
-      --   apply card_nsmul_le
-      --   assumption
-        -- field_simp
-        -- ring
-        -- this is a comment
-  -- · sorry
-  -- · sorry
+  -- WHY DOES IT FAIL WHEN I REMOVED THIS COMMENT
 
 lemma card_of_inv (a : α) (A : Finset α) (h : a ≠ 0) : (a • A).card = A.card := by
   apply Eq.symm
@@ -239,6 +215,11 @@ lemma card_of_inv (a : α) (A : Finset α) (h : a ≠ 0) : (a • A).card = A.ca
     exists y
     simp
     assumption
+
+lemma add_le_of_add_add (C : Finset α) : (B+C).card ≤ (A+B).card * (A+C).card := by
+  sorry
+  -- calc (B+C).card
+  --   _ =
 
 lemma Stab_neg (h : a ∈ Stab K A) : -a ∈ Stab (K^3) A := by
   by_cases A.card = 0
@@ -259,7 +240,7 @@ lemma Stab_neg (h : a ∈ Stab K A) : -a ∈ Stab (K^3) A := by
     _ ≤ K^2 * K * A.card := by gcongr
     _ = K^3 * A.card := by ring
   simp [Stab] at *
-  rw [add_neg_eq_sub]
+  rw [← sub_eq_add_neg]
   calc ((A - a • A).card : ℚ)
     _ ≤ (A + a • A).card^3 / (A.card * (a • A).card) := sub_le_add ..
     _ ≤ (K * A.card)^3 / (A.card * (a • A).card) := by gcongr
