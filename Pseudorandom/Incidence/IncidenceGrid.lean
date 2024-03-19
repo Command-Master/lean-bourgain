@@ -12,9 +12,9 @@ import LeanAPAP.Prereqs.Expect.Basic
 import Mathlib.LinearAlgebra.Projectivization.Basic
 import Mathlib.Data.SetLike.Fintype
 import Mathlib.Combinatorics.Additive.Energy
-import Pseudorandom.Lines
-import Pseudorandom.Constants
-import Pseudorandom.Claim342_grid
+import Pseudorandom.Geometry.Lines
+import Pseudorandom.Incidence.Constants
+import Pseudorandom.Incidence.Claim342_grid
 
 open Classical Real BigOps Finset Pointwise
 

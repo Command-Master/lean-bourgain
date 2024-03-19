@@ -1,8 +1,7 @@
 import Mathlib.LinearAlgebra.FiniteDimensional
 import Mathlib.Data.SetLike.Fintype
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
-import Pseudorandom.Lines
-import Pseudorandom.Constants
+import Pseudorandom.Geometry.Lines
 
 open Classical Finset
 

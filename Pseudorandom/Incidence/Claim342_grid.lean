@@ -11,8 +11,8 @@ import Mathlib.Algebra.Order.Chebyshev
 import LeanAPAP.Prereqs.Expect.Basic
 import Mathlib.LinearAlgebra.Projectivization.Basic
 import Mathlib.Data.SetLike.Fintype
-import Pseudorandom.Lines
-import Pseudorandom.Constants
+import Pseudorandom.Geometry.Lines
+import Pseudorandom.Incidence.Constants
 import Pseudorandom.Util
 
 open Classical Real BigOps Finset

@@ -11,11 +11,11 @@ import Mathlib.Algebra.Order.Chebyshev
 import LeanAPAP.Prereqs.Expect.Basic
 import Mathlib.LinearAlgebra.Projectivization.Basic
 import Mathlib.Data.SetLike.Fintype
-import Pseudorandom.Lines
-import Pseudorandom.Constants
-import Pseudorandom.Claim342
-import Pseudorandom.Projective
-import Pseudorandom.IncidenceGrid
+import Pseudorandom.Geometry.Lines
+import Pseudorandom.Incidence.Constants
+import Pseudorandom.Incidence.Claim342
+import Pseudorandom.Geometry.Projective
+import Pseudorandom.Incidence.IncidenceGrid
 
 open Classical Real BigOps Finset
 
