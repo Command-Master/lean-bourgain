@@ -54,15 +54,6 @@ lemma card_of_inv (a : α) (h : a ≠ 0) : (a • A).card = A.card := by
     simp
     assumption
 
-lemma add_le_of_add_add (h : B.Nonempty) : (A+C).card ≤ ((A + B).card * (B+C).card^3 / (B.card^2 * C.card) : ℚ≥0) := by
-  calc ((A+C).card : ℚ≥0)
-    _ = (A+C).card * B.card / B.card := by field_simp
-    _ ≤ ((A + B).card * (B - C).card) / B.card := by gcongr ?a / _; norm_cast; apply card_add_mul_le_card_add_mul_card_sub
-    _ ≤ (A + B).card * ((B + C).card^3 / (B.card * C.card)) / B.card := by
-      gcongr
-      apply sub_le_add
-    _ = (A + B).card * (B+C).card^3 / (B.card^2 * C.card) := by field_simp; ring_nf
-
 lemma add_of_large_intersection (h : (A ∩ C).Nonempty) : (B+C).card ≤ ((B + A).card * (C+C).card / (A ∩ C).card : ℚ≥0) := by
   calc
     ((B+C).card : ℚ≥0) = (B+C).card * (A ∩ C).card / (A ∩ C).card := by field_simp
