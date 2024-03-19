@@ -12,10 +12,10 @@ import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.NumberTheory.LegendreSymbol.AddCharacter
 import Mathlib.GroupTheory.FiniteAbelian
 import Mathlib.Algebra.Order.Chebyshev
--- import LeanAPAP.Prereqs.Discrete.DFT.Basic
--- import LeanAPAP.Prereqs.Expect.Basic
+import LeanAPAP.Prereqs.Discrete.DFT.Basic
+import LeanAPAP.Prereqs.Expect.Basic
 
-open Classical Finset Real Std Matrix RealInnerProductSpace BigOperators
+open Classical Finset Real Std Matrix RealInnerProductSpace BigOps
 
 universe u1 u2 u3
 
@@ -417,8 +417,8 @@ theorem XOR_lemma' (ε : ℝ≥0) (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontr
       rfl
       intros
       rw [←(Complex.abs_re_eq_abs).mpr]
-      simp
-      simp
+      simp [f]
+      simp [f]
       apply sum_nonneg
       aesop
     _ = ‖dft f‖ₙ_[2]^2 := by rw [nl2Norm_dft]
@@ -434,12 +434,12 @@ theorem XOR_lemma' (ε : ℝ≥0) (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontr
       rw [sq_le_sq]
       rw [Complex.norm_eq_abs, Complex.abs_abs, NNReal.abs_eq, ←Complex.norm_eq_abs]
       by_cases h₂ : i = 0
-      simp [h₂, dft_apply, l2Inner_eq_sum]
+      simp [h₂, dft_apply, l2Inner_eq_sum, f]
       have : ∑ x, (a x : ℂ) = Complex.ofReal (∑ x, a x) := by
         simp only [map_sum, Complex.ofReal_eq_coe]
       rw [this]
       simp
-      simp [dft_sub]
+      simp [dft_sub, f]
       rw [dft_const]
       simp
       apply h i
