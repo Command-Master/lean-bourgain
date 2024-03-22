@@ -14,6 +14,7 @@ import Mathlib.Data.SetLike.Fintype
 import Mathlib.Combinatorics.Additive.Energy
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
 import Mathlib.Combinatorics.Additive.RuzsaCovering
+import LeanAPAP.Mathlib.Combinatorics.Additive.Energy
 
 open NNRat Classical Real BigOps Finset Pointwise
 
@@ -125,3 +126,73 @@ lemma triple_add :
     _ = (C + A).card * (A+B).card^8 / (A.card^6 * B.card^2) := by field_simp; ring_nf
   · simp_all
   · simp_all
+
+lemma additive_mul_eq (C : α) (h : C ≠ 0) : E[A, C • A] = ((((A ×ˢ A) ×ˢ A ×ˢ A)).filter
+    fun x : (α × α) × α × α => x.1.1 + C * x.1.2 = x.2.1 + C * x.2.2).card := calc
+  _ = (((A ×ˢ A) ×ˢ (C • A) ×ˢ (C • A)).filter
+      fun x : (α × α) × α × α => x.1.1 + x.2.1 = x.1.2 + x.2.2).card := rfl
+  _ = ((((A ×ˢ A) ×ˢ A ×ˢ A)).filter
+      fun x : (α × α) × α × α => x.1.1 + C • x.2.1 = x.1.2 + C • x.2.2).card := by
+    norm_cast
+    apply Eq.symm
+    apply card_congr (fun ⟨x1, x2⟩ _ => ⟨x1, C • x2⟩)
+    · intros a ha
+      simp only [smul_eq_mul, filter_congr_decidable, mem_filter, mem_product] at ha
+      simp only [mem_filter, mem_product, ha, and_self, Prod.smul_fst, smul_eq_mul,
+        Prod.smul_snd, true_and, and_true]
+      constructor <;> (apply smul_mem_smul_finset; simp only [ha])
+    · intros a c ha hc h
+      simp at h
+      cases a
+      cases c
+      rw [smul_right_inj] at h
+      simp at h
+      simp [h]
+      field_simp
+      assumption
+    · intros a ha
+      exists ⟨a.1, C⁻¹ • a.2⟩
+      simp only [inv_div, smul_eq_mul, filter_congr_decidable, mem_filter, mem_product,
+        Prod.smul_fst, Prod.smul_snd, exists_prop]
+      simp only [mem_filter, mem_product] at ha
+      repeat constructor
+      · exact ha.1.1.1
+      · exact ha.1.1.2
+      constructor
+      · have := ha.1.2.1
+        rw [mem_smul_finset] at this
+        have ⟨y, hy, hY⟩ := this
+        field_simp at hY
+        suffices C⁻¹ * a.2.1 = y by rw [this]; exact hy
+        apply Eq.symm
+        field_simp
+        rw [mul_comm, hY]
+      · have := ha.1.2.2
+        rw [mem_smul_finset] at this
+        have ⟨y, hy, hY⟩ := this
+        field_simp at hY
+        suffices C⁻¹ * a.2.2 = y by rw [this]; exact hy
+        apply Eq.symm
+        field_simp
+        rw [mul_comm, hY]
+      · rw [←mul_assoc]
+        field_simp
+        rw [ha.2]
+        ring
+      · rw [←smul_assoc]
+        field_simp
+  _ = ((((A ×ˢ A) ×ˢ A ×ˢ A)).filter
+      fun x : (α × α) × α × α => x.1.1 + C * x.1.2 = x.2.1 + C * x.2.2).card := by
+    norm_cast
+    apply card_congr (fun ⟨⟨a1, a2⟩, ⟨a3, a4⟩⟩ _ => ⟨⟨a1, a3⟩, ⟨a2, a4⟩⟩)
+    · intros a ha
+      simp at ha
+      simp [ha]
+    · intros _ _ _ _ h
+      simp at h
+      rw [Prod.ext_iff, Prod.ext_iff, Prod.ext_iff]
+      simp [h]
+    · intros a ha
+      exists ((a.1.1, a.2.1), (a.1.2, a.2.2))
+      simp at ha
+      simp [ha]
