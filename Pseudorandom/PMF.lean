@@ -1,6 +1,7 @@
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Data.Finset.Powerset
 import Mathlib.Data.Finset.Image
+import LeanAPAP.Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Algebra.BigOperators.Order
 import Mathlib.Algebra.BigOperators.Ring
 import Mathlib.Data.Real.Archimedean
@@ -8,7 +9,7 @@ import Mathlib.Order.SetNotation
 import Mathlib.Data.Set.Finite
 import Mathlib.Tactic.Linarith.Frontend
 
-open Classical Finset BigOperators
+open Classical Finset BigOps
 
 variable
    {α : Type u1} [Nonempty α] [Fintype α]
@@ -30,21 +31,6 @@ theorem FinPMF.sum_coe (p : FinPMF α) : ∑ a, p a = 1 := p.2.1
 theorem FinPMF.nonneg (p : FinPMF α) : 0 ≤ p x := by simp [instFunLike, p.2.2]
 
 attribute [local simp] Set.Finite.bddAbove Set.finite_range card_univ
-
--- The maximum value a PMF takes is greater than zero
-lemma FinPMF.not_all_zero : 0 < ⨆ x, a x := by
-  by_contra
-  simp_all
-  have := by
-    calc
-      1 = ∑ x, a x := by simp
-      _ ≤ 0 := by
-        apply sum_nonpos
-        intro i _
-        calc
-          a i ≤ ⨆ x, a x := by apply le_ciSup; simp
-          _ ≤ 0 := by assumption
-  linarith
 
 -- The uniform distribution over some nonempty set.
 noncomputable def Uniform (t : { x : Finset α // x.Nonempty }) : FinPMF α := ⟨fun x : α => if x ∈ t.1 then (1 / (t.1.card) : ℝ) else 0, by
@@ -114,3 +100,14 @@ noncomputable instance instSubFinPMF [Sub α] : HSub (FinPMF α) (FinPMF α) (Fi
   hSub := fun a b => (a*b).apply (fun x => x.1 - x.2)
 
 theorem FinPMF.sub_val [Sub α] : a - b = (a*b).apply (fun x => x.1-x.2) := rfl
+
+noncomputable def FinPMF.linear_combination (a : FinPMF α) (f : α → FinPMF β) : FinPMF β :=
+  ⟨(fun x => ∑ y ∈ univ, (a y) * (f y x)), by
+    constructor
+    rw [sum_comm]
+    simp [← mul_sum]
+    intros
+    apply sum_nonneg
+    intros
+    exact mul_nonneg (nonneg _) (nonneg _)
+    ⟩

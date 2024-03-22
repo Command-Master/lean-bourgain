@@ -1,4 +1,4 @@
-import Pseudorandom.PDF
+import Pseudorandom.PMF
 
 open Classical Finset BigOperators
 

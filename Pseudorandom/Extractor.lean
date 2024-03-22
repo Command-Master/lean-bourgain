@@ -1,7 +1,7 @@
 import Mathlib.Analysis.SpecialFunctions.Log.Base
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.InnerProductSpace.PiL2
-import Pseudorandom.PDF
+import Pseudorandom.PMF
 import Pseudorandom.SD
 
 open Classical Real Finset BigOperators RealInnerProductSpace
@@ -13,25 +13,48 @@ variable
    {β : Type u2} [Nonempty β] [Fintype β]
    (a b : FinPMF α)
 
+noncomputable def max_val : ℝ :=
+  ⨆ x : α, a x
+
+@[simp]
+lemma le_max_val : a x ≤ max_val a := by
+  apply le_ciSup
+  simp
+
+-- The maximum value a PMF takes is greater than zero
+lemma card_inv_le_max_val : (Fintype.card α : ℝ)⁻¹ ≤ max_val a := by
+  rw [inv_pos_le_iff_one_le_mul']
+  calc
+    1 = ∑ x, a x := by simp
+    _ ≤ ∑ __ : α, max_val a := by
+      gcongr
+      simp
+    _ = (Fintype.card α) * max_val a := by
+      simp
+  simp [Fintype.card_pos]
+
+lemma zero_lt_max_val : 0 < max_val a := calc
+  0 < (Fintype.card α : ℝ)⁻¹ := by simp [Fintype.card_pos]
+  _ ≤ max_val a := card_inv_le_max_val ..
+
 noncomputable def min_entropy : ℝ :=
-  -(logb 2 (⨆ x : α, a x))
+  -(logb 2 (max_val a))
 
 lemma min_entropy_le (k : ℝ) : min_entropy a ≥ k ↔ ∀ i, a i ≤ 2^(-k) := by
-  constructor
-  intros p i
-  calc
-    a i ≤ ⨆ x, a x := by apply le_ciSup; simp
-    _ = 2^(logb 2 (⨆ x, a x)) := by rw [rpow_logb]; aesop; aesop; apply FinPMF.not_all_zero
-    _ = 2^(-min_entropy a) := by simp [min_entropy]
-    _ ≤ 2^(-k) := by apply rpow_le_rpow_of_exponent_le <;> linarith
-  intro p
-  simp [min_entropy]
-  rw [le_neg]
-  rw [←logb_rpow (x := -k) zero_lt_two (OfNat.ofNat_ne_one 2)]
-  apply logb_le_logb_of_le
-  exact one_lt_two
-  apply FinPMF.not_all_zero
-  exact ciSup_le p
+  rw [min_entropy]
+  rw [ge_iff_le]
+  conv =>
+    lhs
+    rw [←rpow_le_rpow_left_iff one_lt_two]
+  rw [rpow_neg, rpow_logb zero_lt_two (by norm_num), ← le_inv, ← rpow_neg]
+  simp only [max_val]
+  apply ciSup_le_iff
+  simp
+  exact zero_le_two
+  apply zero_lt_max_val
+  exact rpow_pos_of_pos zero_lt_two k
+  apply zero_lt_max_val
+  exact zero_le_two
 
 -- min entropy implies a bound on the L2 norm of the function.
 lemma min_entropy_l2_norm (k : ℕ) (a : FinPMF α) (h : ↑k ≤ min_entropy a):
