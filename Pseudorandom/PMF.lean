@@ -1,6 +1,7 @@
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Data.Finset.Powerset
 import Mathlib.Data.Finset.Image
+import Mathlib.Data.Fin.VecNotation
 import LeanAPAP.Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Algebra.BigOperators.Order
 import Mathlib.Algebra.BigOperators.Ring
@@ -8,6 +9,7 @@ import Mathlib.Data.Real.Archimedean
 import Mathlib.Order.SetNotation
 import Mathlib.Data.Set.Finite
 import Mathlib.Tactic.Linarith.Frontend
+import Mathlib.Algebra.BigOperators.Fin
 
 open Classical Finset BigOps
 
@@ -21,7 +23,7 @@ def FinPMF (α : Type u) [Fintype α] : Type u :=
   { f : α → ℝ // ∑ x, f x = 1 ∧ ∀ x, f x ≥ 0}
 
 instance instFunLike : FunLike (FinPMF α) α ℝ where
-  coe p a := p.1 a
+  coe p := p.1
   coe_injective' _ _ h := Subtype.eq h
 
 @[simp]
@@ -40,6 +42,13 @@ noncomputable def Uniform (t : { x : Finset α // x.Nonempty }) : FinPMF α := �
   intro x
   split <;> simp
 ⟩
+
+noncomputable def Uniform_singleton (x : α) : FinPMF α := Uniform ⟨{x}, singleton_nonempty ..⟩
+
+-- The value of the uniform distribution over the universe.
+@[simp]
+lemma uniform_single_value (x y : α) : (Uniform_singleton x) y = if y = x then 1 else 0 := by
+  simp [Uniform_singleton, Uniform, instFunLike]
 
 -- The value of the uniform distribution over the universe.
 @[simp]
@@ -111,3 +120,22 @@ noncomputable def FinPMF.linear_combination (a : FinPMF α) (f : α → FinPMF �
     intros
     exact mul_nonneg (nonneg _) (nonneg _)
     ⟩
+
+theorem linear_combination_linear_combination [Fintype γ] (a : FinPMF α) (f : α → FinPMF β) (g : β → FinPMF γ):
+  FinPMF.linear_combination (FinPMF.linear_combination a f) g =
+  FinPMF.linear_combination a (fun x => FinPMF.linear_combination (f x) g) := by
+  simp only [FinPMF.linear_combination]
+  apply Subtype.ext
+  simp only [instFunLike]
+  ext x
+  simp only [sum_mul, mul_sum]
+  rw [sum_comm]
+  simp [mul_assoc]
+
+noncomputable def FinPMF.adjust (a : FinPMF α) (x : α) (p : ℝ) (h₁ : 0 ≤ p) (h₂ : p ≤ 1) : FinPMF α :=
+  FinPMF.linear_combination (α := Fin 2) ⟨![1-p, p], by
+    constructor
+    simp
+    rw [Fin.forall_fin_two]
+    simp [h₁, h₂]
+  ⟩ (![a, Uniform_singleton x] : Fin 2 → FinPMF α)
