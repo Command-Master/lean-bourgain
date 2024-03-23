@@ -132,6 +132,32 @@ theorem linear_combination_linear_combination [Fintype γ] (a : FinPMF α) (f : 
   rw [sum_comm]
   simp [mul_assoc]
 
+theorem linear_combination_apply [Nonempty γ] [Fintype γ] (a : FinPMF α) (f : α → FinPMF β) (g : β → γ) :
+  (FinPMF.linear_combination a f).apply g = FinPMF.linear_combination a (fun x => (f x).apply g) := by
+  unfold FinPMF.apply FinPMF.linear_combination
+  apply Subtype.ext
+  simp only [instFunLike]
+  ext x
+  simp only [mul_sum]
+  rw [sum_comm]
+
+theorem linear_combination_mul [Nonempty α'] [Fintype α'] [Nonempty β'] [Fintype β'] (a : FinPMF α) (f : α → FinPMF α')
+    (b : FinPMF β) (g : β → FinPMF β') :
+    (a.linear_combination f) * (b.linear_combination g) = (a * b).linear_combination (fun ⟨x, y⟩ => (f x) * (g y)) := by
+  unfold FinPMF.linear_combination
+  simp only [instFunLike, instMulFinPMF]
+  apply Subtype.ext
+  simp only
+  ext x
+  simp [sum_mul_sum]
+  apply sum_congr
+  rfl
+  intros
+  apply sum_congr
+  rfl
+  intros
+  ring
+
 noncomputable def FinPMF.adjust (a : FinPMF α) (x : α) (p : ℝ) (h₁ : 0 ≤ p) (h₂ : p ≤ 1) : FinPMF α :=
   FinPMF.linear_combination (α := Fin 2) ⟨![1-p, p], by
     constructor

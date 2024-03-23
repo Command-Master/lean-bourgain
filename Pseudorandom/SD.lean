@@ -15,6 +15,27 @@ variable
 noncomputable def SD : ℝ :=
   ∑ x, |1 / 2 * (a x - b x)|
 
+theorem SD_linear_combination_le (a : FinPMF α) (f : α → FinPMF β) (b : FinPMF β) :
+    SD (a.linear_combination f) b ≤ ∑ x, a x * SD (f x) b := by
+  unfold FinPMF.linear_combination SD
+  simp only [instFunLike, mul_sum]
+  calc ∑ x, |1/2 * (∑ y, a y * (f y) x - b x)|
+    _ = ∑ x, |1/2 * (∑ y, a y * (f y) x - 1 * b x)| := by simp
+    _ = ∑ x, |1/2 * (∑ y, a y * (f y) x - (∑ y, a y) * b x)| := by simp
+    _ = ∑ x, |1/2 * (∑ y, a y * (f y) x - ∑ y, a y * b x)| := by simp [-FinPMF.sum_coe, sum_mul]
+    _ = ∑ x, |1/2 * (∑ y, (a y * (f y) x - a y * b x))| := by simp
+    _ = ∑ x, |1/2 * (∑ y, a y * ((f y) x - b x))| := by rcongr; ring
+    _ = ∑ x, |∑ y, 1/2 * a y * ((f y) x - b x)| := by simp [mul_sum, mul_assoc]
+    _ ≤ ∑ x, ∑ y, |1/2 * a y * ((f y) x - b x)| := by gcongr; apply abs_sum_le_sum_abs
+    _ = ∑ x, ∑ y, a y * |1/2 * ((f y) x - b x)| := by
+      rcongr x y
+      have := (abs_eq_self (a := a y)).mpr (by simp)
+      conv =>
+        rhs
+        rw [← this, ← abs_mul]
+      ring_nf
+    _ = ∑ y, ∑ x, a y * |1/2 * ((f y) x - b x)| := by rw [sum_comm]
+
 -- A simple lemma about absolute value.
 lemma abs_ite (x : ℝ) : |x| = if x ≥ 0 then x else -x := by aesop
 

@@ -40,6 +40,26 @@ lemma zero_lt_max_val : 0 < max_val a := calc
 noncomputable def min_entropy : ℝ :=
   -(logb 2 (max_val a))
 
+lemma two_pow_neg_min_entropy_eq_max_val :
+  2^(-min_entropy a) = max_val a := by
+  unfold min_entropy
+  simp
+  rw [rpow_logb]
+  repeat norm_num
+  apply zero_lt_max_val
+
+lemma min_entropy_of_max_val_le (k : ℝ) :
+  max_val a ≤ (2^k)⁻¹ ↔ k ≤ min_entropy a := by
+    rw [← two_pow_neg_min_entropy_eq_max_val]
+    simp [rpow_neg]
+    rw [inv_le_inv]
+    have : 1 < (2 : ℝ) := by norm_num
+    simp
+    apply rpow_pos_of_pos
+    norm_num
+    apply rpow_pos_of_pos
+    norm_num
+
 lemma min_entropy_le (k : ℝ) : min_entropy a ≥ k ↔ ∀ i, a i ≤ 2^(-k) := by
   rw [min_entropy]
   rw [ge_iff_le]
@@ -84,5 +104,5 @@ lemma min_entropy_l2_norm (k : ℕ) (a : FinPMF α) (h : ↑k ≤ min_entropy a)
   at most ε.
 -/
 noncomputable def two_extractor {γ : Type u3} [Nonempty γ] [Fintype γ]
-  (h : (α × β) → γ) (k : ℕ) (ε : ℝ) : Prop :=
+  (h : (α × β) → γ) (k : ℝ) (ε : ℝ) : Prop :=
   ∀ a, ∀ b, (min_entropy a ≥ k ∧ min_entropy b ≥ k) → (SD ((a * b).apply h) (Uniform ⟨univ, univ_nonempty⟩) ≤ ε)
