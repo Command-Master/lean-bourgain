@@ -3,9 +3,9 @@ import Mathlib.Data.SetLike.Fintype
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 import Pseudorandom.Geometry.Lines
 
-open Classical Finset
+open Finset
 
-variable {α : Type*} [Field α] [Fintype α]
+variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
 
 noncomputable def projective_transform (p q : α × α) (h : p ≠ q) : (α × α × α) ≃ₗ[α] (α × α × α) := by
   let l := Submodule.pair p q

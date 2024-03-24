@@ -18,7 +18,7 @@ import LeanAPAP.Mathlib.Combinatorics.Additive.Energy
 
 open NNRat Classical Real BigOps Finset Pointwise
 
-variable {α : Type*} [Field α] [Fintype α]
+variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
   (A B C : Finset α)
 
 lemma sub_le_add : (A - B).card ≤ ((A + B).card^3 / (A.card * B.card) : ℚ≥0) := by
@@ -54,6 +54,24 @@ lemma card_of_inv (a : α) (h : a ≠ 0) : (a • A).card = A.card := by
     exists y
     simp
     assumption
+
+lemma add_smul_subset_smul_add_smul (a b : α) : (a + b) • A ⊆ a • A + b • A := by
+  rw [subset_iff]
+  intro x hx
+  rw [mem_smul_finset] at hx
+  have ⟨y, hy, hx⟩ := hx
+  rw [add_smul] at hx
+  rw [← hx]
+  simp only [add_mem_add, smul_mem_smul_finset, hy]
+
+lemma sub_smul_subset_smul_sub_smul (a b : α) : (a - b) • A ⊆ a • A - b • A := by
+  rw [subset_iff]
+  intro x hx
+  rw [mem_smul_finset] at hx
+  have ⟨y, hy, hx⟩ := hx
+  rw [sub_smul] at hx
+  rw [← hx]
+  simp only [sub_mem_sub, smul_mem_smul_finset, hy]
 
 lemma add_of_large_intersection (h : (A ∩ C).Nonempty) : (B+C).card ≤ ((B + A).card * (C+C).card / (A ∩ C).card : ℚ≥0) := by
   calc

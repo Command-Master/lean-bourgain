@@ -19,7 +19,7 @@ import Pseudorandom.Incidence.Claim342_grid
 
 open Classical Real BigOps Finset Pointwise
 
-variable {α : Type*} [Field α] [Fintype α]
+variable {α : Type} [Field α] [Fintype α] {p : ℕ} [Fact p.Prime] [Fact (α = ZMod p)]
 
 set_option maxHeartbeats 500000
 

@@ -19,10 +19,10 @@ import Pseudorandom.Additive.Main
 import Mathlib.Algebra.IsPrimePow
 import Mathlib.FieldTheory.Finite.Basic
 
-variable {α : Type*} [Field α] [Fintype α]
+variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
   (A B C : Finset α)
 
-open NNRat Classical Real BigOps Finset Pointwise
+open NNRat Real BigOps Finset Pointwise
 
 lemma card_field_prime_pow : IsPrimePow (Fintype.card α) := by
   have ⟨p, n, h⟩ := FiniteField.card' α
@@ -33,7 +33,7 @@ lemma two_le_card_field : 2 ≤ Fintype.card α := IsPrimePow.two_le card_field_
 
 set_option maxHeartbeats 300000
 
-theorem exists_grower : ∃ (a : α), (A + a • A).card ≥ ((min (A.card^2) (Fintype.card α)) / 2 : ℚ) := by
+theorem exists_grower : ∃ (a : α), a ≠ 0 ∧ (A + a • A).card ≥ ((min (A.card^2) (Fintype.card α)) / 2 : ℚ) := by
   by_cases ane : A.Nonempty
   have vnn : 0 ≤ (A.card^2 * (A.card^2 - 1) : ℚ) := by
     apply mul_nonneg
@@ -61,6 +61,7 @@ theorem exists_grower : ∃ (a : α), (A + a • A).card ≥ ((min (A.card^2) (F
     -- sorry
     have ⟨a, h1, h2⟩ := this
     exists a
+    refine' ⟨h1, _⟩
     have mulnE : (a • A).Nonempty := by simp; assumption
     have en_pos : 0 < E[A, a • A] := additiveEnergy_pos (by assumption) mulnE
     calc ((A + a • A).card : ℚ)
@@ -225,9 +226,230 @@ theorem exists_grower : ∃ (a : α), (A + a • A).card ≥ ((min (A.card^2) (F
     _ = A.card^2 * (Fintype.card α - 1) + A.card^2 * (A.card^2 - 1) := by
       simp
       ring_nf
-  · simp_all
+  · exists 1
+    simp_all
 
 #print exists_grower
 
-theorem GUS (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) : (3 • A^2 - 3 • A^2).card ≥ ((min (A.card^2) (Fintype.card α)) / 2 : ℚ) := by
-  sorry
+theorem GUS (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) : (3 • A^2 - 3 • A^2).card ≥
+    ((min (A.card^2) p) / 2 : ℚ) := by
+  by_cases cardb : A.card > 1
+  have : A.Nonempty := by
+    rw [← card_pos]
+    omega
+  let B := (A - A) / (A - A)
+  by_cases univ ⊆ B
+  ·
+    rw [ge_iff_le]
+    suffices ((min (A.card^2) p) / 2 : ℚ) ≤ (2 • A^2 - 2 • A^2).card by
+      refine' this.trans _
+      have : 3 • A^2 - 3 • A^2 = 2 • A^2 - 2 • A^2 + (A^2 - A^2) := by
+        simp [sub_eq_add_neg]
+        rw [← neg_nsmul]
+        rw [← neg_nsmul]
+        generalize - A^2 = C
+        abel
+      rw [this]
+      norm_cast
+      apply card_le_card_add_right
+      simp [sq]
+      assumption
+    obtain ⟨g, ⟨gnz, hg⟩⟩ := exists_grower A
+    rw [ZMod.card] at hg
+    refine' hg.trans _
+    have : g ∈ B := by simp_all
+    simp only [mem_div, mem_sub, exists_exists_and_exists_and_eq_and, B] at this
+    obtain ⟨a, ha, b, hb, c, hc, d, hd, h⟩ := this
+    have : c - d ≠ 0 := by
+      intro v
+      simp [v] at h
+      exact gnz h.symm
+    rw [← h]
+    conv =>
+      lhs
+      arg 1
+      rw [← card_of_inv _ (c - d) this]
+    gcongr
+    rw [subset_iff]
+    intro x hx
+    simp only [mem_smul_finset, mem_add, smul_eq_mul, exists_exists_and_eq_and,
+      exists_exists_and_exists_and_eq_and] at hx
+    obtain ⟨e, he, f, hf, h⟩ := hx
+    conv at h =>
+      lhs
+      tactic =>
+        change _ = (c-d)*e + (a-b) * f
+        field_simp
+        ring
+    rw [← h]
+    rw [sub_mul, sub_mul]
+    simp only [sq, two_nsmul]
+    simp only [mem_sub, mem_add, mem_mul, exists_exists_and_exists_and_eq_and]
+    exists c*e + a*f
+    constructor
+    exists c, hc, e, he, a, ha, f, hf
+    exists d*e + b*f
+    constructor
+    exists d, hd, e, he, b, hb, f, hf
+    ring
+  ·
+    let B' := Bᶜ
+    have : B'.Nonempty := by
+      rw [← compl_ne_univ_iff_nonempty]
+      simp_all [B']
+    have : B.Nonempty := by simp_all [B]
+    have ⟨x, hx⟩ := this.bex
+    let x₂ := (B'.image fun y => (y - x).val).min' (by simp_all)
+    have mm : x₂ ∈ (B'.image fun y => (y - x).val) := min'_mem (B'.image fun y => (y - x).val) (by simp_all)
+    have x₂_neq_zero : x₂ ≠ 0 := fun v => by
+      simp only [v, mem_image, ZMod.val_eq_zero] at mm
+      obtain ⟨m, hm1, hm2⟩ := mm
+      apply eq_of_sub_eq_zero at hm2
+      rw [hm2] at hm1
+      simp [B'] at hm1
+      contradiction
+    simp only [mem_image] at mm
+    have ⟨m, hm1, hm2⟩ := mm
+    have t2 : x + x₂ ∈ B' := by
+      have : ((m-x).val : ZMod p) = (x₂ : ZMod p) := by rw [hm2]
+      simp [sub_eq_iff_eq_add] at this
+      rw [this, add_comm] at hm1
+      exact hm1
+    have t1 : x + x₂ - 1 ∈ B := by
+      by_contra! nh
+      have : x₂ - 1 ∈ (B'.image fun y => (y - x).val) := by
+        simp
+        exists x + (x₂ - 1 : ℕ)
+        constructor
+        rw [Nat.cast_sub]
+        simp [B', nh, ← add_sub_assoc]
+        omega
+        ring_nf
+        apply ZMod.val_cast_of_lt
+        have : x₂ < p := by
+          rw [← hm2]
+          apply ZMod.val_lt
+        omega
+      have : x₂ ≤ x₂ - 1 := Finset.min'_le (B'.image fun y => (y - x).val) _ this
+      omega
+    rw [ge_iff_le]
+    let v := x + x₂
+    change v ∈ B' at t2
+    simp only [B', mem_compl] at t2
+    change v - 1 ∈ B at t1
+    simp [B, mem_div, mem_sub] at t1
+    have ⟨a, ha, b, hb, c, hc, d, hd, h⟩ := t1
+    clear mm hm1 hm2 hx x₂_neq_zero t1
+    have diff_ne_zero : c - d ≠ 0 := by
+      intro h₂
+      rw [h₂] at h
+      simp at h
+      have h : v = 1 := by linear_combination -h
+      rw [h] at t2
+      suffices 1 ∈ B by exact t2 this
+      have ⟨a, ha, b, hb, neq⟩ := one_lt_card.mp cardb
+      have : a - b ≠ 0 := sub_ne_zero_of_ne neq
+      have : (a - b) / (a - b) = 1 := by field_simp
+      rw [← this]
+      simp [B, div_mem_div, sub_mem_sub, ha, hb]
+    calc ((min (A.card^2) p) / 2 : ℚ)
+      _ ≤ (A.card^2) / 2 := by gcongr; simp
+      _ ≤ A.card^2 := by simp
+      _ = (A + v • A).card := by
+        norm_cast
+        rw [sq, ← card_product]
+        apply card_congr (fun ⟨x1, x2⟩ _ => x1 + v • x2)
+        · intros
+          apply add_mem_add
+          simp_all
+          apply smul_mem_smul_finset
+          simp_all
+        · rintro ⟨e₁, e₂⟩ ⟨f₁, f₂⟩ he hf h₂
+          simp only [mem_product] at he hf
+          simp only [smul_eq_mul] at h₂
+          have : f₂ = e₂ := by
+            by_contra! nh
+            have : e₁ - f₁ = v * (f₂ - e₂) := by linear_combination h₂
+            apply sub_ne_zero_of_ne at nh
+            have : v = (e₁ - f₁) / (f₂ - e₂) := by field_simp [this]
+            suffices v ∈ B by exact t2 this
+            rw [this]
+            simp [B, he, div_mem_div, sub_mem_sub, hf]
+          rw [this] at h₂
+          have : e₁ = f₁ := by linear_combination h₂
+          simp_all
+        · intro b hb
+          simp only [mem_add, mem_smul_finset, smul_eq_mul, exists_exists_and_eq_and] at hb
+          have ⟨y, hy, a, ha, v⟩ := hb
+          exists (y, a)
+          simp [v, ha, hy]
+      _ = (A + ((a - b) / (c - d) + 1) • A).card := by
+        congr
+        linear_combination h.symm
+      _ = ((c - d) • (A + ((a - b) / (c - d) + 1) • A)).card := by
+        norm_cast
+        apply Eq.symm
+        apply card_of_inv
+        assumption
+      _ = ((c - d) • A + (c - d) • ((a - b) / (c - d) + 1) • A).card := by
+        simp
+      _ = ((c - d) • A + ((a - b) + (c - d)) • A).card := by
+        congr 3
+        rw [← smul_assoc]
+        congr 1
+        field_simp
+        ring
+      _ ≤ ((c - d) • A + ((a - b) • A + (c - d) • A)).card := by
+        gcongr
+        apply add_subset_add_left
+        apply add_smul_subset_smul_add_smul
+      _ ≤ ((c • A - d • A) + ((a • A - b • A) + (c • A - d • A))).card := by
+        gcongr
+        apply add_subset_add
+        apply sub_smul_subset_smul_sub_smul
+        apply add_subset_add
+        apply sub_smul_subset_smul_sub_smul
+        apply sub_smul_subset_smul_sub_smul
+      _ ≤ ((A * A - A * A) + ((A * A - A * A) + (A * A - A * A))).card := by
+        gcongr
+        apply add_subset_add
+        · apply sub_subset_sub
+          · apply smul_finset_subset_smul
+            assumption
+          · apply smul_finset_subset_smul
+            assumption
+        apply add_subset_add
+        · apply sub_subset_sub
+          · apply smul_finset_subset_smul
+            assumption
+          · apply smul_finset_subset_smul
+            assumption
+        · apply sub_subset_sub
+          · apply smul_finset_subset_smul
+            assumption
+          · apply smul_finset_subset_smul
+            assumption
+      _ = _ := by
+        congr
+        simp [← sq, sub_eq_add_neg]
+        rw [← neg_nsmul]
+        generalize -A^2 = B
+        abel_nf
+  · by_cases A.card = 0
+    · simp_all
+    · have : A.card = 1 := by omega
+      calc ((min (A.card^2) p) / 2 : ℚ)
+        _ ≤ 1 / 2 := by gcongr; simp [this]
+        _ ≤ 1 := by norm_num
+        _ ≤ _ := by
+          norm_cast
+          rw [Nat.one_le_iff_ne_zero]
+          have : 3•A^2 - 3•A^2 = ((A*A + A*A + A*A) - (A*A + A*A + A*A)) := by
+            congr <;> (simp [sq]; abel_nf)
+          rw [this]
+          apply card_ne_zero_of_mem (a := 0)
+          simp only [sub_self, zero_mem_sub_iff, disjoint_self, bot_eq_empty, add_eq_empty,
+            mul_eq_empty, or_self]
+          apply Nonempty.ne_empty
+          rw [← card_pos]
+          simp_all

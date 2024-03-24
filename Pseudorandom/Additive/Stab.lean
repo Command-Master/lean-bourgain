@@ -16,10 +16,10 @@ import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
 import Mathlib.Combinatorics.Additive.RuzsaCovering
 import Pseudorandom.Additive.Main
 
-variable {α : Type*} [Field α] [Fintype α]
+variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
   (A B C : Finset α)
 
-open NNRat Classical Real BigOps Finset Pointwise
+open NNRat Real BigOps Finset Pointwise
 
 noncomputable def Stab (K : ℚ) (A : Finset α) := (univ : Finset α).filter fun a => (A + a • A).card ≤ K * A.card
 

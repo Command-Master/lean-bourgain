@@ -6,7 +6,7 @@ import Mathlib.LinearAlgebra.FiniteDimensional
 import Mathlib.Data.SetLike.Fintype
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 
-variable {α : Type*} [Field α] [Fintype α]
+variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
 
 open Classical BigOperators Finset
 
@@ -27,6 +27,11 @@ lemma Line_finrank {l : Line α} : FiniteDimensional.finrank α l.val = 2 := by
 
 instance mem2 : Membership (α × α) (Line α) where
   mem x l := ⟨x.1, x.2, 1⟩ ∈ l
+
+
+instance instDecidableMem2 (x : α × α) (y : Line α) : Decidable (x ∈ y) := sorry
+
+instance instDecidableEqLine : DecidableEq (Line α) := sorry
 
 def Line.apply (l : Line α) (p : (α × α × α) ≃ₗ[α] (α × α × α)) : Line α := ⟨Submodule.map (p : (α × α × α) →ₗ[α] (α × α × α)) l.val, by
   rw [LinearEquiv.finrank_map_eq]
