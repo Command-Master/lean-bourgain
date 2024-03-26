@@ -1,3 +1,5 @@
+import Mathlib.Data.Finset.Functor
+import Mathlib.Data.IsROrC.Basic
 import Pseudorandom.PMF
 
 open Classical Finset BigOperators

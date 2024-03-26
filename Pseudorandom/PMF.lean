@@ -1,15 +1,7 @@
-import Mathlib.Data.Fintype.BigOperators
-import Mathlib.Data.Finset.Powerset
-import Mathlib.Data.Finset.Image
-import Mathlib.Data.Fin.VecNotation
 import LeanAPAP.Mathlib.Algebra.BigOperators.Basic
-import Mathlib.Algebra.BigOperators.Order
-import Mathlib.Algebra.BigOperators.Ring
-import Mathlib.Data.Real.Archimedean
-import Mathlib.Order.SetNotation
-import Mathlib.Data.Set.Finite
-import Mathlib.Tactic.Linarith.Frontend
 import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Algebra.BigOperators.Order
+import Mathlib.Data.Real.Basic
 
 open Classical Finset BigOps
 

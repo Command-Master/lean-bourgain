@@ -17,9 +17,11 @@ import Pseudorandom.Incidence.Claim342
 import Pseudorandom.Geometry.Projective
 import Pseudorandom.Incidence.IncidenceGrid
 
-open Classical Real BigOps Finset
+open Real BigOps Finset
 
-variable {α : Type*} [Field α] [Fintype α]
+variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
+
+set_option maxHeartbeats 500000
 
 theorem ST_prime_field_proj (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Line α)) (n : ℕ+)
   (nhₗ : (p^β : ℝ) ≤ n) (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (h₁ : P.card ≤ n) (h₂ : L.card ≤ n)

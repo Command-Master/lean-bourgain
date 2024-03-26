@@ -80,14 +80,6 @@ theorem exists_grower : ∃ (a : α), a ≠ 0 ∧ (A + a • A).card ≥ ((min (
           calc ((A.card^2 * A.card^2) / (A.card^2 + A.card^2 * (A.card^2 - 1) / (Fintype.card α - 1)) : ℚ)
             _ ≥ (A.card^2 * A.card^2) / (A.card^2 + A.card^4 / A.card^2) := by
               gcongr
-              -- apply add_pos_of_pos_of_nonneg
-              -- · apply pow_pos
-              --   norm_cast
-              --   exact ane.card_pos
-              -- · apply div_nonneg
-              --   assumption
-              --   simp
-              --   exact Nat.one_le_of_lt h
               · simp [mul_sub]
                 ring_nf
                 simp

@@ -8,7 +8,7 @@ import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 
 variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
 
-open Classical BigOperators Finset
+open BigOperators Finset
 
 def Line (α : Type*) [Ring α] := {x : Submodule α (α × α × α) // FiniteDimensional.finrank α x = 2}
 
@@ -29,9 +29,11 @@ instance mem2 : Membership (α × α) (Line α) where
   mem x l := ⟨x.1, x.2, 1⟩ ∈ l
 
 
-instance instDecidableMem2 (x : α × α) (y : Line α) : Decidable (x ∈ y) := sorry
+noncomputable instance instDecidableMem2 (x : α × α) (y : Line α) : Decidable (x ∈ y) := by
+  classical apply inferInstance
 
-instance instDecidableEqLine : DecidableEq (Line α) := sorry
+noncomputable instance instDecidableEqLine : DecidableEq (Line α) := by
+  classical apply inferInstance
 
 def Line.apply (l : Line α) (p : (α × α × α) ≃ₗ[α] (α × α × α)) : Line α := ⟨Submodule.map (p : (α × α × α) →ₗ[α] (α × α × α)) l.val, by
   rw [LinearEquiv.finrank_map_eq]

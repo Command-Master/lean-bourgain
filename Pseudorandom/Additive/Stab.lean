@@ -1,20 +1,6 @@
-import Mathlib.Data.Nat.Prime
-import Mathlib.Data.Fintype.Basic
-import Mathlib.Data.Finset.Powerset
-import Mathlib.Data.Finset.Image
-import Mathlib.Data.ZMod.Defs
-import Mathlib.Algebra.BigOperators.Basic
-import Mathlib.Analysis.SpecialFunctions.Log.Base
-import Mathlib.Analysis.InnerProductSpace.Basic
-import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.Algebra.Order.Chebyshev
-import LeanAPAP.Prereqs.Expect.Basic
-import Mathlib.LinearAlgebra.Projectivization.Basic
-import Mathlib.Data.SetLike.Fintype
-import Mathlib.Combinatorics.Additive.Energy
-import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
-import Mathlib.Combinatorics.Additive.RuzsaCovering
-import Pseudorandom.Additive.Main
+import Mathlib.Tactic.Rify
+import Pseudorandom.Additive.Constants
+import Pseudorandom.Additive.Growth
 
 variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
   (A B C : Finset α)
@@ -142,3 +128,167 @@ lemma Stab_mul (h₁ : a ∈ Stab K A) (h₂ : b ∈ Stab K A) : a * b ∈ Stab 
       _ ≤ (K*K) * A.card := by gcongr;
       _ = K^2 * A.card := by ring
   · simp_all [Stab]
+
+lemma mem_Stab_le (h₁ : a ∈ Stab K A) (h₂ : K ≤ K₂) : a ∈ Stab K₂ A := by
+  simp_all [Stab]
+  refine' h₁.trans _
+  gcongr
+
+lemma Stab_subset : 3 • (Stab K A)^2 - 3 • (Stab K A)^2 ⊆ Stab (K^4374) A := by
+  by_cases A.Nonempty
+  suffices 3 • (Stab K A)^2 - 3 • (Stab K A)^2 ⊆ Stab (((K^162)^3)^9) A by
+    have : (((K^162)^3)^9) = (K^4374) := by simp [← pow_mul]
+    rwa [← this]
+  suffices ss : 3 • (Stab K A)^2 ⊆ Stab (K^162) A by
+    rw [subset_iff]
+    intro x hx
+    simp [mem_sub] at hx
+    have ⟨y, hy, z, hz, h⟩ := hx
+    rw [subset_iff] at ss
+    have ym : y ∈ Stab (K^162) A := ss hy
+    have zm : z ∈ Stab (K^162) A := ss hz
+    rw [sub_eq_add_neg] at h
+    have nzm : -z ∈ Stab ((K^162)^3) A := Stab_neg A zm
+    have ym : y ∈ Stab ((K^162)^3) A := mem_Stab_le A ym (by
+      apply le_self_pow
+      apply one_le_of_mem A (by assumption) ym
+      norm_num
+    )
+    rw [← h]
+    apply Stab_add <;> assumption
+  have : 3 • (Stab K A)^2 = (Stab K A)^2 + (Stab K A)^2 + (Stab K A)^2 := by abel
+  rw [this]
+  have : (((K^2)^9)^9) = (K^162) := by simp [← pow_mul]
+  rw [← this]
+  suffices ss : (Stab K A)^2 ⊆ Stab (K^2) A by
+    rw [subset_iff]
+    intro x hx
+    simp [mem_add] at hx
+    have ⟨a, ha, b, hb, c, hc, h⟩ := hx
+    rw [subset_iff] at ss
+    apply ss at ha
+    apply ss at hb
+    apply ss at hc
+    have a1m : a + b ∈ Stab ((K^2)^9) A := Stab_add A ha hb
+    have m2 : c ∈ Stab ((K^2)^9) A := mem_Stab_le A hc (by
+      apply le_self_pow
+      apply one_le_of_mem A (by assumption) hc
+      norm_num
+    )
+    have : (a + b) + c ∈ Stab (((K^2)^9)^9) A := Stab_add A a1m m2
+    rw [← h]
+    exact this
+  rw [sq]
+  rw [subset_iff]
+  intro x hx
+  simp [mem_mul] at hx
+  have ⟨a, ha, b, hb, h⟩ := hx
+  rw [← h]
+  apply Stab_mul <;> assumption
+  · simp_all [Stab]
+
+lemma Stab_card_inc (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) :
+    (min ((Stab K A).card^2) p / 2 : ℚ) ≤ (Stab (K^4374) A).card := by
+  have := Stab_subset A (K := K)
+  have := card_le_card this
+  suffices (min ((Stab K A).card^2) p / 2 : ℚ) ≤ (3 • (Stab K A)^2 - 3 • (Stab K A)^2).card by
+    refine' this.trans _
+    norm_cast
+  apply GUS
+
+lemma Stab_card_inc' (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) (h : 4 ≤ (Stab K A).card) :
+    (min ((Stab K A).card^(3/2 : ℝ)) (p / 2) : ℝ) ≤ (Stab (K^4374) A).card := by
+  have := Stab_card_inc (K := K) p A
+  rify at this
+  refine' LE.le.trans _ this
+  rw [← min_div_div_right]
+  apply min_le_min_right
+  rw [← one_le_div]
+  rw [div_right_comm, ← rpow_nat_cast, ← rpow_sub]
+  norm_num
+  simp
+  rw [one_le_div, le_rpow_inv_iff_of_pos]
+  norm_num
+  assumption
+  norm_num
+  simp
+  norm_num
+  norm_num
+  norm_cast
+  omega
+  apply rpow_pos_of_pos
+  norm_cast
+  omega
+  norm_num
+
+
+lemma Stab_card_inc_rep (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) (h : 4 ≤ (Stab K A).card) (n : ℕ):
+    (min ((Stab K A).card^((3/2 : ℝ)^n)) (p / 2) : ℝ) ≤ (Stab (K^4374^n) A).card := by
+  by_cases A.Nonempty
+  induction n
+  · simp
+  · rename_i n hn
+    have : 4 ≤ (Stab (K^4374^n) A).card := by
+      refine' h.trans _
+      gcongr
+      rw [subset_iff]
+      intro x hx
+      apply mem_Stab_le A hx
+      apply le_self_pow
+      apply one_le_of_mem A
+      assumption
+      exact hx
+      simp
+    have := Stab_card_inc' (K := (K^4374^n)) p A this
+    rw [← pow_mul, ← pow_succ'] at this
+    refine' LE.le.trans _ this
+    simp [-div_pow]
+    simp [-div_pow] at hn
+    rcases hn with hp | hq
+    · left
+      refine' LE.le.trans _ (rpow_le_rpow (z := 3/2) _ hp _)
+      rw [← rpow_mul, ← pow_succ']
+      simp
+      apply rpow_nonneg
+      simp
+      norm_num
+    · right
+      refine' hq.trans _
+      conv =>
+        lhs
+        apply (rpow_one _).symm
+      apply rpow_le_rpow_of_exponent_le
+      simp
+      omega
+      norm_num
+  · simp_all [Stab]
+    right
+    rw [card_univ]
+    simp
+
+
+lemma Stab_full' (p : ℕ) [inst : Fact (p.Prime)] (A : Finset (ZMod p)) (β : ℝ) (βpos : 0 < β) (h : 4 ≤ (Stab K A).card) (h₂ : (p ^ β : ℝ) ≤ (Stab K A).card) :
+    (p/2 : ℝ) ≤ (Stab (K ^ full_C₂ β) A).card := by
+  let n := ⌈Real.logb (3/2 : ℝ) (1 / β)⌉₊
+  simp only [full_C₂]
+  change (p/2 : ℝ) ≤ (Stab (K ^ 4374^n) A).card
+  have := Stab_card_inc_rep (K := K) p A h n
+  refine' LE.le.trans _ this
+  simp only [le_min_iff, le_refl, and_true]
+  have : (p / 2 : ℝ) ≤ p := by simp
+  refine' this.trans _
+  -- apply_fun (fun x:ℝ => x^(3/2 : ℝ)^n) at h₂
+  -- TODO: replace by correct
+  simp only at h₂
+  refine' LE.le.trans _ h₂
+  conv =>
+    lhs
+    apply (rpow_one _).symm
+  rw [← rpow_mul]
+  apply rpow_le_rpow_of_exponent_le
+  have := inst.out.one_le
+  simp [this]
+  simp only [n]
+
+  sorry
+  sorry
