@@ -1,6 +1,7 @@
 import Mathlib.Tactic.Rify
 import Pseudorandom.Additive.Constants
 import Pseudorandom.Additive.Growth
+import Mathlib.Combinatorics.SetFamily.CauchyDavenport
 
 variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
   (A B C : Finset α)
@@ -9,7 +10,7 @@ open NNRat Real BigOps Finset Pointwise
 
 noncomputable def Stab (K : ℚ) (A : Finset α) := (univ : Finset α).filter fun a => (A + a • A).card ≤ K * A.card
 
-lemma Stab_inv (h : a ∈ Stab K A) : 1/a ∈ Stab K A := by
+lemma Stab_inv' (h : a ∈ Stab K A) : 1/a ∈ Stab K A := by
   by_cases a = 0
   · simp_all
   simp [Stab] at h
@@ -36,7 +37,7 @@ lemma one_le_of_mem (hA : A.Nonempty) (h : a ∈ Stab K A) : 1 ≤ K := by
     _ = A.card := by simp
   linarith
 
-lemma Stab_neg (h : a ∈ Stab K A) : -a ∈ Stab (K^3) A := by
+lemma Stab_neg' (h : a ∈ Stab K A) : -a ∈ Stab (K^3) A := by
   by_cases A.card = 0
   · simp_all [Stab]
   have : A.Nonempty := by apply nonempty_of_ne_empty; simp_all
@@ -56,33 +57,17 @@ lemma Stab_neg (h : a ∈ Stab K A) : -a ∈ Stab (K^3) A := by
     _ = (K * A.card)^3 / (A.card * A.card) := by rwa [card_of_inv]
     _ = K^3 * A.card := by field_simp; ring
 
-lemma Stab_add (h₁ : a ∈ Stab K A) (h₂ : b ∈ Stab K A) : a + b ∈ Stab (K^9) A := by
+lemma Stab_add' (h₁ : a ∈ Stab K₁ A) (h₂ : b ∈ Stab K₂ A) : a + b ∈ Stab (K₁^8 * K₂) A := by
   by_cases A.Nonempty
-  have : 1 ≤ K := one_le_of_mem A (by assumption) h₁
+  have : 1 ≤ K₁ := one_le_of_mem A (by assumption) h₁
+  have : 1 ≤ K₂ := one_le_of_mem A (by assumption) h₂
   by_cases a ≠ 0
   simp_all only [Stab, mem_filter, mem_univ, true_and, ne_eq, ge_iff_le]
   calc ((A + (a + b) • A).card : ℚ)
     _ ≤ (A + (a • A + b • A)).card := by
       gcongr
       apply add_subset_add_left (s := A)
-      rw [subset_iff]
-      intros x hx
-      rw [mem_smul_finset] at hx
-      have ⟨y, hy⟩ := hx
-      rw [mem_add]
-      exists a • y
-      constructor
-      rw [mem_smul_finset]
-      exists y
-      exact ⟨hy.1, rfl⟩
-      exists b • y
-      constructor
-      rw [mem_smul_finset]
-      exists y
-      exact ⟨hy.1, rfl⟩
-      rw [←hy.2]
-      simp
-      ring_nf
+      apply add_smul_subset_smul_add_smul
     _ = (A + a • A + b • A).card := by abel_nf
     _ ≤ (b • A + A).card * (A + a • A).card^8 / (A.card^6 * (a • A).card^2) := by
       apply triple_add
@@ -91,22 +76,23 @@ lemma Stab_add (h₁ : a ∈ Stab K A) (h₂ : b ∈ Stab K A) : a + b ∈ Stab 
       abel
       apply card_of_inv
       assumption
-    _ ≤ (K * A.card) * (K * A.card)^8 / (A.card^6 * A.card^2) := by gcongr
-    _ = K^9 * A.card := by field_simp; ring_nf
+    _ ≤ (K₂ * A.card) * (K₁ * A.card)^8 / (A.card^6 * A.card^2) := by gcongr
+    _ = K₁^8 * K₂ * A.card := by field_simp; ring_nf
   · simp_all only [Stab, mem_filter, mem_univ, true_and, ne_eq, not_not, zero_add, ge_iff_le,
     zero_smul_finset, add_zero]
     calc
-      ((A + b•A).card : ℚ) ≤ K * A.card := by assumption
-      _ ≤ 1^8 * K * A.card := by simp
-      _ ≤ K^8 * K * A.card := by gcongr
-      _ = K^9 * A.card := by ring
+      ((A + b•A).card : ℚ) ≤ K₂ * A.card := by assumption
+      _ ≤ 1^8 * K₂ * A.card := by simp
+      _ ≤ K₁^8 * K₂ * A.card := by gcongr
   · simp_all [Stab]
 
-lemma Stab_mul (h₁ : a ∈ Stab K A) (h₂ : b ∈ Stab K A) : a * b ∈ Stab (K^2) A := by
+
+lemma Stab_mul' (h₁ : a ∈ Stab K₁ A) (h₂ : b ∈ Stab K₂ A) : a * b ∈ Stab (K₁ * K₂) A := by
   by_cases ane : A.Nonempty
   have := one_le_of_mem A ane h₁
+  have := one_le_of_mem A ane h₂
   by_cases h : a ≠ 0
-  apply Stab_inv at h₁
+  apply Stab_inv' at h₁
   simp_all [Stab]
   calc ((A + (a * b) • A).card : ℚ)
     _ = (a⁻¹ • (A + (a * b) • A)).card := by rw [card_of_inv]; simp [h]
@@ -119,76 +105,97 @@ lemma Stab_mul (h₁ : a ∈ Stab K A) (h₂ : b ∈ Stab K A) : a * b ∈ Stab 
       norm_cast
       apply card_add_mul_card_le_card_add_mul_card_add
     _ ≤ ((A + a⁻¹ • A).card * (A + b • A).card) / A.card := by rw [add_comm]
-    _ ≤ ((K * A.card) * (K * A.card)) / A.card := by gcongr
-    _ = K^2 * A.card := by field_simp; ring
+    _ ≤ ((K₁ * A.card) * (K₂ * A.card)) / A.card := by gcongr
+    _ = K₁ * K₂ * A.card := by field_simp; ring
   · simp_all [Stab]
     calc (A.card : ℚ)
-      _ ≤ K * A.card := by assumption
-      _ = (1*K) * A.card := by ring
-      _ ≤ (K*K) * A.card := by gcongr;
-      _ = K^2 * A.card := by ring
+      _ ≤ K₁ * A.card := by assumption
+      _ = (1*K₁) * A.card := by ring
+      _ ≤ (K₂*K₁) * A.card := by gcongr;
+      _ = K₁ * K₂ * A.card := by ring
   · simp_all [Stab]
 
-lemma mem_Stab_le (h₁ : a ∈ Stab K A) (h₂ : K ≤ K₂) : a ∈ Stab K₂ A := by
+lemma Stab_le' (h₁ : a ∈ Stab K A) (h₂ : K ≤ K₂) : a ∈ Stab K₂ A := by
   simp_all [Stab]
   refine' h₁.trans _
   gcongr
 
-lemma Stab_subset : 3 • (Stab K A)^2 - 3 • (Stab K A)^2 ⊆ Stab (K^4374) A := by
-  by_cases A.Nonempty
-  suffices 3 • (Stab K A)^2 - 3 • (Stab K A)^2 ⊆ Stab (((K^162)^3)^9) A by
-    have : (((K^162)^3)^9) = (K^4374) := by simp [← pow_mul]
-    rwa [← this]
-  suffices ss : 3 • (Stab K A)^2 ⊆ Stab (K^162) A by
-    rw [subset_iff]
-    intro x hx
-    simp [mem_sub] at hx
-    have ⟨y, hy, z, hz, h⟩ := hx
-    rw [subset_iff] at ss
-    have ym : y ∈ Stab (K^162) A := ss hy
-    have zm : z ∈ Stab (K^162) A := ss hz
-    rw [sub_eq_add_neg] at h
-    have nzm : -z ∈ Stab ((K^162)^3) A := Stab_neg A zm
-    have ym : y ∈ Stab ((K^162)^3) A := mem_Stab_le A ym (by
-      apply le_self_pow
-      apply one_le_of_mem A (by assumption) ym
-      norm_num
-    )
-    rw [← h]
-    apply Stab_add <;> assumption
-  have : 3 • (Stab K A)^2 = (Stab K A)^2 + (Stab K A)^2 + (Stab K A)^2 := by abel
-  rw [this]
-  have : (((K^2)^9)^9) = (K^162) := by simp [← pow_mul]
-  rw [← this]
-  suffices ss : (Stab K A)^2 ⊆ Stab (K^2) A by
-    rw [subset_iff]
-    intro x hx
-    simp [mem_add] at hx
-    have ⟨a, ha, b, hb, c, hc, h⟩ := hx
-    rw [subset_iff] at ss
-    apply ss at ha
-    apply ss at hb
-    apply ss at hc
-    have a1m : a + b ∈ Stab ((K^2)^9) A := Stab_add A ha hb
-    have m2 : c ∈ Stab ((K^2)^9) A := mem_Stab_le A hc (by
-      apply le_self_pow
-      apply one_le_of_mem A (by assumption) hc
-      norm_num
-    )
-    have : (a + b) + c ∈ Stab (((K^2)^9)^9) A := Stab_add A a1m m2
-    rw [← h]
-    exact this
-  rw [sq]
+lemma Stab_le (h₂ : K ≤ K₂) : (Stab K A) ⊆ (Stab K₂ A) := by
   rw [subset_iff]
   intro x hx
-  simp [mem_mul] at hx
-  have ⟨a, ha, b, hb, h⟩ := hx
-  rw [← h]
-  apply Stab_mul <;> assumption
+  apply Stab_le'
+  exact hx
+  exact h₂
+
+lemma Stab_le₂ (h₂ : 1 ≤ K → K ≤ K₂) : (Stab K A) ⊆ (Stab K₂ A) := by
+  by_cases A.Nonempty
+  · rw [subset_iff]
+    intro x hx
+    apply Stab_le'
+    exact hx
+    apply h₂
+    apply one_le_of_mem A
+    assumption
+    exact hx
   · simp_all [Stab]
 
+lemma Stab_add : (Stab K₁ A) + (Stab K₂ A) ⊆ (Stab (K₁^8 * K₂) A) := by
+  rw [subset_iff]
+  intro x hx
+  rw [mem_add] at hx
+  have ⟨a, ha, b, hb, h⟩ := hx
+  rw [← h]
+  apply Stab_add' <;> assumption
+
+lemma Stab_neg : -(Stab K A) ⊆ (Stab (K^3) A) := by
+  rw [subset_iff]
+  intro x hx
+  rw [mem_neg] at hx
+  have ⟨y, hy, h⟩ := hx
+  rw [← h]
+  apply Stab_neg'
+  assumption
+
+lemma Stab_sub : (Stab K₁ A) - (Stab K₂ A) ⊆ (Stab (K₁^8 * K₂^3) A) := calc
+  (Stab K₁ A) - (Stab K₂ A) = (Stab K₁ A) + (-(Stab K₂ A)) := by rw [sub_eq_add_neg]
+  _ ⊆ (Stab K₁ A) + (Stab (K₂^3) A) := by apply add_subset_add_left; apply Stab_neg
+  _ ⊆ Stab (K₁^8 * K₂^3) A := by apply Stab_add
+
+lemma Stab_mul : (Stab K₁ A) * (Stab K₂ A) ⊆ (Stab (K₁ * K₂) A) := by
+  rw [subset_iff]
+  intro x hx
+  rw [mem_mul] at hx
+  have ⟨a, ha, b, hb, h⟩ := hx
+  rw [← h]
+  apply Stab_mul' <;> assumption
+
+lemma Stab_nsmul (n : ℕ) : (n+1) • (Stab K A) ⊆ (Stab (K ^ (8*n + 1)) A) := by
+  induction n
+  · simp
+  · rename_i n hn
+    calc
+      (n.succ + 1) • (Stab K A) = n.succ • (Stab K A) + (Stab K A) := by rw [add_nsmul]; simp
+      _ ⊆ (Stab (K ^ (8*n + 1)) A) + (Stab K A) := by apply add_subset_add_right; assumption
+      _ = (Stab K A) + (Stab (K ^ (8*n + 1)) A) := by abel
+      _ ⊆ (Stab (K^8 * (K ^ (8*n + 1))) A) := by apply Stab_add
+      _ = (Stab (K ^ (8*n.succ + 1)) A) := by congr 1; rw [← pow_add]; congr 1; rw [Nat.succ_eq_add_one]; ring
+
+lemma Stab_subset : 3 • (Stab K A)^2 - 3 • (Stab K A)^2 ⊆ Stab (K^374) A := by
+  suffices 3 • (Stab K A)^2 ⊆ Stab (K^34) A by
+    calc 3 • (Stab K A)^2 - 3 • (Stab K A)^2
+      _ ⊆ (Stab (K^34) A) - (Stab (K^34) A) := by apply sub_subset_sub <;> exact this
+      _ ⊆ Stab ((K^34)^8 * (K^34)^3) A := by apply Stab_sub
+      _ = Stab (K^374) A := by simp [← pow_mul, ← pow_add]
+  calc 3 • (Stab K A)^2
+    _ ⊆ 3 • (Stab (K^2) A) := by
+      apply nsmul_subset_nsmul
+      rw [sq, sq]
+      apply Stab_mul
+    _ ⊆ (Stab ((K^2)^(8*2+1)) A) := Stab_nsmul ..
+    _ = Stab (K^34) A := by rw [← pow_mul]
+
 lemma Stab_card_inc (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) :
-    (min ((Stab K A).card^2) p / 2 : ℚ) ≤ (Stab (K^4374) A).card := by
+    (min ((Stab K A).card^2) p / 2 : ℚ) ≤ (Stab (K^374) A).card := by
   have := Stab_subset A (K := K)
   have := card_le_card this
   suffices (min ((Stab K A).card^2) p / 2 : ℚ) ≤ (3 • (Stab K A)^2 - 3 • (Stab K A)^2).card by
@@ -197,7 +204,7 @@ lemma Stab_card_inc (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) :
   apply GUS
 
 lemma Stab_card_inc' (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) (h : 4 ≤ (Stab K A).card) :
-    (min ((Stab K A).card^(3/2 : ℝ)) (p / 2) : ℝ) ≤ (Stab (K^4374) A).card := by
+    (min ((Stab K A).card^(3/2 : ℝ)) (p / 2) : ℝ) ≤ (Stab (K^374) A).card := by
   have := Stab_card_inc (K := K) p A
   rify at this
   refine' LE.le.trans _ this
@@ -223,23 +230,18 @@ lemma Stab_card_inc' (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) (h : 4 ≤
 
 
 lemma Stab_card_inc_rep (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) (h : 4 ≤ (Stab K A).card) (n : ℕ):
-    (min ((Stab K A).card^((3/2 : ℝ)^n)) (p / 2) : ℝ) ≤ (Stab (K^4374^n) A).card := by
-  by_cases A.Nonempty
+    (min ((Stab K A).card^((3/2 : ℝ)^n)) (p / 2) : ℝ) ≤ (Stab (K^374^n) A).card := by
   induction n
   · simp
   · rename_i n hn
-    have : 4 ≤ (Stab (K^4374^n) A).card := by
+    have : 4 ≤ (Stab (K^374^n) A).card := by
       refine' h.trans _
       gcongr
-      rw [subset_iff]
-      intro x hx
-      apply mem_Stab_le A hx
-      apply le_self_pow
-      apply one_le_of_mem A
-      assumption
-      exact hx
+      apply Stab_le₂
+      intro h
+      apply le_self_pow h
       simp
-    have := Stab_card_inc' (K := (K^4374^n)) p A this
+    have := Stab_card_inc' (K := (K^374^n)) p A this
     rw [← pow_mul, ← pow_succ'] at this
     refine' LE.le.trans _ this
     simp [-div_pow]
@@ -261,25 +263,20 @@ lemma Stab_card_inc_rep (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) (h : 4 
       simp
       omega
       norm_num
-  · simp_all [Stab]
-    right
-    rw [card_univ]
-    simp
 
 
 lemma Stab_full' (p : ℕ) [inst : Fact (p.Prime)] (A : Finset (ZMod p)) (β : ℝ) (βpos : 0 < β) (h : 4 ≤ (Stab K A).card) (h₂ : (p ^ β : ℝ) ≤ (Stab K A).card) :
     (p/2 : ℝ) ≤ (Stab (K ^ full_C₂ β) A).card := by
   let n := ⌈Real.logb (3/2 : ℝ) (1 / β)⌉₊
   simp only [full_C₂]
-  change (p/2 : ℝ) ≤ (Stab (K ^ 4374^n) A).card
+  change (p/2 : ℝ) ≤ (Stab (K ^ 374^n) A).card
   have := Stab_card_inc_rep (K := K) p A h n
   refine' LE.le.trans _ this
   simp only [le_min_iff, le_refl, and_true]
   have : (p / 2 : ℝ) ≤ p := by simp
   refine' this.trans _
-  -- apply_fun (fun x:ℝ => x^(3/2 : ℝ)^n) at h₂
-  -- TODO: replace by correct
-  simp only at h₂
+  have h₂ : ((p ^ β) ^ (3/2: ℝ)^n : ℝ) ≤ (Stab K A).card ^ (3/2: ℝ)^n := by
+    gcongr
   refine' LE.le.trans _ h₂
   conv =>
     lhs
@@ -289,6 +286,63 @@ lemma Stab_full' (p : ℕ) [inst : Fact (p.Prime)] (A : Finset (ZMod p)) (β : �
   have := inst.out.one_le
   simp [this]
   simp only [n]
+  calc
+    1 = β * (3/2) ^ (Real.logb (3/2 : ℝ) (1 / β)) := by
+      rw [Real.rpow_logb]
+      simp
+      rw [mul_inv_cancel]
+      positivity
+      norm_num
+      norm_num
+      positivity
+    _ ≤ β * (3/2) ^ (n : ℝ) := by
+      gcongr
+      norm_num
+      simp only [n]
+      apply Nat.le_ceil
+    _ = β * (3/2) ^ n := by simp [Real.rpow_nat_cast]
+  simp
 
-  sorry
-  sorry
+lemma Stab_full (p : ℕ) [inst : Fact (p.Prime)] (A : Finset (ZMod p)) (β : ℝ) (βpos : 0 < β) (h : 4 ≤ (Stab K A).card) (h₂ : (p ^ β : ℝ) ≤ (Stab K A).card) :
+    (Stab (K ^ full_C β) A) = univ := by
+  have := Stab_full' p A β βpos h h₂
+  rw [← Nat.ceil_le] at this
+  have card_bound : (Stab K A).card ≤ univ.card := by gcongr; simp
+  simp only [card_univ, ZMod.card] at card_bound
+  have ⟨pd, hp⟩ : Odd p := inst.out.odd_of_ne_two (by omega)
+  have t2 : ⌈(p / 2 : ℝ)⌉₊ = pd + 1 := calc
+    ⌈(p / 2 : ℝ)⌉₊ = ⌈((2*pd + 1) / 2 : ℝ)⌉₊ := by rw [hp]; congr; norm_cast
+    _ = ⌈pd + (1 / 2 : ℝ)⌉₊ := by congr; field_simp; ring
+    _ = pd + 1 := by
+      apply le_antisymm
+      · norm_num
+      · by_contra! nh
+        rw [Nat.lt_add_one_iff] at nh
+        simp only [one_div, Nat.ceil_le, add_le_iff_nonpos_right, inv_nonpos] at nh
+        linarith
+  rw [t2] at this
+  apply eq_of_subset_of_card_le
+  simp
+  simp only [card_univ, ZMod.card]
+  calc
+     p ≤ min p ((Stab (K ^ full_C₂ β) A).card + (Stab (K ^ full_C₂ β) A).card - 1) := by
+      simp only [le_min_iff, le_refl, true_and]
+      omega
+     _ ≤ ((Stab (K ^ full_C₂ β) A) + (Stab (K ^ full_C₂ β) A)).card := by
+      apply ZMod.min_le_card_add
+      exact inst.1
+      repeat {
+      rw [← card_pos]
+      have : (Stab K A).card ≤ (Stab (K ^ full_C₂ β) A).card := by
+        gcongr
+        apply Stab_le₂
+        intro h
+        apply le_self_pow h
+        simp [full_C₂]
+      linarith
+      }
+     _ ≤ (Stab (K ^ full_C β) A).card := by
+      gcongr
+      convert Stab_add (K₁ := (K ^ full_C₂ β)) (K₂ := (K ^ full_C₂ β)) A
+      simp [full_C, ← pow_mul, ← pow_add]
+      rfl
