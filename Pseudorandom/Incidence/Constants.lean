@@ -19,7 +19,7 @@ noncomputable def ST_prime_field_eps₄ (α : ℝ) : ℝ := 12/13 * (SG_eps α)
 noncomputable def ST_prime_field_eps₃ (α : ℝ) : ℝ := (ST_prime_field_eps₄ α) / 4
 noncomputable def ST_prime_field_eps₂ (α : ℝ) : ℝ := (ST_prime_field_eps₃ α) / 3
 noncomputable def ST_prime_field_eps (α : ℝ) : ℝ := (ST_prime_field_eps₂ α) / 3
-noncomputable def SG_epsᵥ (α : ℝ) : ℝ := SG_eps₂ α + SG_eps α + 4 * ST_prime_field_eps₂ α
+-- noncomputable def SG_epsᵥ (α : ℝ) : ℝ := SG_eps₂ α + SG_eps α + 4 * ST_prime_field_eps₂ α
 
 lemma pos_ST_prime_field_eps₂ (α : ℝ) (h : 0 < α) : 0 < ST_prime_field_eps₂ α := sorry
 

@@ -194,7 +194,9 @@ lemma Stab_subset : 3 • (Stab K A)^2 - 3 • (Stab K A)^2 ⊆ Stab (K^374) A :
     _ ⊆ (Stab ((K^2)^(8*2+1)) A) := Stab_nsmul ..
     _ = Stab (K^34) A := by rw [← pow_mul]
 
-lemma Stab_card_inc (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) :
+variable (K : ℚ) (p : ℕ) [inst : Fact (p.Prime)] (A : Finset (ZMod p)) (β γ : ℝ)
+
+lemma Stab_card_inc :
     (min ((Stab K A).card^2) p / 2 : ℚ) ≤ (Stab (K^374) A).card := by
   have := Stab_subset A (K := K)
   have := card_le_card this
@@ -229,7 +231,7 @@ lemma Stab_card_inc' (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) (h : 4 ≤
   norm_num
 
 
-lemma Stab_card_inc_rep (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) (h : 4 ≤ (Stab K A).card) (n : ℕ):
+lemma Stab_card_inc_rep (h : 4 ≤ (Stab K A).card) (n : ℕ):
     (min ((Stab K A).card^((3/2 : ℝ)^n)) (p / 2) : ℝ) ≤ (Stab (K^374^n) A).card := by
   induction n
   · simp
@@ -265,7 +267,7 @@ lemma Stab_card_inc_rep (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) (h : 4 
       norm_num
 
 
-lemma Stab_full' (p : ℕ) [inst : Fact (p.Prime)] (A : Finset (ZMod p)) (β : ℝ) (βpos : 0 < β) (h : 4 ≤ (Stab K A).card) (h₂ : (p ^ β : ℝ) ≤ (Stab K A).card) :
+lemma Stab_full' (βpos : 0 < β) (h : 4 ≤ (Stab K A).card) (h₂ : (p ^ β : ℝ) ≤ (Stab K A).card) :
     (p/2 : ℝ) ≤ (Stab (K ^ full_C₂ β) A).card := by
   let n := ⌈Real.logb (3/2 : ℝ) (1 / β)⌉₊
   simp only [full_C₂]
@@ -303,9 +305,9 @@ lemma Stab_full' (p : ℕ) [inst : Fact (p.Prime)] (A : Finset (ZMod p)) (β : �
     _ = β * (3/2) ^ n := by simp [Real.rpow_nat_cast]
   simp
 
-lemma Stab_full (p : ℕ) [inst : Fact (p.Prime)] (A : Finset (ZMod p)) (β : ℝ) (βpos : 0 < β) (h : 4 ≤ (Stab K A).card) (h₂ : (p ^ β : ℝ) ≤ (Stab K A).card) :
+lemma Stab_full (βpos : 0 < β) (h : 4 ≤ (Stab K A).card) (h₂ : (p ^ β : ℝ) ≤ (Stab K A).card) :
     (Stab (K ^ full_C β) A) = univ := by
-  have := Stab_full' p A β βpos h h₂
+  have := Stab_full' _ p A β βpos h h₂
   rw [← Nat.ceil_le] at this
   have card_bound : (Stab K A).card ≤ univ.card := by gcongr; simp
   simp only [card_univ, ZMod.card] at card_bound
@@ -346,3 +348,39 @@ lemma Stab_full (p : ℕ) [inst : Fact (p.Prime)] (A : Finset (ZMod p)) (β : �
       convert Stab_add (K₁ := (K ^ full_C₂ β)) (K₂ := (K ^ full_C₂ β)) A
       simp [full_C, ← pow_mul, ← pow_add]
       rfl
+
+lemma Stab_no_full (A : Finset α)
+    (h : ((Fintype.card α) ^ β : ℝ) ≤ A.card) (h₂ : A.card ≤ ((Fintype.card α) ^ (1-β) : ℝ)) (h₃ : K < ((Fintype.card α)^β / 2 : ℝ)) :
+    (Stab K A) ≠ univ := by
+  have ⟨a, _, ha2⟩ := exists_grower A
+  apply_fun (a ∈ ·)
+  simp only [Stab, filter_congr_decidable, mem_filter, mem_univ, true_and, ne_eq, eq_iff_iff,
+    iff_true, not_le]
+  refine' LT.lt.trans_le _ ha2
+  rify
+  have : (K * A.card : ℝ) < (Fintype.card α^β / 2) * A.card := by
+    gcongr
+    calc
+      (0 : ℝ) < (Fintype.card α)^β := by positivity
+      _ ≤ A.card := by assumption
+  refine' LT.lt.trans_le this _
+  simp only [Nat.cast_min, Nat.cast_pow, ge_iff_le, Nat.ofNat_nonneg, ← min_div_div_right,
+    le_min_iff]
+  constructor
+  · calc ((Fintype.card α^β / 2) * A.card : ℝ)
+      _ ≤ (A.card / 2) * A.card := by gcongr
+      _ = A.card^2/2 := by ring
+  · calc ((Fintype.card α^β / 2) * A.card : ℝ)
+      _ ≤ (Fintype.card α^β / 2) * (Fintype.card α) ^ (1-β) := by gcongr
+      _ = Fintype.card α^(β + (1-β)) / 2 := by rw [rpow_add]; ring; positivity
+      _ = Fintype.card α / 2 := by simp
+
+lemma Stab_small (β : ℝ) (βpos : 0 < β) (h : 4 ≤ (Stab K A).card) (h₂ : (p ^ β : ℝ) ≤ (Stab K A).card)
+  (γ : ℝ) (h₃ : (p ^ γ : ℝ) ≤ A.card) (h₄ : A.card ≤ (p ^ (1-γ) : ℝ)) :
+  (p^γ / 2 : ℝ) ≤ (K ^ full_C β) := by
+  by_contra! nh
+  absurd Stab_full K p A β βpos h h₂
+  apply Stab_no_full (β := γ)
+  simp [h₃]
+  simp [h₄]
+  simp [nh]

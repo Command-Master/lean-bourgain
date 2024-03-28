@@ -16,10 +16,13 @@ import Pseudorandom.Additive.Main
 import Pseudorandom.Geometry.Lines
 import Pseudorandom.Incidence.Constants
 import Pseudorandom.Incidence.Claim342_grid
+set_option autoImplicit false
 
-open Classical Real BigOps Finset Pointwise
+open Real BigOps Finset Pointwise
 
-variable {α : Type} [Field α] [Fintype α] {p : ℕ} [Fact p.Prime] [Fact (α = ZMod p)]
+variable {p : ℕ} [Fact p.Prime]
+
+local notation "α" => (ZMod p)
 
 set_option maxHeartbeats 500000
 
@@ -322,7 +325,7 @@ theorem ST_grid_aux (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line 
   (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ)) (h₂ : L.card ≤ n)
   (hC : ∀ l ∈ L, (n ^ (1/2 - SG_eps β) : ℝ) < (IntersectionsP (A ×ˢ B) l).card)
   :
-  (Intersections (A ×ˢ B) L).card ≤ (SG_C₂ * n ^ (3/2 - SG_eps β) : ℝ) := by
+  (Intersections (A ×ˢ B) L).card ≤ (SG_C₂ * n ^ (3/2 - SG_eps β) : ℝ) := by classical
   calc ((Intersections (A ×ˢ B) L).card : ℝ)
     _ = ∑ l ∈ L, (IntersectionsP (A ×ˢ B) l).card := by norm_cast; apply IntersectionsP_sum
     _ = ∑ l ∈ L.filter (fun l => l.horiz), (IntersectionsP (A ×ˢ B) l).card +

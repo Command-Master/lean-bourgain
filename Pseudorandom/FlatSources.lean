@@ -320,9 +320,7 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
   termination_by
     measure_complexity a l
 
-#print split_to_flat_sources
-
-example (a b : ℕ) : ℕ := a - b
+#check split_to_flat_sources
 
 theorem extractor_suffices_flat_sources [DecidableEq α] [DecidableEq β] [Nonempty β] [Fintype β] [Fintype γ] [Nonempty γ]
   (f : (α × β) → γ) (k : ℕ+) (ε : ℝ)

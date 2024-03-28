@@ -6,12 +6,13 @@ import LeanAPAP.Prereqs.Expect.Basic
 open Classical Real Finset BigOps
 
 variable
-   {α : Type u1} [Nonempty α] [Fintype α] [AddCommGroup α]
+   {α : Type*} [Nonempty α] [Fintype α] [AddCommGroup α]
+   {β : Type*} [Nonempty β] [Fintype β] [AddCommGroup β]
    (a b : FinPMF α)
 
 open scoped NNReal
 
--- Note: their DFT isn't normalized.
+-- The DFT isn't normalized.
 
 theorem XOR_lemma' (ε : ℝ≥0) (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖dft (a ·) χ‖ ≤ ε) :
   ∑ x : α, (a x - (Fintype.card α : ℝ)⁻¹)^2 ≤ (ε : ℝ)^2 := by
