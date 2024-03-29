@@ -55,6 +55,11 @@ lemma card_of_inv (a : α) (h : a ≠ 0) : (a • A).card = A.card := by
     simp
     assumption
 
+
+lemma neg_inter_distrib : (-A ∩ -B) = -(A ∩ B) := by
+  ext x
+  simp
+
 lemma add_smul_subset_smul_add_smul (a b : α) : (a + b) • A ⊆ a • A + b • A := by
   rw [subset_iff]
   intro x hx
