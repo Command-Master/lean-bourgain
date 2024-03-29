@@ -8,14 +8,14 @@ variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
 
 open NNRat Real BigOps Finset Pointwise
 
-noncomputable def Stab (K : ℚ) (A : Finset α) := (univ : Finset α).filter fun a => (A + a • A).card ≤ K * A.card
+noncomputable def Stab (K : ℝ) (A : Finset α) := (univ : Finset α).filter fun a => (A + a • A).card ≤ K * A.card
 
 lemma Stab_inv' (h : a ∈ Stab K A) : 1/a ∈ Stab K A := by
   by_cases a = 0
   · simp_all
   simp [Stab] at h
   simp [Stab]
-  calc ((A + a⁻¹ • A).card : ℚ)
+  calc ((A + a⁻¹ • A).card : ℝ)
     _ = (a • (A + a⁻¹ • A)).card := by rwa [card_of_inv]
     _ = (a • A + a • a⁻¹ • A).card := by simp
     _ = (a • A + (a • a⁻¹) • A).card := by rw [smul_assoc]
@@ -28,7 +28,7 @@ lemma one_le_of_mem (hA : A.Nonempty) (h : a ∈ Stab K A) : 1 ≤ K := by
   by_contra! nh
   simp [Stab] at h
   have := calc
-    (A.card : ℚ) ≤ (A + a • A).card := by
+    (A.card : ℝ) ≤ (A + a • A).card := by
       norm_cast
       apply card_le_card_add_right
       simp [hA]
@@ -51,8 +51,11 @@ lemma Stab_neg' (h : a ∈ Stab K A) : -a ∈ Stab (K^3) A := by
     _ = K^3 * A.card := by ring
   simp [Stab] at *
   rw [← sub_eq_add_neg]
-  calc ((A - a • A).card : ℚ)
-    _ ≤ (A + a • A).card^3 / (A.card * (a • A).card) := sub_le_add ..
+  calc ((A - a • A).card : ℝ)
+    _ ≤ (A + a • A).card^3 / (A.card * (a • A).card) := by
+      have := sub_le_add A (a • A)
+      rify at this
+      exact this
     _ ≤ (K * A.card)^3 / (A.card * (a • A).card) := by gcongr
     _ = (K * A.card)^3 / (A.card * A.card) := by rwa [card_of_inv]
     _ = K^3 * A.card := by field_simp; ring
@@ -63,14 +66,16 @@ lemma Stab_add' (h₁ : a ∈ Stab K₁ A) (h₂ : b ∈ Stab K₂ A) : a + b �
   have : 1 ≤ K₂ := one_le_of_mem A (by assumption) h₂
   by_cases a ≠ 0
   simp_all only [Stab, mem_filter, mem_univ, true_and, ne_eq, ge_iff_le]
-  calc ((A + (a + b) • A).card : ℚ)
+  calc ((A + (a + b) • A).card : ℝ)
     _ ≤ (A + (a • A + b • A)).card := by
       gcongr
       apply add_subset_add_left (s := A)
       apply add_smul_subset_smul_add_smul
     _ = (A + a • A + b • A).card := by abel_nf
     _ ≤ (b • A + A).card * (A + a • A).card^8 / (A.card^6 * (a • A).card^2) := by
-      apply triple_add
+      have := triple_add A (a • A) (b • A)
+      rify at this
+      exact this
     _ = (A + b • A).card * (A + a • A).card^8 / (A.card^6 * A.card^2) := by
       congr 4
       abel
@@ -94,7 +99,7 @@ lemma Stab_mul' (h₁ : a ∈ Stab K₁ A) (h₂ : b ∈ Stab K₂ A) : a * b �
   by_cases h : a ≠ 0
   apply Stab_inv' at h₁
   simp_all [Stab]
-  calc ((A + (a * b) • A).card : ℚ)
+  calc ((A + (a * b) • A).card : ℝ)
     _ = (a⁻¹ • (A + (a * b) • A)).card := by rw [card_of_inv]; simp [h]
     _ = (a⁻¹ • A + a⁻¹ • (a * b) • A).card := by simp
     _ = (a⁻¹ • A + (a⁻¹ • (a * b)) • A).card := by rw [smul_assoc]
@@ -108,7 +113,7 @@ lemma Stab_mul' (h₁ : a ∈ Stab K₁ A) (h₂ : b ∈ Stab K₂ A) : a * b �
     _ ≤ ((K₁ * A.card) * (K₂ * A.card)) / A.card := by gcongr
     _ = K₁ * K₂ * A.card := by field_simp; ring
   · simp_all [Stab]
-    calc (A.card : ℚ)
+    calc (A.card : ℝ)
       _ ≤ K₁ * A.card := by assumption
       _ = (1*K₁) * A.card := by ring
       _ ≤ (K₂*K₁) * A.card := by gcongr;
@@ -194,7 +199,7 @@ lemma Stab_subset : 3 • (Stab K A)^2 - 3 • (Stab K A)^2 ⊆ Stab (K^374) A :
     _ ⊆ (Stab ((K^2)^(8*2+1)) A) := Stab_nsmul ..
     _ = Stab (K^34) A := by rw [← pow_mul]
 
-variable (K : ℚ) (p : ℕ) [inst : Fact (p.Prime)] (A : Finset (ZMod p)) (β γ : ℝ)
+variable (K : ℝ) (p : ℕ) [inst : Fact (p.Prime)] (A : Finset (ZMod p)) (β γ : ℝ)
 
 lemma Stab_card_inc :
     (min ((Stab K A).card^2) p / 2 : ℚ) ≤ (Stab (K^374) A).card := by
@@ -353,11 +358,11 @@ lemma Stab_no_full (A : Finset α)
     (h : ((Fintype.card α) ^ β : ℝ) ≤ A.card) (h₂ : A.card ≤ ((Fintype.card α) ^ (1-β) : ℝ)) (h₃ : K < ((Fintype.card α)^β / 2 : ℝ)) :
     (Stab K A) ≠ univ := by
   have ⟨a, _, ha2⟩ := exists_grower A
+  rify at ha2
   apply_fun (a ∈ ·)
   simp only [Stab, filter_congr_decidable, mem_filter, mem_univ, true_and, ne_eq, eq_iff_iff,
     iff_true, not_le]
   refine' LT.lt.trans_le _ ha2
-  rify
   have : (K * A.card : ℝ) < (Fintype.card α^β / 2) * A.card := by
     gcongr
     calc

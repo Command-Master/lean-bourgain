@@ -21,7 +21,7 @@ open NNRat Classical Real BigOps Finset Pointwise
 variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
   (A B C : Finset α)
 
-lemma sub_le_add : (A - B).card ≤ ((A + B).card^3 / (A.card * B.card) : ℚ≥0) := by
+lemma sub_le_add : (A - B).card ≤ ((A + B).card^3 / (A.card * B.card) : ℚ) := by
   by_cases A.Nonempty
   by_cases B.card ≠ 0
   calc ((A - B).card : ℚ≥0)
@@ -73,7 +73,7 @@ lemma sub_smul_subset_smul_sub_smul (a b : α) : (a - b) • A ⊆ a • A - b �
   rw [← hx]
   simp only [sub_mem_sub, smul_mem_smul_finset, hy]
 
-lemma add_of_large_intersection (h : (A ∩ C).Nonempty) : (B+C).card ≤ ((B + A).card * (C+C).card / (A ∩ C).card : ℚ≥0) := by
+lemma add_of_large_intersection (h : (A ∩ C).Nonempty) : (B+C).card ≤ ((B + A).card * (C+C).card / (A ∩ C).card : ℚ) := by
   calc
     ((B+C).card : ℚ≥0) = (B+C).card * (A ∩ C).card / (A ∩ C).card := by field_simp
     _ ≤ ((B + (A ∩ C)).card * ((A ∩ C) + C).card) / (A ∩ C).card := by
@@ -88,7 +88,7 @@ lemma add_of_large_intersection (h : (A ∩ C).Nonempty) : (B+C).card ≤ ((B + 
       apply inter_subset_right
 
 lemma triple_add :
-    (A + B + C).card ≤ ((C + A).card * (A+B).card^8 / (A.card^6 * B.card^2) : ℚ≥0) := by
+    (A + B + C).card ≤ ((C + A).card * (A+B).card^8 / (A.card^6 * B.card^2) : ℚ) := by
   by_cases hA : A.Nonempty
   by_cases hB : B.Nonempty
   have ⟨u, hu1, hu2⟩ := exists_subset_add_sub A hB
