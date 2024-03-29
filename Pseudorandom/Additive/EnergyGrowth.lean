@@ -104,36 +104,40 @@ theorem Theorem335 (h : ∀ x ∈ T, K⁻¹ * A.card^3 ≤ E[A, x • A]) :
     T' ⊆ Stab (K ^ C3353) A' := by
   by_cases ane : A.Nonempty
   by_cases tne : T.Nonempty
-  have t1 : ∀ x ∈ T, ∃ A' ⊆ A, ∃ B' ⊆ (x • A),
-    (2 ^ 4)⁻¹ * K⁻¹ * A.card ≤ A'.card ∧
-    (2 ^ 4)⁻¹ * K⁻¹ * A.card ≤ B'.card ∧
-    (A' - B').card ≤ 2^10 * K^5 * (x • A).card^4 / A.card^3 := by
-    intro x hx
-    apply BSG₂
-    linarith
-    simp [ane]
-    convert h x hx
-    rw [card_of_inv]
-    ring
-    intro v
-    rw [v] at hx
-    contradiction
+  -- have t1 : ∀ x ∈ T, ∃ A' ⊆ A, ∃ B' ⊆ (x • A),
+  --   (2 ^ 4)⁻¹ * K⁻¹ * A.card ≤ A'.card ∧
+  --   (2 ^ 4)⁻¹ * K⁻¹ * A.card ≤ B'.card ∧
+  --   (A' - B').card ≤ 2^10 * K^5 * (x • A).card^4 / A.card^3 := by
+  --   intro x hx
+  --   apply BSG₂
+  --   linarith
+  --   simp [ane]
+  --   convert h x hx
+  --   rw [card_of_inv]
+  --   ring
+  --   intro v
+  --   rw [v] at hx
+  --   contradiction
   have t2 : ∀ x ∈ T, ∃ A' ⊆ A, ∃ B' ⊆ A,
     (2 ^ 4)⁻¹ * K⁻¹ * A.card ≤ A'.card ∧
     (2 ^ 4)⁻¹ * K⁻¹ * A.card ≤ B'.card ∧
-    (A' - x • B').card ≤ 2^10 * K^5 * (x • A).card^4 / A.card^3 := by
-    intro x hx
-    have ⟨A', ha, B', hb, h⟩ := t1 x hx
-    have : x ≠ 0 := fun v => h' (v ▸ hx)
-    exists A', ha, x⁻¹ • B'
-    simp only [← smul_assoc, smul_eq_mul, ne_eq, this, not_false_eq_true, mul_inv_cancel, one_smul]
-    constructor
-    · convert smul_finset_subset_smul_finset hb (a := x⁻¹)
-      simp [← smul_assoc, this]
-    · convert h using 4
-      apply card_of_inv
-      simp [this]
-  clear t1
+    (A' - x • B').card ≤ 2^10 * K^5 * A.card := by
+    sorry
+    -- intro x hx
+    -- have ⟨A', ha, B', hb, h⟩ := t1 x hx
+    -- have : x ≠ 0 := fun v => h' (v ▸ hx)
+    -- exists A', ha, x⁻¹ • B'
+    -- simp only [← smul_assoc, smul_eq_mul, ne_eq, this, not_false_eq_true, mul_inv_cancel, one_smul]
+    -- constructor
+    -- · convert smul_finset_subset_smul_finset hb (a := x⁻¹)
+    --   simp [← smul_assoc, this]
+    -- · rw [card_of_inv] at h
+    --   rw [card_of_inv]
+    --   convert h using 3
+    --   field_simp; ring
+    --   simp [this]
+    --   exact this
+  -- clear t1
   let f (x : ZMod p) := if h : x ∈ T then (t2 x h).choose ×ˢ (t2 x h).choose_spec.2.choose else ∅
   have ⟨s, hs, hs₂⟩ := claim336 T tne f (A ×ˢ A) (by simp [ane]) (((2^4)⁻¹ * K⁻¹)^2) (by positivity) (fun v hv => by
     simp only [f, hv, dite_true]
@@ -161,11 +165,56 @@ theorem Theorem335 (h : ∀ x ∈ T, K⁻¹ * A.card^3 ≤ E[A, x • A]) :
     apply card_of_inv
     simp [this]
   · rw [subset_iff]
-    intro v hv
+    intro v' hv'
+    rw [mem_smul_finset] at hv'
+    have ⟨v, hv', h'⟩ := hv'
+    simp only [filter_congr_decidable, card_product, Nat.cast_mul, mem_filter, T'] at hv'
+    have ⟨hv, h⟩ := hv'
+    rw [← h']
     simp only [Stab, filter_congr_decidable, mem_filter, mem_univ, true_and]
+
+    let X₁ := (t2 s hs).choose
+    let Y₁ := (t2 s hs).choose_spec.2.choose
+    let X₂ := (t2 v hv).choose
+    let Y₂ := (t2 v hv).choose_spec.2.choose
+
+    change (Y₁ + (s⁻¹ • v) • Y₁).card ≤ K ^ C3353 * Y₁.card
+
+    unfold_let f at h
+
+    simp [hv, hs] at h
+
+    change (((2 ^ 4)⁻¹ * K⁻¹) ^ 2) ^ 2 / 2 * (A.card * A.card) ≤ (X₂ ×ˢ Y₂ ∩ X₁ ×ˢ Y₁).card at h
+
+    simp [product_inter_product] at h
+
+
+    -- Define X₁ = (t2 s hs).choose
+    -- Define Y₁ = (t2 s hs).choose_spec.2.choose
+    -- Define X₂ = (t2 v hv).choose
+    -- Define Y₂ = (t2 v hv).choose_spec.2.choose
+
+    -- Show X₁ ∩ X₂ is large
+    -- Show Y₁ ∩ Y₂ is large
+
+    -- (s • X₁ + v • X₁).card
+    -- (s • X₁ + v • X₂).card * small
+    -- We have (v • X₂ - Y₂).card is small
+    -- Want to show (s • X₁ + v • X₂).card ≤ (s • X₁ - Y₂).card * small
+    -- (s • X₁ + v • X₂).card * Y₂.card ≤
+    --   (s • X₁ - Y₂).card * (v • X₂ - Y₂).card
+    -- card_add_mul_card_le_card_sub_mul_card_sub
+    -- (s • X₁ - Y₂).card * small * small
+    -- (s • X₁ - Y₁).card * small * small * small
+    --              small * small * small * small
+
     sorry
-
-
+    -- calc ((A' + (s⁻¹ • v) • A').card : ℝ)
+    --   _ = (s • (A' + (s⁻¹ • v) • A')).card := by rw [card_of_inv _ s this]
+    --   _ = (s • A' + (s • (s⁻¹ • v)) • A').card := by rw [smul_add, ← smul_assoc]
+    --   _ = (s • A' + v • A').card := by congr 4; simp [this]
+    --   _ ≤ (s • A' + )
+      -- _ ≤ K^C3353 * A'.card := sorry
   · exists A, ?_, 1, ∅
     simp_all only [not_nonempty_iff_eq_empty, one_smul, Subset.refl, card_empty, CharP.cast_eq_zero,
       mul_zero, le_refl, empty_subset, and_self, and_true, true_and, not_mem_empty,
