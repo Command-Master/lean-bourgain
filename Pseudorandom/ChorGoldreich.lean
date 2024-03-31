@@ -78,7 +78,7 @@ lemma inner_product_sum (n : ℕ)
             have := Fin.exists_fin_two.mp (Exists.intro (y i) rfl)
             simp_all
           clear h'
-          rw [neg_eq_neg_one_mul ((-1) ^ _), ←pow_succ]
+          rw [neg_eq_neg_one_mul ((-1) ^ _), ←pow_succ']
           rw [(_ : 1 = ZMod.val (1 : ZMod 2))]
           conv =>
             rhs

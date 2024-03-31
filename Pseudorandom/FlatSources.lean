@@ -160,10 +160,9 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
       constructor
       · simp only [sum_ite, ← sum_div, sum_sub_distrib, sum_const,
           card_filter_indexOf_lt l vals vnp (by assumption), nsmul_eq_mul, a'', ← add_div]
-        rw [mul_div_cancel_left]
         rw [sub_add_eq_add_sub, sum_filter_add_sum_filter_not]
         field_simp
-        simp
+        ring
       · intro x
         simp [a'']
         split
@@ -177,7 +176,7 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
               apply Nat.le_of_lt_succ
               simp [Nat.succ_eq_add_one]
               assumption
-            _ = l * a vals[l.natPred] / l := by rw [mul_div_cancel_left]; simp
+            _ = l * a vals[l.natPred] / l := by rw [mul_div_cancel_left₀]; simp
             _ ≥ pr / l := by gcongr; simp [pr]
           exact le_of_lt zero_lt_inv_pr
         · apply div_nonneg
@@ -210,7 +209,7 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
           simp [pr]
         _ = (l : ℝ)⁻¹ := by
           simp only [sub_sub_cancel]
-          rw [div_mul_left]
+          rw [div_mul_cancel_right₀]
           simp
           exact ev
     have dec : measure_complexity a' l < measure_complexity a l := by
@@ -230,7 +229,7 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
           simp only [ge_iff_le, h₂, min_eq_left, sub_sub_cancel, pr]
           simp only [← List.getElem_eq_get]
           change a vals[(l : ℕ)] / (l * a vals[(l : ℕ)]) = (l : ℝ)⁻¹
-          rw [div_mul_left]
+          rw [div_mul_cancel_right₀]
           simp
           exact ev
       · exists vals[l.natPred]
@@ -250,7 +249,7 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
           left
           rw [sub_eq_zero]
           simp only [min_def, h₂, ↓reduceIte, pr]
-          rw [mul_div_cancel_left]
+          rw [mul_div_cancel_left₀]
           simp
           rfl
           simp

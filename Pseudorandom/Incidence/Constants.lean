@@ -1,9 +1,10 @@
 import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 
-def SG_C₄ : NNReal := 1
+def SG_C₅ : NNReal := 2^49
+noncomputable def SG_C₄ : NNReal := 4+16*(SG_C₅+2)
 noncomputable def SG_C₃ : NNReal := 4 * NNReal.sqrt (SG_C₄ + 1)
 noncomputable def SG_C₂ : NNReal := SG_C₃ + 16
-noncomputable def SG_V : NNReal := ((SG_C₄ - 4) / 16 - 2)
+-- noncomputable def SG_V : NNReal := ((SG_C₄ - 4) / 16 - 2)
 noncomputable def SG_C :  NNReal := SG_C₂ + 1
 noncomputable def ST_C₇ : NNReal := SG_C
 noncomputable def ST_C₆ : NNReal := ST_C₇ + 2
@@ -70,3 +71,9 @@ lemma lemma7 (β : ℝ) (h : 0 < β) :
 
 lemma lemma8 (β : ℝ) (h : 0 < β) :
   0 ≤ 1 / 2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps₂ β := sorry
+
+lemma lemma9 (β : ℝ) (h : 0 < β) :
+  0 ≤ ST_prime_field_eps₂ β := sorry
+
+lemma lemma10 (β : ℝ) (h : 0 < β) :
+  0 ≤ SG_eps₃ β := sorry

@@ -96,7 +96,7 @@ lemma claim336 [DecidableEq α] (K : Finset β) (hK : K.Nonempty) (f : β → Fi
 end general
 
 -- set_option trace.profiler true
-set_option maxHeartbeats 500000
+set_option maxHeartbeats 2000000
 
 theorem Theorem335 (h : ∀ x ∈ T, K⁻¹ * A.card^3 ≤ E[A, x • A]) :
     ∃ A' ⊆ A,
@@ -104,57 +104,55 @@ theorem Theorem335 (h : ∀ x ∈ T, K⁻¹ * A.card^3 ≤ E[A, x • A]) :
     ∃ T' ⊆ (x • T),
     (2^4)⁻¹ * K⁻¹ * A.card ≤ A'.card ∧
     (2^17)⁻¹ * (K^4 : ℝ)⁻¹ * T.card ≤ T'.card ∧
-    T' ⊆ Stab (K ^ C3353) A' := by
+    T' ⊆ Stab (2^110 * K^42) A' := by
   by_cases ane : A.Nonempty
   by_cases tne : T.Nonempty
-  -- have t1 : ∀ x ∈ T, ∃ A' ⊆ A, ∃ B' ⊆ (x • A),
-  --   (2 ^ 4)⁻¹ * K⁻¹ * A.card ≤ A'.card ∧
-  --   (2 ^ 4)⁻¹ * K⁻¹ * A.card ≤ B'.card ∧
-  --   (A' - B').card ≤ 2^10 * K^5 * (x • A).card^4 / A.card^3 := by
-  --   intro x hx
-  --   apply BSG₂
-  --   linarith
-  --   simp [ane]
-  --   convert h x hx
-  --   rw [card_of_inv]
-  --   ring
-  --   intro v
-  --   rw [v] at hx
-  --   contradiction
+  have t1 : ∀ x ∈ T, ∃ A' ⊆ A, ∃ B' ⊆ (x • A),
+    (2 ^ 4)⁻¹ * K⁻¹ * A.card ≤ A'.card ∧
+    (2 ^ 4)⁻¹ * K⁻¹ * A.card ≤ B'.card ∧
+    (A' - B').card ≤ 2^10 * K^5 * (x • A).card^4 / A.card^3 := by
+    intro x hx
+    apply BSG₂
+    linarith
+    simp [ane]
+    convert h x hx
+    rw [card_of_inv]
+    ring
+    intro v
+    rw [v] at hx
+    contradiction
   have t2 : ∀ x ∈ T, ∃ A' ⊆ A, ∃ B' ⊆ A,
     (2 ^ 4)⁻¹ * K⁻¹ * A.card ≤ A'.card ∧
     (2 ^ 4)⁻¹ * K⁻¹ * A.card ≤ B'.card ∧
     (A' - x • B').card ≤ 2^10 * K^5 * A.card := by
-    sorry
-    -- intro x hx
-    -- have ⟨A', ha, B', hb, h⟩ := t1 x hx
-    -- have : x ≠ 0 := fun v => h' (v ▸ hx)
-    -- exists A', ha, x⁻¹ • B'
-    -- simp only [← smul_assoc, smul_eq_mul, ne_eq, this, not_false_eq_true, mul_inv_cancel, one_smul]
-    -- constructor
-    -- · convert smul_finset_subset_smul_finset hb (a := x⁻¹)
-    --   simp [← smul_assoc, this]
-    -- · rw [card_of_inv] at h
-    --   rw [card_of_inv]
-    --   convert h using 3
-    --   field_simp; ring
-    --   simp [this]
-    --   exact this
-  -- clear t1
+    intro x hx
+    have ⟨A', ha, B', hb, h⟩ := t1 x hx
+    have : x ≠ 0 := fun v => h' (v ▸ hx)
+    exists A', ha, x⁻¹ • B'
+    simp only [← smul_assoc, smul_eq_mul, ne_eq, this, not_false_eq_true, mul_inv_cancel, one_smul]
+    constructor
+    · convert smul_finset_subset_smul_finset hb (a := x⁻¹)
+      simp [← smul_assoc, this]
+    · rw [card_of_inv] at h
+      rw [card_of_inv]
+      convert h using 3
+      field_simp; ring
+      simp [this]
+      exact this
+  clear t1
   let f (x : ZMod p) := if h : x ∈ T then (t2 x h).choose ×ˢ (t2 x h).choose_spec.2.choose else ∅
   have ⟨s, hs, hs₂⟩ := claim336 T tne f (A ×ˢ A) (by simp [ane]) (((2^4)⁻¹ * K⁻¹)^2) (by positivity) (fun v hv => by
-    sorry
-    -- simp only [f, hv, dite_true]
-    -- constructor
-    -- · apply product_subset_product
-    --   exact (t2 v hv).choose_spec.1
-    --   exact (t2 v hv).choose_spec.2.choose_spec.1
-    -- · simp
-    --   convert_to ((2 ^ 4)⁻¹ * K⁻¹ * A.card) * ((2 ^ 4)⁻¹ * K⁻¹ * A.card) ≤ _
-    --   ring
-    --   gcongr
-    --   exact (t2 v hv).choose_spec.2.choose_spec.2.1
-    --   exact (t2 v hv).choose_spec.2.choose_spec.2.2.1
+    simp only [f, hv, dite_true]
+    constructor
+    · apply product_subset_product
+      exact (t2 v hv).choose_spec.1
+      exact (t2 v hv).choose_spec.2.choose_spec.1
+    · simp
+      convert_to ((2 ^ 4)⁻¹ * K⁻¹ * A.card) * ((2 ^ 4)⁻¹ * K⁻¹ * A.card) ≤ _
+      ring
+      gcongr
+      exact (t2 v hv).choose_spec.2.choose_spec.2.1
+      exact (t2 v hv).choose_spec.2.choose_spec.2.2.1
   )
   have : s ≠ 0 := fun v => h' (v ▸ hs)
   let A' := (t2 s hs).choose_spec.2.choose
@@ -171,30 +169,32 @@ theorem Theorem335 (h : ∀ x ∈ T, K⁻¹ * A.card^3 ≤ E[A, x • A]) :
   · rw [subset_iff]
     intro v' hv'
     rw [mem_smul_finset] at hv'
-    have ⟨v, hv', h'⟩ := hv'
+    have ⟨v, hv', h'''⟩ := hv'
     simp only [filter_congr_decidable, card_product, Nat.cast_mul, mem_filter, T'] at hv'
     have ⟨hv, h''⟩ := hv'
-    rw [← h']
+    rw [← h''']
     simp only [Stab, filter_congr_decidable, mem_filter, mem_univ, true_and]
 
-    have vne : v ≠ 0 := sorry
+    have vne : v ≠ 0 := fun nh => h' (nh ▸ hv)
 
     let X₁ := (t2 s hs).choose
     let Y₁ := (t2 s hs).choose_spec.2.choose
 
     have largeX₁ : (2^4)⁻¹ * K⁻¹ * A.card ≤ X₁.card := (t2 s hs).choose_spec.2.choose_spec.2.1
+    have largeY₁ : (2^4)⁻¹ * K⁻¹ * A.card ≤ Y₁.card := (t2 s hs).choose_spec.2.choose_spec.2.2.1
     have small_diff₁ : (X₁ - s • Y₁).card ≤ 2^10 * K^5 * A.card := (t2 s hs).choose_spec.2.choose_spec.2.2.2
 
     let X₂ := (t2 v hv).choose
     let Y₂ := (t2 v hv).choose_spec.2.choose
 
     have largeX₂ : (2^4)⁻¹ * K⁻¹ * A.card ≤ X₂.card := (t2 v hv).choose_spec.2.choose_spec.2.1
+    have largeY₂ : (2^4)⁻¹ * K⁻¹ * A.card ≤ Y₂.card := (t2 v hv).choose_spec.2.choose_spec.2.2.1
     have small_diff₂ : (X₂ - v • Y₂).card ≤ 2^10 * K^5 * A.card := (t2 v hv).choose_spec.2.choose_spec.2.2.2
 
-    have X₁ss : X₁ ⊆ A := sorry
-    have Y₁ss : Y₁ ⊆ A := sorry
+    have X₁ss : X₁ ⊆ A := (t2 s hs).choose_spec.1
+    have Y₁ss : Y₁ ⊆ A := (t2 s hs).choose_spec.2.choose_spec.1
 
-    change (Y₁ + (s⁻¹ • v) • Y₁).card ≤ K ^ C3353 * Y₁.card
+    change (Y₁ + (s⁻¹ • v) • Y₁).card ≤ (2^110 * K^42) * Y₁.card
 
     unfold_let f at h''
 
@@ -208,27 +208,27 @@ theorem Theorem335 (h : ∀ x ∈ T, K⁻¹ * A.card^3 ≤ E[A, x • A]) :
 
     simp [product_inter_product] at h
 
-    clear h'' X₁ss Y₁ss hv' h'
+    clear h'' hv' h'''
     clear v' hv' A' T' hs₂
 
-    have iL' : (2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card ≤ (X₂ ∩ X₁).card * (Y₂ ∩ Y₁).card / A.card := sorry
-      -- calc
-      -- (2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card = ((2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * (A.card * A.card)) / A.card := by field_simp; ring
-      -- _ ≤ (X₂ ∩ X₁).card * (Y₂ ∩ Y₁).card / A.card := by gcongr
+    have iL' : (2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card ≤ (X₂ ∩ X₁).card * (Y₂ ∩ Y₁).card / A.card :=
+      calc
+      (2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card = ((2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * (A.card * A.card)) / A.card := by field_simp; ring
+      _ ≤ (X₂ ∩ X₁).card * (Y₂ ∩ Y₁).card / A.card := by gcongr
 
-    have i₁L : (2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card ≤ (X₂ ∩ X₁).card := sorry
-      -- calc
-      -- (2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card ≤ (X₂ ∩ X₁).card * (Y₂ ∩ Y₁).card / A.card := iL'
-      -- _ ≤ (X₂ ∩ X₁).card * Y₁.card / A.card := by gcongr; apply inter_subset_right
-      -- _ ≤ (X₂ ∩ X₁).card * A.card / A.card := by gcongr
-      -- _ = (X₂ ∩ X₁).card := by field_simp
+    have i₁L : (2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card ≤ (X₂ ∩ X₁).card :=
+      calc
+      (2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card ≤ (X₂ ∩ X₁).card * (Y₂ ∩ Y₁).card / A.card := iL'
+      _ ≤ (X₂ ∩ X₁).card * Y₁.card / A.card := by gcongr; apply inter_subset_right
+      _ ≤ (X₂ ∩ X₁).card * A.card / A.card := by gcongr
+      _ = (X₂ ∩ X₁).card := by field_simp
 
-    have i₂L : (2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card ≤ (Y₂ ∩ Y₁).card := sorry
-      -- calc
-      -- (2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card ≤ (X₂ ∩ X₁).card * (Y₂ ∩ Y₁).card / A.card := iL'
-      -- _ ≤ X₁.card * (Y₂ ∩ Y₁).card / A.card := by gcongr; apply inter_subset_right
-      -- _ ≤ A.card * (Y₂ ∩ Y₁).card / A.card := by gcongr
-      -- _ = (Y₂ ∩ Y₁).card := by field_simp; ring
+    have i₂L : (2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card ≤ (Y₂ ∩ Y₁).card :=
+      calc
+      (2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card ≤ (X₂ ∩ X₁).card * (Y₂ ∩ Y₁).card / A.card := iL'
+      _ ≤ X₁.card * (Y₂ ∩ Y₁).card / A.card := by gcongr; apply inter_subset_right
+      _ ≤ A.card * (Y₂ ∩ Y₁).card / A.card := by gcongr
+      _ = (Y₂ ∩ Y₁).card := by field_simp; ring
 
     calc ((Y₁ + (s⁻¹ • v) • Y₁).card : ℝ)
       _ = (s • (Y₁ + (s⁻¹ • v) • Y₁)).card := by rw [card_of_inv _ s this]
@@ -262,28 +262,27 @@ theorem Theorem335 (h : ∀ x ∈ T, K⁻¹ * A.card^3 ≤ E[A, x • A]) :
         gcongr
         rw [le_div_iff]
         norm_cast
-        sorry
+        apply card_add_mul_le_card_sub_mul_card_sub
         refine LT.lt.trans_le ?_ largeX₁
         positivity
-      -- _ = (s • Y₁ + v • Y₂).card * ((X₁ - s • Y₁).card * (X₁ - s • Y₁).card / X₁.card) / ((2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card) := by
-      --   congr 5
-      --   rw [← card_neg]
-      --   simp
-      -- _ ≤ (s • Y₁ + v • Y₂).card * ((2^10 * K^5 * A.card) * (2^10 * K^5 * A.card) / ((2^4)⁻¹ * K⁻¹ * A.card)) / ((2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card) := by
-      --   gcongr
-      -- _ = (s • Y₁ + v • Y₂).card * 2^41 * K^15 := by
-        -- field_simp
-        -- ring_nf
-      -- _ ≤ ((s • Y₁ - X₂).card * (X₂ - v • Y₂).card / X₂.card) * 2^41 * K^15 := by
-      --   gcongr
-      --   rw [le_div_iff]
-      --   norm_cast
-      --   sorry
-      --   refine LT.lt.trans_le ?_ largeX₂
-      --   positivity
+      _ = (s • Y₁ + v • Y₂).card * ((X₁ - s • Y₁).card * (X₁ - s • Y₁).card / X₁.card) / ((2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card) := by
+        congr 5
+        rw [← card_neg]
+        simp
+      _ ≤ (s • Y₁ + v • Y₂).card * ((2^10 * K^5 * A.card) * (2^10 * K^5 * A.card) / ((2^4)⁻¹ * K⁻¹ * A.card)) / ((2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card) := by
+        gcongr
+      _ = (s • Y₁ + v • Y₂).card * 2^41 * K^15 := by
+        field_simp
+        ring_nf
+      _ ≤ ((s • Y₁ - X₂).card * (X₂ - v • Y₂).card / X₂.card) * 2^41 * K^15 := by
+        gcongr
+        rw [le_div_iff]
+        norm_cast
+        apply card_add_mul_le_card_sub_mul_card_sub
+        refine LT.lt.trans_le ?_ largeX₂
+        positivity
       _ ≤ ((s • Y₁ - X₂).card * (2^10 * K^5 * A.card) / ((2^4)⁻¹ * K⁻¹ * A.card)) * 2^41 * K^15 := by
-        -- gcongr
-        sorry
+        gcongr
       _ = (s • Y₁ + (-X₂)).card * 2^55 * K^21 := by rw [sub_eq_add_neg]; field_simp; ring_nf
       _ ≤ ((s • Y₁ + (-X₁)).card * ((-X₂) + (-X₂)).card / ((-X₁) ∩ (-X₂)).card) * 2^55 * K^21 := by
         gcongr
@@ -303,49 +302,40 @@ theorem Theorem335 (h : ∀ x ∈ T, K⁻¹ * A.card^3 ≤ E[A, x • A]) :
       _ ≤ ((2^10 * K^5 * A.card) * (X₂ + X₂).card / ((2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card)) * 2^55 * K^21 := by
         gcongr
       _ = (X₂ + X₂).card * 2^82 * K^30 := by field_simp; ring_nf
-
-      _ ≤ K^C3353 * Y₁.card := sorry
-
-    -- Define X₁ = (t2 s hs).choose V
-    -- Define Y₁ = (t2 s hs).choose_spec.2.choose V
-    -- Define X₂ = (t2 v hv).choose V
-    -- Define Y₂ = (t2 v hv).choose_spec.2.choose V
-
-    -- Show X₁ ∩ X₂ is large V
-    -- Show Y₁ ∩ Y₂ is large V
-
-    -- (s • X₁ + v • X₁).card
-    -- (s • X₁ + v • X₂).card * small
-    -- (s • X₁ - Y₂).card * small * small
-    -- (s • X₁ - Y₁).card * small * small * small
-    --              small * small * small * small
-
-    -- We have (v • X₂ - Y₂).card is small
-    -- Want to show (s • X₁ + v • X₂).card ≤ (s • X₁ - Y₂).card * small
-    -- (s • X₁ + v • X₂).card * Y₂.card ≤
-    --   (s • X₁ - Y₂).card * (v • X₂ - Y₂).card
-    -- card_add_mul_card_le_card_sub_mul_card_sub
-  · sorry
-    -- exists A, ?_, 1, ∅
-    -- simp_all only [not_nonempty_iff_eq_empty, one_smul, Subset.refl, card_empty, CharP.cast_eq_zero,
-    --   mul_zero, le_refl, empty_subset, and_self, and_true, true_and, not_mem_empty,
-    --   not_false_eq_true, IsEmpty.forall_iff, forall_const]
-    -- apply mul_le_of_le_one_left
-    -- simp
-    -- calc
-    --   (2^4)⁻¹ * K⁻¹ ≤ (2^4)⁻¹ * 1⁻¹ := by gcongr
-    --   _ ≤ 1 := by norm_num
-  · sorry
-    -- exists ∅, ?_, 1, T
-    -- simp
-    -- simp_all only [not_nonempty_iff_eq_empty, one_smul, Subset.refl, card_empty, CharP.cast_eq_zero,
-    --   mul_zero, le_refl, true_and, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow,
-    --   smul_finset_empty, additiveEnergy_empty_right, implies_true, forall_const]
-    -- constructor
-    -- · apply mul_le_of_le_one_left
-    --   simp
-    --   calc
-    --     (2^17)⁻¹ * (K^4)⁻¹ ≤ (2^17)⁻¹ * (1^4)⁻¹ := by gcongr
-    --     _ ≤ 1 := by norm_num
-    -- · simp only [Stab, smul_finset_empty, add_empty, card_empty, CharP.cast_eq_zero, mul_zero,
-    --   le_refl, mem_univ, forall_true_left, forall_const, filter_true_of_mem, subset_univ]
+      _ ≤ ((X₂ - v • Y₂).card * (X₂ - v • Y₂).card / Y₂.card) * 2^82 * K^30 := by
+        gcongr
+        rw [le_div_iff]
+        norm_cast
+        convert card_add_mul_le_card_sub_mul_card_sub X₂ (v • Y₂) X₂ using 2
+        · rwa [card_of_inv]
+        · rw [← card_neg]
+          simp
+        refine LT.lt.trans_le ?_ largeY₂
+        positivity
+      _ ≤ ((2^10 * K^5 * A.card) * (2^10 * K^5 * A.card) / ((2^4)⁻¹ * K⁻¹ * A.card)) * 2^82 * K^30 := by
+        gcongr
+      _ = ((2^4)⁻¹ * K⁻¹ * A.card) * 2^110 * K^42 := by field_simp; ring_nf
+      _ ≤ Y₁.card * 2^110 * K^42 := by gcongr
+      _ = (2^110 * K^42) * Y₁.card := by ring
+  · exists A, ?_, 1, ∅
+    simp_all only [not_nonempty_iff_eq_empty, one_smul, Subset.refl, card_empty, CharP.cast_eq_zero,
+      mul_zero, le_refl, empty_subset, and_self, and_true, true_and, not_mem_empty,
+      not_false_eq_true, IsEmpty.forall_iff, forall_const]
+    apply mul_le_of_le_one_left
+    simp
+    calc
+      (2^4)⁻¹ * K⁻¹ ≤ (2^4)⁻¹ * 1⁻¹ := by gcongr
+      _ ≤ 1 := by norm_num
+  · exists ∅, ?_, 1, T
+    simp
+    simp_all only [not_nonempty_iff_eq_empty, one_smul, Subset.refl, card_empty, CharP.cast_eq_zero,
+      mul_zero, le_refl, true_and, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow,
+      smul_finset_empty, additiveEnergy_empty_right, implies_true, forall_const]
+    constructor
+    · apply mul_le_of_le_one_left
+      simp
+      calc
+        (2^17)⁻¹ * (K^4)⁻¹ ≤ (2^17)⁻¹ * (1^4)⁻¹ := by gcongr
+        _ ≤ 1 := by norm_num
+    · simp only [Stab, smul_finset_empty, add_empty, card_empty, CharP.cast_eq_zero, mul_zero,
+      le_refl, mem_univ, forall_true_left, forall_const, filter_true_of_mem, subset_univ]

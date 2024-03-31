@@ -1,5 +1,5 @@
 import Mathlib.Data.Finset.Functor
-import Mathlib.Data.IsROrC.Basic
+import Mathlib.Analysis.RCLike.Basic
 import Pseudorandom.PMF
 
 open Classical Finset BigOperators

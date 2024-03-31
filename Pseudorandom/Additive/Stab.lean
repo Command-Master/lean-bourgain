@@ -249,14 +249,14 @@ lemma Stab_card_inc_rep (h : 4 ≤ (Stab K A).card) (n : ℕ):
       apply le_self_pow h
       simp
     have := Stab_card_inc' (K := (K^374^n)) p A this
-    rw [← pow_mul, ← pow_succ'] at this
+    rw [← pow_mul, ← pow_succ] at this
     refine' LE.le.trans _ this
     simp [-div_pow]
     simp [-div_pow] at hn
     rcases hn with hp | hq
     · left
       refine' LE.le.trans _ (rpow_le_rpow (z := 3/2) _ hp _)
-      rw [← rpow_mul, ← pow_succ']
+      rw [← rpow_mul, ← pow_succ]
       simp
       apply rpow_nonneg
       simp
