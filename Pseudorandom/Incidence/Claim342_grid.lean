@@ -242,7 +242,6 @@ theorem claim342_grid (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Lin
       simp
       ring_nf
       apply lemma7
-      assumption
     _ = (SG_C₃^2 * 16⁻¹ - 1) * n^(1 - 4*ST_prime_field_eps₂ β - 2 * SG_eps β) := by ring
     _ = SG_C₄ * n ^ (1 - SG_eps₂ β) := by
       congr 2

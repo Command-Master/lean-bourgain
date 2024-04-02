@@ -342,7 +342,6 @@ theorem ST_prime_field_aux (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : 
       norm_cast
       simp
       apply lemma4
-      assumption
       }
     _ = (ST_C₆ - 2) * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₄ β) := by ring
     _ = ST_C₇ * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₄ β) := by simp [ST_C₆]

@@ -4,11 +4,11 @@ set_option autoImplicit false
 
 open Real BigOps Finset Pointwise
 
-variable {p : ℕ} [Fact p.Prime]
+variable {p : ℕ} [instpprime : Fact p.Prime]
 
 local notation "α" => (ZMod p)
 
--- set_option maxHeartbeats 100000
+set_option maxHeartbeats 1000000
 
 theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nhₗ : (p^β : ℝ) ≤ n)
   (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ))
@@ -17,7 +17,6 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
   (hb₂ : ¬b₂ ∈ B) (neq : b₁ ≠ b₂)
   (allInt : ∀ b ∈ B, (n ^ (1 - SG_eps₃ β) : ℝ) < ∑ v ∈ A ×ˢ A, if (b₂ - b) / (b₂ - b₁) * v.1 + (b - b₁) / (b₂ - b₁) * v.2 ∈ A then 1 else 0):
   B.card < (SG_C₅ * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps₂ β) : ℝ) := by
-  -- have : Finset α := (2 • A)
   by_cases bne : B.Nonempty
   have nd0₃ : ¬(b₂ - b₁ = 0) := fun v => neq (eq_of_sub_eq_zero v).symm
   have aLarge' : (n^(1 - SG_eps₃ β) : ℝ) < A.card * A.card := by
@@ -42,84 +41,86 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
       simp
     _ < (A.card * A.card) ^ ((2 : ℝ)⁻¹) := by gcongr
     _ = A.card := by rw [← sq, ← rpow_natCast_mul]; simp; simp
-  -- sorry
-  -- sorry
-  have ane : A.Nonempty := sorry
+  have ane : A.Nonempty := by
+    rw [← card_pos]
+    rify
+    refine lt_of_le_of_lt ?_ aLarge
+    apply rpow_nonneg
+    simp
   have : ∀ b ∈ B, (4⁻¹ * (n^(2 - 2 * SG_eps₃ β - (1/2 + 2*ST_prime_field_eps₂ β)) : ℝ)) < additiveEnergy A (((b₂ - b) / (b -b₁)) • A) := by
-    sorry
-    -- intro b hb
-    -- have nd0 : ¬(b₂ - b = 0) := fun h => by
-    --   sorry
-    -- have nd0₂ : ¬(b - b₁ = 0) := fun h => by
-    --   sorry
-    -- have := allInt b hb
-    -- -- simp at this
-    -- calc (E[A, (((b₂ - b) / (b - b₁)) • A)] : ℝ)
-    --   _ = ((((A ×ˢ A) ×ˢ A ×ˢ A)).filter
-    --       fun x : (α × α) × α × α => (b - b₁) / (b₂ - b₁) * x.1.1 + (b₂ - b) / (b₂ - b₁) * x.1.2 =
-    --       (b - b₁) / (b₂ - b₁) * x.2.1 + (b₂ - b) / (b₂ - b₁) * x.2.2).card := by
-    --     norm_cast
-    --     rw [additive_mul_eq]
-    --     congr
-    --     ext x
-    --     field_simp
-    --     ring_nf
-    --     apply div_ne_zero nd0 nd0₂
-    --   _ = ∑ x ∈ (A ×ˢ A) ×ˢ A ×ˢ A, if (b - b₁) / (b₂ - b₁) * x.1.1 + (b₂ - b) / (b₂ - b₁) * x.1.2 = (b - b₁) / (b₂ - b₁) * x.2.1 + (b₂ - b) / (b₂ - b₁) * x.2.2 then 1 else 0 := by simp
-    --   _ = ∑ x₁ ∈ A ×ˢ A, ∑ x₂ ∈ A ×ˢ A, if (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = (b - b₁) / (b₂ - b₁) * x₂.1 + (b₂ - b) / (b₂ - b₁) * x₂.2 then 1 else 0 := by rw [sum_product]
-    --   _ = ∑ (a : α), ∑ x₁ ∈ ((A ×ˢ A).filter fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a),
-    --       ∑ x₂ ∈ A ×ˢ A, if (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = (b - b₁) / (b₂ - b₁) * x₂.1 + (b₂ - b) / (b₂ - b₁) * x₂.2 then 1 else 0 := by
-    --     rw [sum_fiberwise (s := A ×ˢ A) (g := fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2)]
-    --   _ = ∑ (a : α), ∑ x₁ ∈ ((A ×ˢ A).filter fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a),
-    --       ∑ x₂ ∈ A ×ˢ A, if a = (b - b₁) / (b₂ - b₁) * x₂.1 + (b₂ - b) / (b₂ - b₁) * x₂.2 then 1 else 0 := by
-    --     -- sorry
-    --     congr
-    --     ext a
-    --     apply sum_congr
-    --     rfl
-    --     intro x₁ hx
-    --     simp at hx
-    --     rcongr
-    --     exact hx.2
-    --   _ = ∑ (a : α), ((A ×ˢ A).filter fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a).card *
-    --       ((A ×ˢ A).filter fun x₁ => a = (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2).card := by simp only [sum_boole,
-    --         sum_const, nsmul_eq_mul, Nat.cast_sum, Nat.cast_mul]
-    --   _ = ∑ (a : α), (((A ×ˢ A).filter fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a).card^2 : ℝ) := by
-    --     simp only [Nat.cast_sum, Nat.cast_mul, sq]
-    --     rcongr
-    --     exact eq_comm
-    --   _ ≥ ∑ a ∈ A, (((A ×ˢ A).filter fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a).card^2 : ℝ) := by
-    --     apply sum_le_sum_of_subset_of_nonneg
-    --     simp
-    --     intros
-    --     simp
-    --   _ ≥ (A.card : ℝ)⁻¹ * (∑ a ∈ A, ((A ×ˢ A).filter fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a).card)^2 := by
-    --     simp only [Nat.cast_sum, ge_iff_le]
-    --     rw [inv_mul_le_iff]
-    --     apply sq_sum_le_card_mul_sum_sq
-    --     norm_cast
-    --     rw [card_pos]
-    --     exact ane
-    --   _ = (A.card : ℝ)⁻¹ * (∑ a ∈ A, ∑ x₁ ∈ (A ×ˢ A), if (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a then 1 else 0)^2 := by simp
-    --   _ = (A.card : ℝ)⁻¹ * (∑ x₁ ∈ (A ×ˢ A), ∑ a ∈ A, if (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a then 1 else 0)^2 := by rw [sum_comm]
-    --   _ = (A.card : ℝ)⁻¹ * (∑ x₁ ∈ (A ×ˢ A), if (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 ∈ A then 1 else 0)^2 := by simp
-    --   _ = (A.card : ℝ)⁻¹ * (∑ x₁ ∈ A, ∑ x₂ ∈ A, if (b - b₁) / (b₂ - b₁) * x₁ + (b₂ - b) / (b₂ - b₁) * x₂ ∈ A then 1 else 0)^2 := by rw [sum_product' (f := fun x₁ x₂ => if (b - b₁) / (b₂ - b₁) * x₁ + (b₂ - b) / (b₂ - b₁) * x₂ ∈ A then 1 else 0)]
-    --   _ = (A.card : ℝ)⁻¹ * (∑ x₁ ∈ (A ×ˢ A), if (b - b₁) / (b₂ - b₁) * x₁.2 + (b₂ - b) / (b₂ - b₁) * x₁.1 ∈ A then 1 else 0)^2 := by rw [sum_product_right' (f := fun x₁ x₂ => if (b - b₁) / (b₂ - b₁) * x₂ + (b₂ - b) / (b₂ - b₁) * x₁ ∈ A then 1 else 0)]
-    --   _ = (A.card : ℝ)⁻¹ * (∑ x₁ ∈ (A ×ˢ A), if (b₂ - b) / (b₂ - b₁) * x₁.1 + (b - b₁) / (b₂ - b₁) * x₁.2 ∈ A then 1 else 0)^2 := by simp [add_comm]
-    --   _ > (A.card : ℝ)⁻¹ * (n^(1 - SG_eps₃ β))^2 := by
-    --     gcongr
-    --   _ ≥ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ)⁻¹ * (n^(1 - SG_eps₃ β))^2 := by
-    --     gcongr
-    --   _ = (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ)⁻¹ * (n^(2 - 2 * SG_eps₃ β)) := by
-    --     congr 1
-    --     rw [←rpow_nat_cast, ←rpow_mul]
-    --     ring_nf
-    --     simp
-    --   _ = 4⁻¹ * (n^(2 - 2 * SG_eps₃ β) / n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ) := by
-    --     ring
-    --   _ = 4⁻¹ * (n^(2 - 2 * SG_eps₃ β - (1/2 + 2*ST_prime_field_eps₂ β)) : ℝ) := by rw [←rpow_sub]; simp
+    -- sorry
+    intro b hb
+    have nd0 : ¬(b₂ - b = 0) := fun h => hb₂ ((eq_of_sub_eq_zero h) ▸ hb)
+    have nd0₂ : ¬(b - b₁ = 0) := fun h => hb₁ ((eq_of_sub_eq_zero h) ▸ hb)
+    have := allInt b hb
+    -- simp at this
+    calc (E[A, (((b₂ - b) / (b - b₁)) • A)] : ℝ)
+      _ = ((((A ×ˢ A) ×ˢ A ×ˢ A)).filter
+          fun x : (α × α) × α × α => (b - b₁) / (b₂ - b₁) * x.1.1 + (b₂ - b) / (b₂ - b₁) * x.1.2 =
+          (b - b₁) / (b₂ - b₁) * x.2.1 + (b₂ - b) / (b₂ - b₁) * x.2.2).card := by
+        norm_cast
+        rw [additive_mul_eq]
+        congr
+        ext x
+        field_simp
+        ring_nf
+        apply div_ne_zero nd0 nd0₂
+      _ = ∑ x ∈ (A ×ˢ A) ×ˢ A ×ˢ A, if (b - b₁) / (b₂ - b₁) * x.1.1 + (b₂ - b) / (b₂ - b₁) * x.1.2 = (b - b₁) / (b₂ - b₁) * x.2.1 + (b₂ - b) / (b₂ - b₁) * x.2.2 then 1 else 0 := by simp
+      _ = ∑ x₁ ∈ A ×ˢ A, ∑ x₂ ∈ A ×ˢ A, if (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = (b - b₁) / (b₂ - b₁) * x₂.1 + (b₂ - b) / (b₂ - b₁) * x₂.2 then 1 else 0 := by rw [sum_product]
+      _ = ∑ (a : α), ∑ x₁ ∈ ((A ×ˢ A).filter fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a),
+          ∑ x₂ ∈ A ×ˢ A, if (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = (b - b₁) / (b₂ - b₁) * x₂.1 + (b₂ - b) / (b₂ - b₁) * x₂.2 then 1 else 0 := by
+        rw [sum_fiberwise (s := A ×ˢ A) (g := fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2)]
+      _ = ∑ (a : α), ∑ x₁ ∈ ((A ×ˢ A).filter fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a),
+          ∑ x₂ ∈ A ×ˢ A, if a = (b - b₁) / (b₂ - b₁) * x₂.1 + (b₂ - b) / (b₂ - b₁) * x₂.2 then 1 else 0 := by
+        -- sorry
+        congr
+        ext a
+        apply sum_congr
+        rfl
+        intro x₁ hx
+        simp at hx
+        rcongr
+        exact hx.2
+      _ = ∑ (a : α), ((A ×ˢ A).filter fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a).card *
+          ((A ×ˢ A).filter fun x₁ => a = (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2).card := by simp only [sum_boole,
+            sum_const, nsmul_eq_mul, Nat.cast_sum, Nat.cast_mul]
+      _ = ∑ (a : α), (((A ×ˢ A).filter fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a).card^2 : ℝ) := by
+        simp only [Nat.cast_sum, Nat.cast_mul, sq]
+        rcongr
+        exact eq_comm
+      _ ≥ ∑ a ∈ A, (((A ×ˢ A).filter fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a).card^2 : ℝ) := by
+        apply sum_le_sum_of_subset_of_nonneg
+        simp
+        intros
+        simp
+      _ ≥ (A.card : ℝ)⁻¹ * (∑ a ∈ A, ((A ×ˢ A).filter fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a).card)^2 := by
+        simp only [Nat.cast_sum, ge_iff_le]
+        rw [inv_mul_le_iff]
+        apply sq_sum_le_card_mul_sum_sq
+        norm_cast
+        rw [card_pos]
+        exact ane
+      _ = (A.card : ℝ)⁻¹ * (∑ a ∈ A, ∑ x₁ ∈ (A ×ˢ A), if (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a then 1 else 0)^2 := by simp
+      _ = (A.card : ℝ)⁻¹ * (∑ x₁ ∈ (A ×ˢ A), ∑ a ∈ A, if (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a then 1 else 0)^2 := by rw [sum_comm]
+      _ = (A.card : ℝ)⁻¹ * (∑ x₁ ∈ (A ×ˢ A), if (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 ∈ A then 1 else 0)^2 := by simp
+      _ = (A.card : ℝ)⁻¹ * (∑ x₁ ∈ A, ∑ x₂ ∈ A, if (b - b₁) / (b₂ - b₁) * x₁ + (b₂ - b) / (b₂ - b₁) * x₂ ∈ A then 1 else 0)^2 := by rw [sum_product' (f := fun x₁ x₂ => if (b - b₁) / (b₂ - b₁) * x₁ + (b₂ - b) / (b₂ - b₁) * x₂ ∈ A then 1 else 0)]
+      _ = (A.card : ℝ)⁻¹ * (∑ x₁ ∈ (A ×ˢ A), if (b - b₁) / (b₂ - b₁) * x₁.2 + (b₂ - b) / (b₂ - b₁) * x₁.1 ∈ A then 1 else 0)^2 := by rw [sum_product_right' (f := fun x₁ x₂ => if (b - b₁) / (b₂ - b₁) * x₂ + (b₂ - b) / (b₂ - b₁) * x₁ ∈ A then 1 else 0)]
+      _ = (A.card : ℝ)⁻¹ * (∑ x₁ ∈ (A ×ˢ A), if (b₂ - b) / (b₂ - b₁) * x₁.1 + (b - b₁) / (b₂ - b₁) * x₁.2 ∈ A then 1 else 0)^2 := by simp [add_comm]
+      _ > (A.card : ℝ)⁻¹ * (n^(1 - SG_eps₃ β))^2 := by
+        gcongr
+      _ ≥ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ)⁻¹ * (n^(1 - SG_eps₃ β))^2 := by
+        gcongr
+      _ = (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ)⁻¹ * (n^(2 - 2 * SG_eps₃ β)) := by
+        congr 1
+        rw [←rpow_nat_cast, ←rpow_mul]
+        ring_nf
+        simp
+      _ = 4⁻¹ * (n^(2 - 2 * SG_eps₃ β) / n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ) := by
+        ring
+      _ = 4⁻¹ * (n^(2 - 2 * SG_eps₃ β - (1/2 + 2*ST_prime_field_eps₂ β)) : ℝ) := by rw [←rpow_sub]; simp
   have ⟨A', hA', x, T', hT, hAsz, hTsz, hStab⟩ :=
     Theorem335 (256 * n^(8 * ST_prime_field_eps₂ β + 2*SG_eps₃ β)) (by
+        -- sorry
         rw [(by norm_num : (1 : ℝ) = 1*1)]
         apply mul_le_mul
         norm_num
@@ -141,6 +142,7 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
         · exact hb₂ ((eq_of_sub_eq_zero v) ▸ hx)
         · exact hb₁ ((eq_of_sub_eq_zero v) ▸ hx))
       (by
+        -- sorry
         intro x' hx'
         simp at hx'
         have ⟨b, hb, h'⟩ := hx'
@@ -193,6 +195,8 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
     intro v
     simp only [eq_of_sub_eq_zero v, ne_eq, not_true_eq_false] at neq
   rw [bieq] at hTsz
+  let K' : ℝ := (2 ^ 110 * (256 * n ^ (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) ^ 42)
+
   have nhTsz :
     (n ^ (1 / 2 - 439 / 45 * SG_eps₃ β) : ℝ) ≤ T'.card := calc
         (n ^ (1 / 2 - 439 / 45 * SG_eps₃ β) : ℝ)
@@ -224,34 +228,117 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
   rw [← le_div_iff, mul_div_assoc, ← rpow_sub, ← div_le_iff'] at nLarge
   ring_nf at nLarge
 
+  change (_ : ℝ) ≤ (Stab K' A').card at hStab
 
-  let K' : ℝ := (2 ^ 110 * (256 * n ^ (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) ^ 42)
-  let β' : ℝ := 2⁻¹ - 439 / 45 * SG_eps₃ β
-  -- have := Stab_small K' p A' β' (sorry /- easy, should be Constants' lemma -/) (sorry) (sorry) (β/2) sorry sorry
-  -- absurd this
-  -- simp only [not_le]
-  -- rw [this]
-  -- unfold_let K'
-  -- Wanna apply Stab_small
-  -- By contradiction with sufficiently large SG_C₅ can have p^(1/2 - ε) ≤ T'.card ≤ (Stab ... A').card
-  -- We have A'.card ≤ A.card ≤ 4 * n^(1/2 + ε₂) ≤ 4 * p^(1 - ε₃)
-  -- Show n^(1/2 - SG_eps₃/2) ≤ A.card
-  -- And (2^12)⁻¹ * A.card * n^(...) ≤ A'.card
-  -- So (2^12)⁻¹ * p^(ε₄) ≤ (2^12)⁻¹ * n^(1/2 - ε - ...) ≤ A'.card
-  -- Main problem, we need 4 ≤ (2^12)⁻¹ * p^ε₄
-  -- Must be able to require p large enough. Large enough depends on β
-  -- I guess for now assume we have it with sorry and later actually get it
+  have fourlt : 4 ≤ (Stab K' A').card := by
+    rify
+    calc
+      (4 : ℝ) ≤ SG_C₅ * (1 / 4) := by unfold SG_C₅; norm_num
+      _ ≤ n ^ (ST_prime_field_eps₂ β * 6 + SG_eps₂ β + SG_eps β) := nLarge
+      _ ≤ n^(1/2 - 439/45 * SG_eps₃ β) := by gcongr; norm_cast; simp; apply lemma13
+      _ ≤ (Stab K' A').card := hStab
 
-  -- Don't actually need assumption, with variables small enough I can case base on large/small
-  sorry
+  have hStab' :
+      (p ^ (β / 2 - 439 / 45 * β * SG_eps₃ β) : ℝ) ≤ (Stab K' A').card := calc
+    (p ^ (β / 2 - 439 / 45 * β * SG_eps₃ β) : ℝ) = (p ^ β) ^ (1 / 2 - 439 / 45 * SG_eps₃ β) := by
+      rw [← rpow_mul]; congr 1; ring_nf; simp
+    _ ≤ n ^ (1 / 2 - 439 / 45 * SG_eps₃ β) := by gcongr; apply lemma14
+    _ ≤ (Stab K' A').card := hStab
+
+  let β' : ℝ := min (β/2 - 17/15 * (2 - β) * SG_eps₃ β) (β / 2 - 113 / 30 * β * SG_eps₃ β)
+
+  have A'small : A'.card ≤ (p^(1 - β') : ℝ) :=
+    calc
+      (A'.card : ℝ) ≤ A.card := by gcongr
+      _ ≤ 4 * n ^ (1/2 + 2 * ST_prime_field_eps₂ β) := hA
+      _ ≤ (SG_C₅ * (1 / 4)) * n ^ (1/2 + 2 * ST_prime_field_eps₂ β) := by
+        gcongr
+        unfold SG_C₅
+        norm_num
+      _ ≤ n^(ST_prime_field_eps₂ β * 6 + SG_eps₂ β + SG_eps β) * n ^ (1/2 + 2 * ST_prime_field_eps₂ β) := by
+        gcongr
+      _ = n^(1/2 + 8 * ST_prime_field_eps₂ β + SG_eps₂ β + SG_eps β) := by
+        rw [← rpow_add]
+        ring_nf
+        simp
+      _ ≤ (p^(2 - β))^(1/2 + 8 * ST_prime_field_eps₂ β + SG_eps₂ β + SG_eps β) := by
+        gcongr
+        exact lemma15 β h
+      _ = p^(1 - (β/2 - 17/15 * (2 - β) * SG_eps₃ β)) := by
+        rw [← rpow_mul]
+        congr 1
+        unfold ST_prime_field_eps₂ ST_prime_field_eps₃ ST_prime_field_eps₄ SG_eps SG_eps₂
+        ring_nf
+        simp
+      _ ≤ p^(1 - β') := by
+        unfold_let β'
+        gcongr
+        simp [instpprime.out.one_le]
+        simp
+
+  have A'large : A'.card ≥ (p^β' : ℝ) :=
+    calc
+    (A'.card : ℝ) ≥ (2 ^ 4)⁻¹ * (256 * n ^ (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β) : ℝ)⁻¹ * A.card := hAsz
+    _ ≥ (2 ^ 4)⁻¹ * (256 * n ^ (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β) : ℝ)⁻¹ * n^(1/2 - 1/2 * SG_eps₃ β) := by
+      gcongr
+    _ = (2 ^ 12)⁻¹ * (n^(1/2 - 1/2 * SG_eps₃ β) / n ^ (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) := by
+      ring_nf
+    _ = (2 ^ 12)⁻¹ * n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) := by
+      rw [← rpow_sub]
+      simp
+    _ ≥ (SG_C₅ * (1 / 4))⁻¹ * n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) := by
+      gcongr
+      unfold SG_C₅
+      norm_num
+    _ ≥ (n^(ST_prime_field_eps₂ β * 6 + SG_eps₂ β + SG_eps β) : ℝ)⁻¹ * n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) := by
+      gcongr
+      push_cast
+      rw [inv_le_inv]
+      exact nLarge
+      apply rpow_pos_of_pos
+      simp
+      unfold SG_C₅
+      norm_num
+    _ = n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) / n^(ST_prime_field_eps₂ β * 6 + SG_eps₂ β + SG_eps β) := by
+      ring
+    _ = n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β) - (ST_prime_field_eps₂ β * 6 + SG_eps₂ β + SG_eps β)) := by
+      rw [← rpow_sub]
+      simp
+    _ = n^(1/2 - 113/30 * SG_eps₃ β) := by
+      congr 1
+      unfold ST_prime_field_eps₂ ST_prime_field_eps₃ ST_prime_field_eps₄ SG_eps SG_eps₂
+      ring_nf
+    _ ≥ (p^β)^(1/2 - 113/30 * SG_eps₃ β) := by
+      gcongr
+      apply lemma16
+    _ = p^(β / 2 - 113 / 30 * β * SG_eps₃ β) := by
+      rw [← rpow_mul]
+      ring_nf
+      simp
+    _ ≥ p^β' := by
+      gcongr
+      simp [instpprime.out.one_le]
+      unfold_let β'
+      simp
+
+
+
+  -- sorry
+  have := Stab_small K' p A' _ (lemma12 β h) fourlt hStab' β' A'large A'small
+
+  absurd this
+  unfold_let K' β'
+  simp only [not_le]
+  apply final_theorem β h n p nhᵤ nLarge
+
   norm_num
   simp
   apply rpow_pos_of_pos
   simp
   · unfold SG_C₅
-    simp_all only [ne_eq, not_nonempty_iff_eq_empty, card_empty,
-    CharP.cast_eq_zero]
-    apply mul_pos
+    simp at bne
+    simp [bne]
+    apply rpow_pos_of_pos
     simp
 
 theorem ST_grid_aux₂ (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line α)) (n : ℕ+) (nhₗ : (p^β : ℝ) ≤ n)
@@ -415,7 +502,6 @@ theorem ST_grid_aux₂ (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Li
       norm_cast
       simp
       apply lemma8
-      assumption
     _ = ((SG_C₄ - 4) * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps₂ β)) / 16 - 2 := by field_simp
     _ = ((SG_C₄ - 4) * (n^(3/2 - SG_eps₂ β - SG_eps β) / n ^ (1 + 4 * ST_prime_field_eps₂ β))) / 16 - 2 := by
       congr
@@ -552,7 +638,6 @@ theorem ST_grid_aux (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line 
       norm_cast
       simp
       apply lemma6
-      assumption
     _ = SG_C₂ * n ^ (3/2 - SG_eps β) := by simp [SG_C₂]; ring_nf
 
 theorem ST_grid (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line α)) (n : ℕ+) (nhₗ : (p^β : ℝ) ≤ n)
@@ -592,4 +677,3 @@ theorem ST_grid (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line α))
       ring_nf
       simp
       apply lemma5
-      assumption

@@ -478,20 +478,17 @@ lemma claim_342 (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Lin
       norm_cast
       simp only [PNat.one_le]
       apply lemma1
-      assumption
       apply Real.one_le_rpow
       norm_cast
       simp only [PNat.one_le]
       simp
       apply lemma2
-      assumption
       norm_cast
       apply inv_le_one
       apply one_le_ST_C₅
       norm_cast
       simp only [PNat.one_le]
       apply lemma3
-      assumption
     _ = (ST_C₅^4 - 73) * n^(1 - 4*ST_prime_field_eps₃ β) := by ring
     _ = (ST_C₆ * n ^ (1 - ST_prime_field_eps₄ β) : ℝ) := by
       congr 2
