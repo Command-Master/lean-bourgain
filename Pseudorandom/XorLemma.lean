@@ -1,97 +1,127 @@
 import Pseudorandom.SD
+import Mathlib.Analysis.SpecialFunctions.Log.Base
 import Mathlib.Algebra.Order.Chebyshev
-import LeanAPAP.Prereqs.Discrete.DFT.Basic
+import LeanAPAP.Prereqs.Discrete.DFT.Compact
 import LeanAPAP.Prereqs.Expect.Basic
 
 open Classical Real Finset BigOps
 
 variable
-   {α : Type*} [Nonempty α] [Fintype α] [AddCommGroup α]
+   {α : Type*} [αnonempty: Nonempty α] [Fintype α] [AddCommGroup α]
    {β : Type*} [Nonempty β] [Fintype β] [AddCommGroup β]
-   (a b : FinPMF α)
+   [RCLike 𝕜]
+   (a b : α → 𝕜)
 
 open scoped NNReal
 
 -- The DFT isn't normalized.
+theorem l1Norm_le_sqrt_card_mul_l2Norm :
+  ‖a‖_[1] ≤ Real.sqrt (Fintype.card α) * ‖a‖_[2] := calc
+    ‖a‖_[1] = ‖1 * a‖_[1] := by simp
+    _ ≤ ‖1‖_[(2 : NNReal)] * ‖a‖_[2] := by
+      apply l1Norm_mul_le
+      rw [NNReal.isConjExponent_iff_eq_conjExponent]
+      rw [NNReal.sub_def]
+      norm_num
+      norm_num
+    _ = Real.sqrt (Fintype.card α) * ‖a‖_[2] := by
+      congr
+      rw [lpNorm_one (p := 2), Real.sqrt_eq_rpow]
+      norm_num
+      norm_num
 
-theorem XOR_lemma' (ε : ℝ≥0) (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖dft (a ·) χ‖ ≤ ε) :
-  ∑ x : α, (a x - (Fintype.card α : ℝ)⁻¹)^2 ≤ (ε : ℝ)^2 := by
-  let f := (fun x => (a x : ℂ)) - Function.const α ((Fintype.card α : ℂ)⁻¹)
-  calc ∑ x : α, (a x - (Fintype.card α : ℝ)⁻¹)^2
-    _ = ‖f‖_[2]^2 := by
-      simp [lpNorm_eq_sum']
-      rw [←rpow_mul_natCast]
-      simp
-      apply sum_congr
-      rfl
-      intros
-      rw [←(Complex.abs_re_eq_abs).mpr]
-      simp [f]
-      simp [f]
-      apply sum_nonneg
-      aesop
-    _ = ‖dft f‖ₙ_[2]^2 := by rw [nl2Norm_dft]
-    _ = 𝔼 x, ‖dft f x‖^2 := by
-      simp [nlpNorm_eq_expect']
-      rw [←rpow_mul_natCast]
-      simp
-      apply expect_nonneg
-      aesop
-    _ ≤ 𝔼 (x : AddChar α ℂ), (ε : ℝ)^2 := by
-      apply expect_le_expect
-      intro i _
-      rw [sq_le_sq]
-      rw [Complex.norm_eq_abs, Complex.abs_abs, NNReal.abs_eq, ←Complex.norm_eq_abs]
-      by_cases h₂ : i = 0
-      simp [h₂, dft_apply, l2Inner_eq_sum, f]
-      have : ∑ x, (a x : ℂ) = Complex.ofReal (∑ x, a x) := by
-        simp only [map_sum, Complex.ofReal_eq_coe]
-      rw [this]
-      simp [card_univ]
-      simp [dft_sub, f]
-      rw [dft_const]
-      simp
-      apply h i
-      rw [AddChar.isNontrivial_iff_ne_trivial]
-      aesop
-      aesop
-    _ = (ε : ℝ)^2 := by simp
+lemma lpNorm_eq_card_rpow_mul_nlpNorm (p : NNReal) (hp : p ≠ 0) :
+    ‖a‖_[p] = (Fintype.card α)^(p.toReal⁻¹) * ‖a‖ₙ_[p] := calc
+  ‖a‖_[p] = (∑ i, ‖a i‖ ^ (p.toReal)) ^ (p.toReal⁻¹) := lpNorm_eq_sum hp ..
+  _ = (Fintype.card α * 𝔼 i, ‖a i‖ ^ (p.toReal)) ^ (p.toReal⁻¹) := by
+    simp only [Fintype.card_mul_expect]
+  _ = (Fintype.card α)^(p.toReal⁻¹) * (𝔼 i, ‖a i‖ ^ (p.toReal)) ^ (p.toReal⁻¹) := by
+    rw [mul_rpow]
+    simp
+    apply expect_nonneg
+    intros
+    apply rpow_nonneg
+    simp
+  _ = (Fintype.card α)^(p.toReal⁻¹) * ‖a‖ₙ_[p] := by
+    rw [nlpNorm_eq_expect hp]
 
-theorem XOR_lemma (ε : ℝ≥0) (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖dft (a ·) χ‖ ≤ ε) :
-  SD a (Uniform ⟨univ, univ_nonempty⟩) ≤ 2⁻¹ * ε * Real.sqrt (Fintype.card α) := by
-  simp [SD, Uniform.univ_uniform]
-  calc ∑ x : α, |2⁻¹ * (a x - (↑(Fintype.card α))⁻¹)|
-    _ = Real.sqrt ((∑ x : α, |2⁻¹ * (a x - (↑(Fintype.card α))⁻¹)|)^2) := by
-      apply Eq.symm
-      apply sqrt_sq
-      apply sum_nonneg
-      intros
-      apply abs_nonneg
-    _ ≤ Real.sqrt ((Fintype.card α) * (∑ x : α, |2⁻¹ * (a x - (↑(Fintype.card α))⁻¹)|^2)) := by
-      apply Real.sqrt_le_sqrt
-      apply sq_sum_le_card_mul_sum_sq
-    _ = Real.sqrt ((Fintype.card α) * (∑ x : α, (2⁻¹ * (a x - (↑(Fintype.card α))⁻¹))^2)) := by congr; ext; apply sq_abs
-    _ = Real.sqrt ((Fintype.card α) * (∑ x : α, 2⁻¹^2 * (a x - (↑(Fintype.card α))⁻¹)^2)) := by
+lemma lpNorm_le_card_rpow_mul_linftyNorm (p : NNReal) (hp : p ≠ 0) :
+    ‖a‖_[p] ≤ (Fintype.card α)^(p.toReal⁻¹) * ‖a‖_[⊤] := calc
+  ‖a‖_[p] = (∑ i, ‖a i‖ ^ (p.toReal)) ^ (p.toReal⁻¹) := lpNorm_eq_sum hp ..
+  _ ≤ (∑ __, ‖a‖_[⊤] ^ (p.toReal)) ^ (p.toReal⁻¹) := by
+    gcongr with i
+    rw [linftyNorm_eq_ciSup]
+    apply le_ciSup (c := i)
+    simp [Set.Finite.bddAbove, Set.finite_range]
+  _ = (Fintype.card α * ‖a‖_[⊤] ^ (p.toReal)) ^ (p.toReal⁻¹) := by
+    simp; rfl
+  _ ≤ (Fintype.card α)^(p.toReal⁻¹) * (‖a‖_[⊤] ^ (p.toReal)) ^ (p.toReal⁻¹) := by
+    rw [mul_rpow]
+    simp
+    apply rpow_nonneg
+    simp
+  _ = (Fintype.card α)^(p.toReal⁻¹) * ‖a‖_[⊤] := by
+    congr
+    rw [← rpow_mul]
+    field_simp
+    simp
+
+variable
+   (a b : α → ℝ)
+
+theorem L1_le_card_rpow_mul_dft_norm :
+    ‖a‖_[1] ≤ ((Fintype.card α)^(3/2 : ℝ) : ℝ) * ‖cft (a ·)‖_[⊤] :=
+  calc
+    ‖a‖_[1] ≤ Real.sqrt (Fintype.card α) * ‖a‖_[(2 : NNReal)] := l1Norm_le_sqrt_card_mul_l2Norm ..
+    _ = (Fintype.card α) * ‖a‖ₙ_[2] := by
+      rw [lpNorm_eq_card_rpow_mul_nlpNorm]
+      rw [← mul_assoc]
+      congr
+      rw [Real.sqrt_eq_rpow, ← rpow_add]
+      norm_num
+      simp [Fintype.card_pos]
+      norm_num
+    _ = (Fintype.card α) * ‖cft (a ·)‖_[2] := by
+      congr
+      rw [l2Norm_cft, nlpNorm_eq_expect', nlpNorm_eq_expect']
       congr
       ext
-      rw [mul_pow]
-    _ = Real.sqrt ((Fintype.card α) * 2⁻¹^2 * (∑ x : α, (a x - (↑(Fintype.card α))⁻¹)^2)) := by
+      simp
+      simp
+      simp
+    _ ≤ (Fintype.card α) * (Real.sqrt (Fintype.card α) * ‖cft (a ·)‖_[⊤]) := by
+      gcongr
+      rw [Real.sqrt_eq_rpow]
+      convert lpNorm_le_card_rpow_mul_linftyNorm (cft (a ·)) 2 (by norm_num) using 3
+      simp
+      simp
+    _ = ((Fintype.card α)^(3/2 : ℝ) : ℝ) * ‖cft (a ·)‖_[⊤] := by
+      rw [sqrt_eq_rpow, ← mul_assoc, ← rpow_one_add']
       congr 1
-      simp [←mul_sum]
-      ring
-    _ ≤ Real.sqrt ((Fintype.card α) * 2⁻¹^2 * ε^2) := by
-      apply Real.sqrt_le_sqrt
-      apply mul_le_mul_of_nonneg_left (XOR_lemma' a ε h)
+      norm_num
       simp
-    _ = 2⁻¹ * ε * Real.sqrt (Fintype.card α) := by
-      rw [Real.sqrt_eq_iff_sq_eq]
-      ring_nf
-      simp
-      apply mul_nonneg
-      simp
-      apply sq_nonneg
-      apply mul_nonneg
-      apply mul_nonneg
-      simp
-      simp
-      apply sqrt_nonneg
+      norm_num
+
+lemma lemma43 (t : ℝ) (ε : ℝ)
+    (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖dft (a ·) χ‖ ≤ ε)
+    (σ : α → β) (h₂ : ∀ χ : AddChar β ℂ,
+      ‖cft (χ ∘ σ)‖_[1] ≤ t / (Fintype.card α)
+    ):
+    ‖σ # a - σ # (fun (x : α) => 1 / (Fintype.card α : ℝ))‖_[1] ≤ t * ε * Real.sqrt (Fintype.card β)
+  := by
+
+  sorry
+
+variable (n m : ℕ+) (hₘ : m ≤ n)
+
+local notation "α" => ZMod n
+local notation "β" => ZMod m
+
+def abelianC : ℝ := 1
+
+theorem XOR_abelian (ε : ℝ≥0)
+  (a : FinPMF α) (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖dft (a ·) χ‖ ≤ ε) :
+  SD (a.apply fun x => (x.val : β)) (Uniform ⟨univ, univ_nonempty⟩) ≤
+    abelianC * (ε * Real.sqrt m * Real.log n + m / n) := by
+
+  sorry

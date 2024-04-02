@@ -1,3 +1,4 @@
+import Pseudorandom.Basic
 import LeanAPAP.Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Algebra.BigOperators.Order
@@ -59,11 +60,10 @@ instance instMulFinPMF : HMul (FinPMF α) (FinPMF β) (FinPMF (α × β)) where
 @[simp]
 theorem FinPMF.mul_val : (a * b) (x, y) = (a x) * (b y) := rfl
 
-
-
 -- Applying some function to a random variable.
 noncomputable def FinPMF.apply (a : FinPMF α) (f : α → β) : FinPMF β :=
-  ⟨(fun x => ∑ y in univ.filter (fun y => f y = x), a y), by
+  ⟨f # a, by
+    unfold transfer
     constructor
     simp
     rw [←sum_biUnion]
@@ -78,7 +78,9 @@ noncomputable def FinPMF.apply (a : FinPMF α) (f : α → β) : FinPMF β :=
 
 -- If B = g(A) then E[f(B)] = E[f(g(A))].
 theorem apply_weighted_sum (g: α → β) (f : β → ℝ) : ∑ x, ((a.apply g) x) * (f x) = ∑ y, (a y) * (f (g y)) := by
-  simp [FinPMF.apply, instFunLike, sum_mul]
+  simp only [instFunLike, FinPMF.apply]
+  unfold transfer
+  simp only [filter_congr_decidable, sum_mul]
   have (x) : ∑ i in filter (fun y => g y = x) univ, a i * f x =
     ∑ i in filter (fun y => g y = x) univ, a i * f (g i) := by
     apply sum_subset_zero_on_sdiff <;> aesop
@@ -126,7 +128,7 @@ theorem linear_combination_linear_combination [Fintype γ] (a : FinPMF α) (f : 
 
 theorem linear_combination_apply [Nonempty γ] [Fintype γ] (a : FinPMF α) (f : α → FinPMF β) (g : β → γ) :
   (FinPMF.linear_combination a f).apply g = FinPMF.linear_combination a (fun x => (f x).apply g) := by
-  unfold FinPMF.apply FinPMF.linear_combination
+  unfold FinPMF.apply transfer FinPMF.linear_combination
   apply Subtype.ext
   simp only [instFunLike]
   ext x

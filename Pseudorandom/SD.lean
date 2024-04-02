@@ -1,8 +1,9 @@
 import Mathlib.Data.Finset.Functor
 import Mathlib.Analysis.RCLike.Basic
+import LeanAPAP.Prereqs.Discrete.DFT.Basic
 import Pseudorandom.PMF
 
-open Classical Finset BigOperators
+open Classical Finset BigOps
 
 attribute [local simp] Set.Finite.bddAbove Set.finite_range card_univ
 
@@ -16,6 +17,15 @@ variable
 -- Definition of statistical distance
 noncomputable def SD : ℝ :=
   ∑ x, |1 / 2 * (a x - b x)|
+
+lemma SD_eq_half_L1 : SD a b = 1/2 * ‖⇑a - ⇑b‖_[1] := by
+  unfold SD
+  rw [l1Norm_eq_sum, mul_sum]
+  apply sum_congr
+  rfl
+  intro x _
+  rw [abs_mul]
+  simp
 
 theorem SD_linear_combination_le (a : FinPMF α) (f : α → FinPMF β) (b : FinPMF β) :
     SD (a.linear_combination f) b ≤ ∑ x, a x * SD (f x) b := by
