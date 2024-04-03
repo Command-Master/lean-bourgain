@@ -194,6 +194,18 @@ local notation "α" => ZMod n
 local notation "β" => ZMod m
 def lemma44C : ℝ := 1
 
+lemma range_eq_zmod_image : range ↑n = image (fun t => ZMod.val t) (univ : Finset α) := by
+  ext x
+  simp only [mem_range, mem_image, mem_univ, true_and]
+  constructor
+  intro v
+  exists x
+  simp only [ZMod.val_nat_cast]
+  apply Nat.mod_eq_of_lt v
+  rintro ⟨a, ha⟩
+  rw [← ha]
+  apply ZMod.val_lt
+
 theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : β)))‖_[1] ≤ lemma44C * Real.log n := by
   simp_rw [l1Norm_eq_sum, cft_apply, nl2Inner, expect]
   simp only [Function.comp_apply, ← nnratCast_smul_eq_nnqsmul ℂ, NNRat.cast_inv, NNRat.cast_natCast,
@@ -228,7 +240,27 @@ theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : �
       field_simp
       ring
       rfl
-  sorry
+  calc (univ.card : ℝ)⁻¹ * ∑ t : α, ‖∑ x : α, (Circle.e (x.val * (w.val * n - t.val * m) / (n * m)) : ℂ)‖
+    _ = (n : ℝ)⁻¹ * ∑ t ∈ Finset.range n, ‖∑ x : α,
+        (Circle.e (x.val * (w.val * n - t * m) / (n * m)) : ℂ)‖ := by
+      congr 1
+      simp [card_univ]
+      apply Eq.symm
+      convert Finset.sum_image ?_
+      apply range_eq_zmod_image
+      intro x _ y _ v
+      apply ZMod.val_injective n v
+    _ = (n : ℝ)⁻¹ * ∑ t ∈ Finset.range n, ‖∑ x ∈ Finset.range n,
+        (Circle.e (x * (w.val * n - t * m) / (n * m)) : ℂ)‖ := by
+      congr
+      ext t
+      congr 1
+      apply Eq.symm
+      convert Finset.sum_image ?_
+      apply range_eq_zmod_image
+      intro x _ y _ v
+      apply ZMod.val_injective n v
+    _ ≤ lemma44C * Real.log n := sorry
 
 
 -- theorem XOR_abelian (ε : ℝ≥0)
