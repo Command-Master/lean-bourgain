@@ -1,4 +1,4 @@
-import Pseudorandom.Basic
+import Pseudorandom.Transfer
 import LeanAPAP.Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Algebra.BigOperators.Order
@@ -77,30 +77,18 @@ noncomputable def FinPMF.apply (a : FinPMF α) (f : α → β) : FinPMF β :=
     ⟩
 
 -- If B = g(A) then E[f(B)] = E[f(g(A))].
-theorem apply_weighted_sum (g: α → β) (f : β → ℝ) : ∑ x, ((a.apply g) x) * (f x) = ∑ y, (a y) * (f (g y)) := by
-  simp only [instFunLike, FinPMF.apply]
-  unfold transfer
-  simp only [filter_congr_decidable, sum_mul]
-  have (x) : ∑ i in filter (fun y => g y = x) univ, a i * f x =
-    ∑ i in filter (fun y => g y = x) univ, a i * f (g i) := by
-    apply sum_subset_zero_on_sdiff <;> aesop
-  conv =>
-    lhs
-    rhs
-    intro x
-    exact this x
-  rw [←sum_biUnion]
-  have : Finset.biUnion univ (fun x => filter (fun y => g y = x) univ) = univ := by
-    apply subset_antisymm
-    · simp
-    · aesop
-  simp_all
-  rfl
-  apply Set.pairwiseDisjoint_filter
+theorem apply_weighted_sum [RCLike 𝕜] (g: α → β) (f : β → 𝕜) : ∑ x, ((a.apply g) x) * (f x) = ∑ y, (a y) * (f (g y)) := by
+  change ∑ x, (RCLike.ofRealAm ∘ (g # ↑a)) x * f x = ∑ x, (a x) * f (g x)
+  simp_rw [comp_transfer]
+  apply transfer_sum
 
 -- Subtraction of FinPMFs, treating them as independent.
 noncomputable instance instSubFinPMF [Sub α] : HSub (FinPMF α) (FinPMF α) (FinPMF α) where
   hSub := fun a b => (a*b).apply (fun x => x.1 - x.2)
+
+-- Subtraction of FinPMFs, treating them as independent.
+noncomputable instance instAddFinPMF [Add α] : HAdd (FinPMF α) (FinPMF α) (FinPMF α) where
+  hAdd := fun a b => (a*b).apply (fun x => x.1 + x.2)
 
 theorem FinPMF.sub_val [Sub α] : a - b = (a*b).apply (fun x => x.1-x.2) := rfl
 

@@ -1,4 +1,5 @@
 import Pseudorandom.SD
+import Mathlib.RingTheory.RootsOfUnity.Complex
 import Mathlib.Analysis.SpecialFunctions.Log.Base
 import Mathlib.Algebra.Order.Chebyshev
 import LeanAPAP.Prereqs.Discrete.DFT.Compact
@@ -66,6 +67,18 @@ lemma lpNorm_le_card_rpow_mul_linftyNorm (p : NNReal) (hp : p ≠ 0) :
     field_simp
     simp
 
+lemma l2Inner_le_l1Norm_mul_linftyNorm :
+    ‖⟪a, b⟫_[𝕜]‖ ≤ ‖a‖_[1] * ‖b‖_[⊤] := by
+  rw [l2Inner, l1Norm_eq_sum, sum_mul]
+  refine (norm_sum_le ..).trans ?_
+  apply sum_le_sum
+  intro i _
+  simp only [norm_mul, RingHomIsometric.is_iso]
+  gcongr
+  rw [linftyNorm_eq_ciSup]
+  apply le_ciSup (c := i)
+  simp [Set.Finite.bddAbove, Set.finite_range]
+
 variable
    (a b : α → ℝ)
 
@@ -102,26 +115,125 @@ theorem L1_le_card_rpow_mul_dft_norm :
       simp
       norm_num
 
-lemma lemma43 (t : ℝ) (ε : ℝ)
-    (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖dft (a ·) χ‖ ≤ ε)
+lemma lemma43 (t ε : NNReal)
+    (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖cft (a ·) χ‖ ≤ ε / (Fintype.card α))
     (σ : α → β) (h₂ : ∀ χ : AddChar β ℂ,
-      ‖cft (χ ∘ σ)‖_[1] ≤ t / (Fintype.card α)
+      ‖cft (χ ∘ σ)‖_[1] ≤ t
     ):
-    ‖σ # a - σ # (fun (x : α) => 1 / (Fintype.card α : ℝ))‖_[1] ≤ t * ε * Real.sqrt (Fintype.card β)
+    ‖σ # a - σ # (Function.const α (𝔼 x, a x))‖_[1] ≤ t * ε * Real.sqrt (Fintype.card β)
   := by
+  suffices ‖cft (fun x => (σ # a - σ # (Function.const α (𝔼 x, a x))) x)‖_[⊤] ≤ t * ε / (Fintype.card β) by
+    calc ‖σ # a - σ # (Function.const α (𝔼 x, a x))‖_[1]
+      _ ≤ (Fintype.card β)^(3/2 : ℝ) * ‖cft (fun x => (σ # a - σ # (Function.const α (𝔼 x, a x))) x)‖_[⊤] := L1_le_card_rpow_mul_dft_norm _
+      _ ≤ (Fintype.card β)^(3/2 : ℝ) * (t * ε / (Fintype.card β)) := by gcongr
+      _ = t * ε * ((Fintype.card β)^(3/2 : ℝ) / (Fintype.card β)) := by ring
+      _ = t * ε * Real.sqrt (Fintype.card β) := by
+        rw [sqrt_eq_rpow, ← rpow_sub_one]
+        norm_num
+        simp
+  rw [linftyNorm_eq_ciSup]
+  apply ciSup_le
+  intro χ
+  dsimp only [cft_apply, nl2Inner_eq_expect]
+  simp_rw [← transfer_sub]
+  change ‖expect _ fun i => _ * (Complex.ofReal ∘ _) i‖ ≤ _
+  simp_rw [comp_transfer]
+  conv =>
+    lhs
+    rhs
+    rhs
+    intro
+    rw [mul_comm]
+  rw [transfer_expect]
+  simp_rw [mul_comm]
+  rw [← nl2Inner_eq_expect]
+  by_cases he : χ = 0
+  · simp only [he, AddChar.one_apply, Function.comp_apply, Pi.sub_apply, map_sub,
+      Complex.ofReal_eq_coe, map_div₀, map_sum, map_natCast, Complex.norm_eq_abs]
+    change Complex.abs (_ • nl2Inner (Function.const α 1) _) ≤ _
+    rw [nl2Inner_const_left]
+    simp [expect_sub_distrib]
+    positivity
+  · calc ‖(Fintype.card α / Fintype.card β : NNRat) • nl2Inner (χ ∘ σ) (⇑Complex.ofReal ∘ (a - Function.const α (expect univ fun x => a x)))‖
+      _ = (Fintype.card α / Fintype.card β : ℝ) * ‖nl2Inner (χ ∘ σ) (⇑Complex.ofReal ∘ (a - Function.const α (expect univ fun x => a x)))‖ := by
+        rw [← nnratCast_smul_eq_nnqsmul ℝ]
+        simp
+      _ = (Fintype.card α / Fintype.card β : ℝ) * ‖l2Inner (cft (χ ∘ σ)) (cft (⇑Complex.ofReal ∘ (a - Function.const α (expect univ fun x => a x))))‖ := by
+        rw [l2Inner_cft]
+      _ ≤ (Fintype.card α / Fintype.card β : ℝ) * (‖cft (χ ∘ σ)‖_[1] * ‖cft (⇑Complex.ofReal ∘ (a - Function.const α (expect univ fun x => a x)))‖_[⊤]) := by
+        gcongr
+        apply l2Inner_le_l1Norm_mul_linftyNorm
+      _ ≤ (Fintype.card α / Fintype.card β : ℝ) * (t * (ε / (Fintype.card α))) := by
+        gcongr
+        apply h₂
+        rw [linftyNorm_eq_ciSup]
+        apply ciSup_le
+        intro ψ
+        by_cases hψ : ψ = 0
+        · simp only [map_comp_sub, Function.comp_const, Complex.ofReal_eq_coe,
+          Complex.ofReal_expect, hψ, cft_apply, AddChar.coe_zero, Complex.norm_eq_abs]
+          change Complex.abs (nl2Inner (Function.const α 1) _) ≤ _
+          rw [nl2Inner_const_left]
+          simp [expect_sub_distrib]
+          positivity
+        · simp only [map_comp_sub, Function.comp_const, Complex.ofReal_eq_coe,
+          Complex.ofReal_expect, cft_sub, Pi.sub_apply]
+          rw [cft_const]
+          simp only [sub_zero]
+          apply h
+          exact (AddChar.isNontrivial_iff_ne_trivial _).mpr hψ
+          exact hψ
+      _ = t * ε / (Fintype.card β) := by
+        field_simp
+        ring_nf
 
-  sorry
 
 variable (n m : ℕ+) (hₘ : m ≤ n)
 
 local notation "α" => ZMod n
 local notation "β" => ZMod m
+def lemma44C : ℝ := 1
 
-def abelianC : ℝ := 1
-
-theorem XOR_abelian (ε : ℝ≥0)
-  (a : FinPMF α) (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖dft (a ·) χ‖ ≤ ε) :
-  SD (a.apply fun x => (x.val : β)) (Uniform ⟨univ, univ_nonempty⟩) ≤
-    abelianC * (ε * Real.sqrt m * Real.log n + m / n) := by
-
+theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : β)))‖_[1] ≤ lemma44C * Real.log n := by
+  simp_rw [l1Norm_eq_sum, cft_apply, nl2Inner, expect]
+  simp only [Function.comp_apply, ← nnratCast_smul_eq_nnqsmul ℂ, NNRat.cast_inv, NNRat.cast_natCast,
+    smul_eq_mul, norm_mul, norm_inv, Complex.norm_nat]
+  simp_rw [← AddChar.map_neg_eq_conj, ← mul_sum]
+  let w := (AddChar.zmodAddEquiv (n := m) (by simp)).symm χ
+  have (y) : χ y = (AddChar.zmod m w) y := by
+    have : χ = AddChar.zmodAddEquiv (n := m) (by simp) w := by unfold_let w; simp
+    simp [this]
+    rfl
+  simp_rw [this]
+  rw [← Equiv.sum_comp (ι := α) (κ := AddChar α ℂ) (AddChar.zmodAddEquiv (n := n) (by simp))]
+  conv =>
+    lhs
+    rhs
+    rhs
+    intro t
+    rhs
+    rhs
+    intro x
+    tactic =>
+      simp only [EquivLike.coe_coe, AddChar.zmodAddEquiv_apply]
+      change ((AddChar.zmod n t) (-x) * (AddChar.zmod m w) (x.val) : circle) = (_ : ℂ)
+      convert_to ((AddChar.zmod n (t.val : ℤ)) (- x.val : ℤ) * (AddChar.zmod m (w.val : ℤ)) (x.val : ℤ) : circle) = (_ : ℂ)
+      congr <;> simp
+      simp only [AddChar.zmod_apply]
+      simp only [ZMod.nat_cast_val, ZMod.int_cast_cast, Int.cast_neg, mul_neg, ←
+        AddChar.map_add_mul]
+      convert_to Circle.e (x.val * (w.val * n - t.val * m) / (n * m)) = (_ : ℂ)
+      congr
+      simp only [ZMod.nat_cast_val]
+      field_simp
+      ring
+      rfl
   sorry
+
+
+-- theorem XOR_abelian (ε : ℝ≥0)
+--   (a : FinPMF α) (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖dft (a ·) χ‖ ≤ ε) :
+--   SD (a.apply fun x => (x.val : β)) (Uniform ⟨univ, univ_nonempty⟩) ≤
+--     abelianC * (ε * Real.sqrt m * Real.log n + m / n) := by
+
+--   sorry
