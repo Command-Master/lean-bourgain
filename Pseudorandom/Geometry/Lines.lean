@@ -289,6 +289,36 @@ theorem Line.vert_constant (l : Line α) (x y : α × α) (h : x ∈ l) (h₂ : 
   assumption
   constructor <;> assumption
 
+def Line.of_equation (a b : α) : Line α := Line.of (0, b) (1, a+b) (by simp)
+
+theorem mem_of_equation_iff (a b : α) (x : α × α) :
+    x ∈ Line.of_equation a b ↔ a * x.1 + b = x.2 := by
+  unfold Line.of_equation Line.of Submodule.pair
+  conv =>
+    lhs
+    apply propext Submodule.mem_span_pair
+  simp only [Prod.smul_mk, smul_eq_mul, mul_zero, mul_one, Prod.mk_add_mk, zero_add, Prod.mk.injEq,
+    exists_eq_left]
+  constructor
+  · rintro ⟨_, hy1, hy2⟩
+    linear_combination hy1 - b * hy2
+  · intro h
+    exists 1 - x.1
+    ring_nf
+    rw [mul_comm] at h
+    simp [h]
+
+theorem Line.uncurry_of_equation_injective : Function.Injective (Function.uncurry (Line.of_equation (α := α))) := by
+  rintro ⟨a1, a2⟩ ⟨b1, b2⟩ h
+  simp at h
+  have t1 := congr((0, a2) ∈ $h)
+  rw [mem_of_equation_iff, mem_of_equation_iff] at t1
+  simp only [mul_zero, zero_add, eq_iff_iff, true_iff] at t1
+  have t2 := congr((1, a1 + a2) ∈ $h)
+  rw [mem_of_equation_iff, mem_of_equation_iff] at t2
+  simp only [mul_one, eq_iff_iff, true_iff] at t2
+  simp_all
+
 theorem point_intersect (i j : α × α) (oh : i ≠ j) :
   (univ.filter (fun (x : Line α) => i ∈ x ∧ j ∈ x)).card = 1 := by
   rw [card_eq_one]

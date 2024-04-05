@@ -1,9 +1,12 @@
 import Pseudorandom.SD
+import Mathlib.Tactic.Rify
 import Mathlib.RingTheory.RootsOfUnity.Complex
 import Mathlib.Analysis.SpecialFunctions.Log.Base
 import Mathlib.Algebra.Order.Chebyshev
 import LeanAPAP.Prereqs.Discrete.DFT.Compact
 import LeanAPAP.Prereqs.Expect.Basic
+import Mathlib.NumberTheory.Harmonic.Bounds
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
 
 open Classical Real Finset BigOps
 
@@ -15,7 +18,6 @@ variable
 
 open scoped NNReal
 
--- The DFT isn't normalized.
 theorem l1Norm_le_sqrt_card_mul_l2Norm :
   ‖a‖_[1] ≤ Real.sqrt (Fintype.card α) * ‖a‖_[2] := calc
     ‖a‖_[1] = ‖1 * a‖_[1] := by simp
@@ -206,7 +208,88 @@ lemma range_eq_zmod_image : range ↑n = image (fun t => ZMod.val t) (univ : Fin
   rw [← ha]
   apply ZMod.val_lt
 
-theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : β)))‖_[1] ≤ lemma44C * Real.log n := by
+lemma le_add_div_add_of_le_of_le (a b n : ℝ) (hb : 0 < b) (hn : 0 < n)
+    (h : a/b ≤ n) : a/b ≤ (a + 1)/(b + 1/n) := by
+  rw [div_le_div_iff]
+  rw [div_le_iff] at h
+  ring_nf
+  gcongr
+  rwa [mul_inv_le_iff]
+  exact hn
+  exact hb
+  exact hb
+  positivity
+
+lemma circle_lower_bound (x : ℝ) :
+  2 - |4 * x - 2| ≤ ‖(Circle.e x : ℂ) - 1‖ := by
+  simp only [Circle.coe_e, Complex.ofReal_ofNat, Complex.norm_eq_abs]
+  rw [Complex.exp_mul_I, Complex.abs_eq_sqrt_sq_add_sq]
+  conv =>
+    rhs
+    rhs
+    congr
+    · lhs
+      simp [-Complex.ofReal_mul, Complex.cos_ofReal_re]
+    · simp [-Complex.ofReal_mul, Complex.sin_ofReal_re]
+  conv =>
+    rhs
+    rhs
+    tactic =>
+      change _ = 2 - 2 * cos (2 * π * x)
+      rw [Real.sin_sq]
+      ring_nf
+  wlog h : (0 ≤ x ∧ x ≤ 1/2) generalizing x
+  · simp only [not_and_or, not_le] at h
+    cases h
+    · calc
+        2 - |4 * x - 2| ≤ 0 := by
+          rw [abs_of_nonpos]
+          linarith
+          linarith
+        _ ≤ Real.sqrt (2 - 2 * cos (2 * π * x)) := by positivity
+    by_cases x ≤ 1
+    · convert this (1 - x) (by constructor <;> linarith) using 2
+      · rw [abs_eq_abs]
+        right
+        ring_nf
+      · congr 2
+        ring_nf
+        conv =>
+          rhs
+          rw [mul_comm]
+        simp
+    · calc
+        2 - |4 * x - 2| ≤ 0 := by
+          rw [abs_of_nonneg]
+          linarith
+          linarith
+        _ ≤ Real.sqrt (2 - 2 * cos (2 * π * x)) := by positivity
+  have ⟨h1, h2⟩ := h
+  rw [← ge_iff_le]
+  calc Real.sqrt (2 - 2 * cos (2 * π * x))
+    _ ≥ Real.sqrt (2 - 2 * (1 - 2 / π^2 * (2 * π * x)^2)) := by
+      apply Real.sqrt_le_sqrt
+      gcongr
+      apply Real.cos_quadratic_upper_bound
+      rw [abs_of_nonneg]
+      rw [mul_comm, ← mul_assoc]
+      apply mul_le_of_le_one_left
+      positivity
+      linarith
+      positivity
+    _ = Real.sqrt ((4 * x)^2) := by
+      congr
+      field_simp
+      ring_nf
+    _ = 4 * x := by apply Real.sqrt_sq; linarith
+    _ = 2 - |4 * x - 2| := by
+      rw [abs_of_nonpos]
+      ring_nf
+      linarith
+
+set_option maxHeartbeats 500000
+
+theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : β)))‖_[1] ≤ 6 * Real.log n + 6 := by
   simp_rw [l1Norm_eq_sum, cft_apply, nl2Inner, expect]
   simp only [Function.comp_apply, ← nnratCast_smul_eq_nnqsmul ℂ, NNRat.cast_inv, NNRat.cast_natCast,
     smul_eq_mul, norm_mul, norm_inv, Complex.norm_nat]
@@ -241,18 +324,10 @@ theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : �
       ring
       rfl
   calc (univ.card : ℝ)⁻¹ * ∑ t : α, ‖∑ x : α, (Circle.e (x.val * (w.val * n - t.val * m) / (n * m)) : ℂ)‖
-    _ = (n : ℝ)⁻¹ * ∑ t ∈ Finset.range n, ‖∑ x : α,
-        (Circle.e (x.val * (w.val * n - t * m) / (n * m)) : ℂ)‖ := by
-      congr 1
-      simp [card_univ]
-      apply Eq.symm
-      convert Finset.sum_image ?_
-      apply range_eq_zmod_image
-      intro x _ y _ v
-      apply ZMod.val_injective n v
-    _ = (n : ℝ)⁻¹ * ∑ t ∈ Finset.range n, ‖∑ x ∈ Finset.range n,
-        (Circle.e (x * (w.val * n - t * m) / (n * m)) : ℂ)‖ := by
+    _ = (n : ℝ)⁻¹ * ∑ t : α, ‖∑ x ∈ Finset.range n,
+        (Circle.e (x * (w.val * n - t.val * m) / (n * m)) : ℂ)‖ := by
       congr
+      simp [card_univ]
       ext t
       congr 1
       apply Eq.symm
@@ -260,7 +335,213 @@ theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : �
       apply range_eq_zmod_image
       intro x _ y _ v
       apply ZMod.val_injective n v
-    _ ≤ lemma44C * Real.log n := sorry
+    _ = (n : ℝ)⁻¹ * ∑ t : α, ‖∑ x ∈ Finset.range n,
+        (Circle.e ((w.val * n / m - t.val) / n) : ℂ)^x‖ := by
+      congr with _
+      congr with _
+      rw [← SubmonoidClass.coe_pow, ← AddChar.map_nsmul_pow]
+      congr 2
+      field_simp
+      ring_nf
+    _ ≤ (n : ℝ)⁻¹ * ∑ t : α,
+        (‖(Circle.e ((w.val * n / m - t.val) / n) : ℂ)^↑n - 1‖ + 1) /
+        (‖(Circle.e ((w.val * n / m - t.val) / n) : ℂ) - 1‖ + 1 / n) := by
+      gcongr with t ht
+      by_cases h : (Circle.e ((w.val * n / m - t.val) / n) : ℂ) = 1
+      · rw [h]
+        simp
+      · have := geom_sum_eq (x := (Circle.e ((w.val * n / m - t.val) / n) : ℂ)) h n
+        apply_fun (‖·‖) at this
+        rw [norm_div] at this
+        rw [this]
+        apply le_add_div_add_of_le_of_le
+        simp only [Complex.norm_eq_abs, AbsoluteValue.pos_iff]
+        exact fun v => h (eq_of_sub_eq_zero v)
+        simp
+        rw [← this]
+        convert norm_sum_le ..
+        convert_to ∑ i ∈ Finset.range n, (1 : ℝ) = _
+        simp
+        apply sum_congr
+        rfl
+        intros
+        simp [-Circle.coe_e]
+    _ ≤ (n : ℝ)⁻¹ * ∑ t : α,
+        ((‖(Circle.e ((w.val * n / m - t.val) / n) : ℂ)^↑n‖ + ‖(1 : ℂ)‖) + 1) /
+        (‖(Circle.e ((w.val * n / m - t.val) / n) : ℂ) - 1‖ + 1 / n) := by
+      gcongr
+      apply norm_sub_le
+    _ ≤ (n : ℝ)⁻¹ * ∑ t : α,
+        ((1 + (1 : ℝ)) + 1) /
+        (‖(Circle.e ((w.val * n / m - t.val) / n) : ℂ) - 1‖ + 1 / n) := by
+      simp [-Circle.coe_e]
+    _ = 3 * ∑ t : α,
+        (n : ℝ)⁻¹ /
+        (‖(Circle.e ((w.val * n / m - t.val) / n) : ℂ) - 1‖ + 1 / n) := by
+      rw [mul_sum, mul_sum]
+      congr
+      ext
+      ring_nf
+    _ = 3 * ∑ t : α,
+        1 / (n * (‖(Circle.e ((w.val * n / m - t.val) / n) : ℂ) - 1‖ + 1 / n)) := by
+      congr
+      ext
+      field_simp
+    _ = 3 * ∑ t : α,
+        1 / (n * (‖(Circle.e (Int.fract ((w.val * n / m - t.val) / n)) : ℂ) - 1‖ + 1 / n)) := by
+      simp
+    _ ≤ 3 * ∑ t : α,
+        1 / (n * ((2 - |4 * Int.fract ((w.val * n / m - t.val) / n : ℝ) - 2|) + 1 / n)) := by
+      gcongr
+      · apply mul_pos
+        simp
+        apply add_pos_of_nonneg_of_pos
+        apply sub_nonneg_of_le
+        simp only [abs_sub_le_iff]
+        constructor
+        apply sub_left_le_of_le_add
+        norm_num
+        exact le_of_lt (Int.fract_lt_one _)
+        apply sub_le_self
+        apply mul_nonneg
+        norm_num
+        apply Int.fract_nonneg
+        simp
+      apply circle_lower_bound
+    _ = 3 * ∑ t : α,
+        1 / (2*n - |4 * (n * Int.fract ((w.val * n / m - t.val) / n : ℝ)) - 2 * n| + 1) := by
+      rcongr
+      ring_nf
+      conv =>
+        lhs
+        rhs
+        rhs
+        rw [← abs_of_nonneg (by simp : 0 ≤ (n : ℝ)), ← abs_mul, abs_of_nonneg (by simp : 0 ≤ (n : ℝ))]
+      field_simp
+      ring_nf
+    _ = 3 * ∑ t : α,
+        1 / (2*n - |4 * (n * Int.fract (((⌊w.val * n / (m : ℝ)⌋ + Int.fract (w.val * n / m : ℝ)) - t.val) / n : ℝ)) - 2 * n| + 1) := by simp
+    _ = 3 * ∑ t : α,
+        1 / (2*n - |4 * (n * Int.fract ((Int.fract (w.val * n / m : ℝ) + (⌊w.val * n / (m : ℝ)⌋ - t.val)) / n : ℝ)) - 2 * n| + 1) := by
+      rcongr
+      ring_nf
+    _ = 3 * ∑ t : α,
+        1 / (2*n - |4 * (n * Int.fract ((Int.fract (w.val * n / m : ℝ) + (⌊w.val * n / (m : ℝ)⌋ - t).val) / n : ℝ)) - 2 * n| + 1) := by
+      congr with t
+      congr 7
+      rw [Int.fract_eq_fract]
+      field_simp
+      rw [← ZMod.nat_cast_val, ← ZMod.nat_cast_val, ← ZMod.nat_cast_val]
+      norm_cast
+      apply exists_eq_mul_left_of_dvd
+      rw [← ZMod.int_cast_zmod_eq_zero_iff_dvd]
+      simp
+    _ = 3 * ∑ t : α,
+        1 / (2*n - |4 * (n * Int.fract ((Int.fract (w.val * n / m : ℝ) + t.val) / n : ℝ)) - 2 * n| + 1) := by
+      congr 1
+      apply Fintype.sum_bijective (fun (x : α) => (⌊w.val * n / (m : ℝ)⌋ - x))
+      · apply Function.Involutive.bijective
+        intro x
+        simp
+      · intro x
+        rfl
+    _ = 3 * ∑ t : α,
+        1 / (2*n - |4 * (n * ((Int.fract (w.val * n / m : ℝ) + t.val) / n : ℝ)) - 2 * n| + 1) := by
+      rcongr
+      rw [Int.fract_eq_self]
+      constructor
+      · apply div_nonneg
+        apply add_nonneg
+        simp
+        norm_cast
+        simp
+        simp
+      · rw [div_lt_one, ← lt_sub_iff_add_lt]
+        refine (Int.fract_lt_one _).trans_le ?_
+        rw [le_sub_iff_add_le]
+        norm_cast
+        rw [Nat.one_add_le_iff]
+        apply ZMod.val_lt
+        simp
+    _ = 3 * ∑ t : α,
+        1 / (2*n - |4 * (Int.fract (w.val * n / m : ℝ) + t.val) - 2 * n| + 1) := by
+      rcongr
+      field_simp
+      ring_nf
+    _ = 3 * ∑ t ∈ Finset.range n,
+        1 / (2*n - |4 * (Int.fract (w.val * n / m : ℝ) + t) - 2 * n| + 1) := by
+      congr 1
+      apply Eq.symm
+      convert Finset.sum_image ?_
+      apply range_eq_zmod_image
+      intro x _ y _ v
+      apply ZMod.val_injective n v
+    _ = 3 * ∑ t ∈ Finset.range n,
+        if t ≤ n/2 - Int.fract (w.val * n / m : ℝ) then
+          1 / (4 * (Int.fract (w.val * n / m : ℝ) + t) + 1)
+        else
+          1 / (4 * (n - (Int.fract (w.val * n / m : ℝ) + t)) + 1) := by
+      rcongr t
+      split
+      · rw [abs_of_nonpos]
+        ring_nf
+        linarith
+      · rw [abs_of_nonneg]
+        ring_nf
+        linarith
+    _ ≤ 3 * ∑ t ∈ Finset.range n,
+        if t ≤ n/2 - Int.fract (w.val * n / m : ℝ) then
+          1 / (4 * t + 1 : ℝ)
+        else
+          1 / (4 * (n - (1 + t)) + 1 : ℝ) := by
+      gcongr with i hi
+      split
+      · rw [one_div, one_div, inv_le_inv]
+        linarith [Int.fract_nonneg (w.val * n / m : ℝ)]
+        linarith [Int.fract_nonneg (w.val * n / m : ℝ)]
+        positivity
+      · have : 1 ≤ (n : ℕ) := by norm_cast; simp
+        simp only [mem_range] at hi
+        apply Nat.le_sub_one_of_lt at hi
+        have : (i : ℝ) ≤ (n : ℝ) - 1 := by exact_mod_cast hi
+        rw [one_div, one_div, inv_le_inv]
+        linarith [Int.fract_lt_one (w.val * n / m : ℝ)]
+        linarith [Int.fract_lt_one (w.val * n / m : ℝ)]
+        linarith
+    _ ≤ 3 * ∑ t ∈ Finset.range n,
+        (1 / (4 * t + 1 : ℝ) + 1 / (4 * (n - (1 + t)) + 1 : ℝ)) := by
+      gcongr with i hi
+      have : 1 ≤ (n : ℕ) := by norm_cast; simp
+      simp only [mem_range] at hi
+      apply Nat.le_sub_one_of_lt at hi
+      have : (i : ℝ) ≤ (n : ℝ) - 1 := by exact_mod_cast hi
+      split
+      · simp only [one_div, le_add_iff_nonneg_right, inv_nonneg]
+        linarith
+      · simp only [one_div, le_add_iff_nonneg_left, inv_nonneg, ge_iff_le]
+        linarith
+    _ = 3 * (∑ t ∈ Finset.range n, 1 / (4 * t + 1 : ℝ) + ∑ t ∈ Finset.range n, 1 / (4 * (n - (1 + t)) + 1 : ℝ)) := by
+      rw [sum_add_distrib]
+    _ = 3 * (∑ t ∈ Finset.range n, 1 / (4 * t + 1 : ℝ) + ∑ t ∈ Finset.range n, 1 / (4 * t + 1 : ℝ)) := by
+      congr 2
+      convert Finset.sum_range_reflect ?_ n
+      rename_i x hx
+      congr 3
+      simp only [mem_range] at hx
+      have : 1+x ≤ (n : ℕ) := Nat.one_add_le_iff.mpr hx
+      norm_cast
+      rw [Nat.sub_add_eq]
+    _ = 6 * (∑ t ∈ Finset.range n, 1 / (4 * t + 1 : ℝ)) := by rw [← two_mul]; ring
+    _ ≤ 6 * ((∑ t ∈ Finset.range n, (t + 1 : ℚ)⁻¹ : ℚ) : ℝ) := by
+      push_cast
+      simp only [one_div]
+      gcongr
+      linarith
+    _ = 6 * (harmonic n : ℝ) := by
+      unfold harmonic
+      norm_cast
+    _ ≤ 6 * (1 + Real.log n) := by gcongr; apply harmonic_le_one_add_log
+    _ = 6 * Real.log n + 6 := by ring_nf
 
 
 -- theorem XOR_abelian (ε : ℝ≥0)

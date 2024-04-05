@@ -54,7 +54,7 @@ lemma one_le_SG_C₃ : 1 ≤ SG_C₃ := calc
 
 lemma SG_C₃_pos : 0 < SG_C₃ := calc
   0 < 1 := zero_lt_one
-  1 ≤ SG_C₃ := one_le_SG_C₃
+  _ ≤ SG_C₃ := one_le_SG_C₃
 
 lemma one_le_ST_C₅ : 1 ≤ ST_C₅ := calc
   1 ≤ 1^(1/4 : ℝ) := by simp
@@ -72,7 +72,6 @@ lemma ST_C₅_pos : 0 < ST_C₅ := calc
 lemma lemma1 (β : ℝ) :
   1 / 2 + 2 * ST_prime_field_eps₂ β ≤ 1 - 4 * ST_prime_field_eps₃ β := by
   unfold ST_prime_field_eps₂ ST_prime_field_eps₃ ST_prime_field_eps₄ SG_eps SG_eps₂
-  ring_nf
   have := ntlSGeps β
   linarith
 
