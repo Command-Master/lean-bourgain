@@ -1,4 +1,5 @@
 import Pseudorandom.Extractor
+import Pseudorandom.XorLemma
 import Mathlib.LinearAlgebra.BilinearForm.Basic
 import Pseudorandom.Incidence.Incidence
 
@@ -11,14 +12,25 @@ theorem AddChar.eq_iff [AddGroup α] [GroupWithZero R] (χ : AddChar α R) : χ 
   apply_fun (· * χ (-b))
   simp only [zero_mul, ne_eq, ← AddChar.map_add_mul, add_right_neg, map_zero_one, one_ne_zero, not_false_eq_true]
 
+def IP [CommSemiring α] : BilinForm α (α × α) := {
+  bilin := fun x y => (x.1*y.1 + x.2*y.2)
+  bilin_add_left := by intros; simp; ring_nf
+  bilin_add_right := by intros; simp; ring_nf
+  bilin_smul_left := by intros; simp; ring_nf
+  bilin_smul_right := by intros; simp; ring_nf
+}
+
+lemma IP_comm [CommSemiring α] (a b : α × α) : IP a b = IP b a := by
+  unfold IP
+  simp [mul_comm]
+
 theorem apply_inner_product_injective [Field α] (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
     Function.Injective (fun x : α × α => {
-      toFun := fun y : α × α => χ (x.1 * y.1 + x.2 * y.2)
+      toFun := fun y : α × α => χ (IP x y)
       map_zero_one' := by simp
       map_add_mul' := by
         intro a b
         simp [← AddChar.map_add_mul]
-        ring_nf
       : AddChar (α × α) ℂ
     }) := by
   obtain ⟨x, hx⟩ := h
@@ -33,6 +45,7 @@ theorem apply_inner_product_injective [Field α] (χ : AddChar α ℂ) (h : χ.I
     rw [AddChar.eq_iff] at this
     replace this : χ x = 1 := by
       convert this
+      unfold IP
       field_simp
       ring_nf
     simp [this] at hx
@@ -43,27 +56,27 @@ theorem apply_inner_product_injective [Field α] (χ : AddChar α ℂ) (h : χ.I
     rw [AddChar.eq_iff] at this
     replace this : χ x = 1 := by
       convert this
+      unfold IP
       field_simp
       ring_nf
     simp [this] at hx
 
 theorem apply_inner_product_bijective [Fintype α] [Field α] (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
     Function.Bijective (fun x : α × α => {
-      toFun := fun y : α × α => χ (x.1 * y.1 + x.2 * y.2)
+      toFun := fun y : α × α => χ (IP x y)
       map_zero_one' := by simp
       map_add_mul' := by
         intro a b
         simp [← AddChar.map_add_mul]
-        ring_nf
       : AddChar (α × α) ℂ
     }) := (Fintype.bijective_iff_injective_and_card _).mpr ⟨apply_inner_product_injective χ h, by simp⟩
 
 noncomputable def AddChar.inner_product_equiv [Fintype α] [Field α] (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
   (α × α) ≃ AddChar (α × α) ℂ := Equiv.ofBijective _ (apply_inner_product_bijective χ h)
 
-noncomputable def bourgain_extractor_aux₀ [Fintype α] [Field α] (a b : (α × α) → ℝ) (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
-    ‖ ∑ x, a x * ∑ y, b y * χ (x.1 * y.1 + x.2 * y.2)‖^2 ≤ (Fintype.card α)^2 * ‖a‖_[2]^2 * ‖b‖_[2]^2 :=
-      calc ‖ ∑ x, a x * ∑ y, b y * χ (x.1 * y.1 + x.2 * y.2)‖^2
+theorem bourgain_extractor_aux₀ [Fintype α] [Field α] (a b : (α × α) → ℝ) (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
+    ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖^2 ≤ (Fintype.card α)^2 * ‖a‖_[2]^2 * ‖b‖_[2]^2 :=
+      calc ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖^2
   _ = ‖ ∑ x, a x * ∑ y, b y * (χ.inner_product_equiv h x) y‖^2 := rfl
   _ = ‖ ∑ x, a x * ∑ y, (χ.inner_product_equiv h x) y * b y‖^2 := by congr; ext; congr; ext; rw [mul_comm]
   _ = ‖ ∑ x, a x * ∑ y, conj ((χ.inner_product_equiv h x)⁻¹ y) * b y‖^2 := by
@@ -112,6 +125,13 @@ noncomputable def bourgain_extractor_aux₀ [Fintype α] [Field α] (a b : (α �
   _ = (Fintype.card α)^2 * ‖a‖_[2]^2 * ‖b‖_[2]^2 := by
     rw [Complex.lpNorm_coe_comp, Complex.lpNorm_coe_comp]
 
+theorem bourgain_extractor_aux₀' [Fintype α] [Field α] (a b : (α × α) → ℝ) (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
+    ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖ ≤ (Fintype.card α) * ‖a‖_[2] * ‖b‖_[2] := by
+  have := bourgain_extractor_aux₀ a b χ h
+  rw [← mul_pow, ← mul_pow, sq_le_sq, abs_of_nonneg, abs_of_nonneg] at this
+  exact this
+  positivity
+  positivity
 
 theorem bourgain_extractor_aux₁ [Fintype α] [Field α] [Fintype β] [AddCommGroup β] [Module α β]
     (a b : FinPMF β) (χ : AddChar α ℂ) (F : BilinForm α β) :
@@ -203,19 +223,146 @@ theorem bourgain_extractor_aux₁' [Fintype α] [Field α] [Fintype β] [AddComm
   norm_num
 
 
+noncomputable def close_high_entropy [Fintype α] (n : ℕ) (ε : ℝ) (a : FinPMF α) : Prop :=
+  ∀ (H : Finset α), (H.card ≤ n) → ∑ v ∈ H, a v ≤ ε
+
+theorem bourgain_extractor_aux₂ (ε : ℝ) (hε : 0 < ε) (n : ℕ+) [Fintype α] [Field α] [DecidableEq (α × α)] (a b : FinPMF (α × α)) (χ : AddChar α ℂ)
+    (h : χ.IsNontrivial) (hA : close_high_entropy n ε a) (hB : close_high_entropy n ε b):
+    ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖ ≤ Fintype.card α / n + 2 * ε := calc ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖
+  _ = ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y, b y * χ (IP x y) +
+      ∑ x ∈ univ.filter (fun x => ¬a x ≤ 1/n), a x * ∑ y, b y * χ (IP x y)‖ := by rw [sum_filter_add_sum_filter_not]
+  _ ≤ ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y, b y * χ (IP x y)‖ +
+      ‖∑ x ∈ univ.filter (fun x => ¬a x ≤ 1/n), a x * ∑ y, b y * χ (IP x y)‖ := norm_add_le ..
+  _ ≤ ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y, b y * χ (IP x y)‖ +
+      ∑ x ∈ univ.filter (fun x => ¬a x ≤ 1/n), ‖a x * ∑ y, b y * χ (IP x y)‖ := by
+    gcongr
+    apply norm_sum_le
+  _ = ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y, b y * χ (IP x y)‖ +
+      ∑ x ∈ univ.filter (fun x => ¬a x ≤ 1/n), ‖a x‖ * ‖∑ y, b y * χ (IP x y)‖ := by
+    simp only [one_div, Fintype.sum_prod_type, Complex.norm_eq_abs, not_le, norm_mul,
+      Complex.abs_ofReal, Real.norm_eq_abs]
+  _ ≤ ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y, b y * χ (IP x y)‖ +
+      ∑ x ∈ univ.filter (fun x => ¬a x ≤ 1/n), ‖a x‖ * ∑ y, ‖b y * χ (IP x y)‖ := by
+    gcongr
+    apply norm_sum_le
+  _ = ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y, b y * χ (IP x y)‖ +
+      ∑ x ∈ univ.filter (fun x => ¬a x ≤ 1/n), ‖a x‖ * ∑ y, ‖b y‖ := by simp only [one_div,
+        Fintype.sum_prod_type, Complex.norm_eq_abs, not_le, Real.norm_eq_abs, norm_mul,
+        Complex.abs_ofReal, AddChar.norm_apply, mul_one]
+  _ = ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y, b y * χ (IP x y)‖ +
+      ∑ x ∈ univ.filter (fun x => ¬a x ≤ 1/n), a x := by simp only [one_div,
+        Fintype.sum_prod_type, Complex.norm_eq_abs, not_le, Real.norm_eq_abs, ge_iff_le,
+        FinPMF.nonneg, abs_of_nonneg, FinPMF.sum_coe, mul_one]
+  _ ≤ ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y, b y * χ (IP x y)‖ + ε := by
+    gcongr
+    apply hA
+    sorry
+  _ = ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x *
+      (∑ y ∈ univ.filter (fun y => b y ≤ 1/n), b y * χ (IP x y) + ∑ y ∈ univ.filter (fun y => ¬b y ≤ 1/n), b y * χ (IP x y))‖ + ε := by
+    simp_rw [sum_filter_add_sum_filter_not]
+  _ = ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => b y ≤ 1/n), b y * χ (IP x y) +
+      ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => ¬b y ≤ 1/n), b y * χ (IP x y)‖ + ε := by
+    simp_rw [mul_add, sum_add_distrib]
+  _ ≤ ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => b y ≤ 1/n), b y * χ (IP x y)‖ +
+      ‖∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => ¬b y ≤ 1/n), b y * χ (IP x y)‖ + ε := by
+    gcongr
+    apply norm_add_le
+  _ ≤ ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => b y ≤ 1/n), b y * χ (IP x y)‖ +
+      ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), ‖a x * ∑ y ∈ univ.filter (fun y => ¬b y ≤ 1/n), b y * χ (IP x y)‖ + ε := by
+    gcongr
+    apply norm_sum_le
+  _ = ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => b y ≤ 1/n), b y * χ (IP x y)‖ +
+      ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), ‖a x‖ * ‖∑ y ∈ univ.filter (fun y => ¬b y ≤ 1/n), b y * χ (IP x y)‖ + ε := by
+    simp only [one_div, Complex.norm_eq_abs, not_le, norm_mul, Complex.abs_ofReal, Real.norm_eq_abs]
+  _ ≤ ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => b y ≤ 1/n), b y * χ (IP x y)‖ +
+      ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), ‖a x‖ * ∑ y ∈ univ.filter (fun y => ¬b y ≤ 1/n), ‖b y * χ (IP x y)‖ + ε := by
+    gcongr
+    apply norm_sum_le
+  _ = ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => b y ≤ 1/n), b y * χ (IP x y)‖ +
+      ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => ¬b y ≤ 1/n), b y + ε := by
+    simp only [one_div, Complex.norm_eq_abs, Real.norm_eq_abs, ge_iff_le, FinPMF.nonneg,
+      abs_of_nonneg, not_le, norm_mul, Complex.abs_ofReal, AddChar.norm_apply, mul_one]
+  _ ≤ ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => b y ≤ 1/n), b y * χ (IP x y)‖ +
+      ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ε + ε := by
+    gcongr
+    simp
+    apply hB
+    sorry
+  _ ≤ ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => b y ≤ 1/n), b y * χ (IP x y)‖ +
+      ∑ x ∈ univ, a x * ε + ε := by
+    gcongr
+    apply sum_le_sum_of_subset_of_nonneg
+    simp
+    intros
+    apply mul_nonneg
+    simp
+    exact le_of_lt hε
+  _ = ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => b y ≤ 1/n), b y * χ (IP x y)‖ +
+      ε + ε := by rw [← sum_mul]; simp
+  _ = ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => b y ≤ 1/n), b y * χ (IP x y)‖ +
+      2 * ε := by ring
+  _ = ‖ ∑ x, (if a x ≤ 1/n then a x else 0) *
+        ∑ y, (if b y ≤ 1/n then b y else 0) * χ (IP x y)‖ +
+      2 * ε := by
+    congr 2
+    apply Finset.sum_subset_zero_on_sdiff
+    · simp
+    · intros
+      simp_all
+    · intros
+      simp_all only [one_div, mem_filter, mem_univ, true_and, ite_true,
+        mul_eq_mul_left_iff, Complex.ofReal_eq_zero]
+      left
+      apply Finset.sum_subset_zero_on_sdiff
+      · simp
+      · intros
+        simp_all
+      · intros
+        simp_all
+  _ ≤ (Fintype.card α) * ‖fun x => (if a x ≤ 1/n then a x else 0)‖_[2] * ‖fun y => (if b y ≤ 1/n then b y else 0)‖_[2] + 2*ε := by
+    gcongr
+    apply bourgain_extractor_aux₀'
+    exact h
+  _ ≤ (Fintype.card α) * Real.sqrt (‖fun x => (if a x ≤ 1/n then a x else 0)‖_[1] * ‖fun x => (if a x ≤ 1/n then a x else 0)‖_[⊤])
+      * Real.sqrt (‖fun y => (if b y ≤ 1/n then b y else 0)‖_[1] * ‖fun y => (if b y ≤ 1/n then b y else 0)‖_[⊤]) + 2*ε := by
+    gcongr <;> apply l2Norm_le_sqrt_l1Norm_mul_linftyNorm
+  _ = (Fintype.card α) * Real.sqrt ((∑ x, ‖if a x ≤ 1/n then a x else 0‖) * ‖fun x => (if a x ≤ 1/n then a x else 0)‖_[⊤])
+      * Real.sqrt ((∑ y, ‖if b y ≤ 1/n then b y else 0‖) * ‖fun y => (if b y ≤ 1/n then b y else 0)‖_[⊤]) + 2*ε := by
+    rw [l1Norm_eq_sum, l1Norm_eq_sum]
+  _ ≤ (Fintype.card α) * Real.sqrt ((∑ x, a x) * (1/n))
+      * Real.sqrt ((∑ y, b y) * (1 / n)) + 2*ε := by
+    gcongr
+    repeat {
+    apply Real.sqrt_le_sqrt
+    gcongr
+    · simp
+    · split
+      simp [abs_of_nonneg]
+      simp
+    · rw [linftyNorm_eq_ciSup]
+      apply ciSup_le
+      intro
+      split
+      simp_all only [one_div, Real.norm_eq_abs, ge_iff_le, FinPMF.nonneg, abs_of_nonneg]
+      simp
+    }
+  _ = (Fintype.card α) * (Real.sqrt (1/n) * Real.sqrt (1 / n)) + 2*ε := by simp [mul_assoc]
+  _ = (Fintype.card α) * (1 / n) + 2*ε := by rw [← sq]; simp
+  _ = Fintype.card α / n + 2 * ε := by ring
+
 variable {p : ℕ} [Fact p.Prime]
 
 local notation "α" => ZMod p
 
+
 noncomputable def lapply (a : FinPMF α) (b : FinPMF (α × α × α)) : FinPMF (α × α) :=
   (a * b).apply (fun ⟨x, y⟩ => (x + y.1, y.2.1 * (x + y.1) + y.2.2))
 
-theorem line_point_large_l2 (a' : {x : Finset α // x.Nonempty}) (b' : {x : Finset (α × α × α) // x.Nonempty})
-    (hD : Set.InjOn Prod.snd (b' : Set (α × α × α)))
-    (H : Finset (α × α)) (hSz : b'.1.card ≤ H.card) (β : ℝ) (hβ : 0 < β) (hkl : (p^β : ℝ) ≤ H.card) (hku: H.card ≤ (p^(2 - β) : ℝ)) :
-    ∑ x ∈ H, lapply (Uniform a') (Uniform b') x ≤ 1/(a'.1.card * b'.1.card) * ST_C * H.card^(3/2 - ST_prime_field_eps β) := by
-  by_cases H.card = 0
-  · simp_all
+theorem line_point_large_l2_aux (n : ℕ+) (β : ℝ) (hβ : 0 < β) (hkl : (p^β : ℝ) ≤ n) (hku: n ≤ (p^(2 - β) : ℝ))
+    (a' : {x : Finset α // x.Nonempty}) (b' : {x : Finset (α × α × α) // x.Nonempty})
+    (hD : Set.InjOn Prod.snd (b' : Set (α × α × α))) (hbSz : b'.1.card ≤ n) :
+    close_high_entropy n (1/(a'.1.card * b'.1.card) * ST_C * n^(3/2 - ST_prime_field_eps β)) (lapply (Uniform a') (Uniform b')) := by
+  intro H hhSz
   let a := Uniform a'
   let b := Uniform b'
   change ∑ x ∈ H, lapply a b x ≤ _
@@ -325,32 +472,16 @@ theorem line_point_large_l2 (a' : {x : Finset α // x.Nonempty}) (b' : {x : Fins
     _ = 1/(a'.1.card*b'.1.card) * ∑ x ∈ H,
         (IntersectionsL x ((b'.1.image Prod.snd).image (Function.uncurry Line.of_equation))).card := rfl
     _ = 1/(a'.1.card*b'.1.card) * (Intersections H ((b'.1.image Prod.snd).image (Function.uncurry Line.of_equation))).card := by rw [IntersectionsL_sum]
-    _ ≤ 1/(a'.1.card*b'.1.card) * (ST_C * (H.card.toPNat (by omega))^(3/2 - ST_prime_field_eps β)) := by
+    _ ≤ 1/(a'.1.card*b'.1.card) * (ST_C * n^(3/2 - ST_prime_field_eps β)) := by
       gcongr
       apply ST_prime_field
       exact hβ
       exact_mod_cast hkl
       exact_mod_cast hku
-      rfl
-      exact Finset.card_image_le.trans (Finset.card_image_le.trans hSz)
-    _ = 1/(a'.1.card * b'.1.card) * ST_C * H.card^(3/2 - ST_prime_field_eps β) := by
-      ring_nf
-      rfl
+      exact hhSz
+      exact Finset.card_image_le.trans (Finset.card_image_le.trans hbSz)
+    _ = 1/(a'.1.card * b'.1.card) * ST_C * n^(3/2 - ST_prime_field_eps β) := by ring
 
-def IP : BilinForm α (α × α) := {
-  bilin := fun x y => (x.1*y.1 + x.2*y.2)
-  bilin_add_left := by intros; simp; ring_nf
-  bilin_add_right := by intros; simp; ring_nf
-  bilin_smul_left := by intros; simp; ring_nf
-  bilin_smul_right := by intros; simp; ring_nf
-}
-
-lemma IP_comm (a b : α × α) : IP a b = IP b a := by
-  unfold IP
-  simp [mul_comm]
-
-
--- (x + y.1, y.2.1 * (x + y.1) + y.2.2)
 
 def lmap (x : α × α) : α × α × α := (x.1 + x.2, (2 * (x.1 + x.2), -((x.1 + x.2)^2 + (x.1^2 + x.2^2))))
 
@@ -468,4 +599,7 @@ theorem bourgain_extractor (ε : ℝ) (a b : FinPMF α) (χ : AddChar α ℂ) (h
     simp_rw [jurl]
   -- _ = ‖∑ y, ((b * b * b).apply fun x => (x.1.1 + x.1.2 + x.2, x.1.1^2 + x.1.2^2 + x.2^2)) y *
   --     ∑ x, ((a * a * a).apply fun x => (x.1.1 + x.1.2 + x.2, x.1.1^2 + x.1.2^2 + x.2^2)) x * χ (IP y x)‖^(64⁻¹ : ℝ) := by
-  _ ≤ ε := sorry
+  _ ≤ ε := by
+
+    sorry
+  _ = ε := rfl

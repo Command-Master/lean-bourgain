@@ -81,6 +81,16 @@ lemma l2Inner_le_l1Norm_mul_linftyNorm :
   apply le_ciSup (c := i)
   simp [Set.Finite.bddAbove, Set.finite_range]
 
+lemma l2Norm_le_sqrt_l1Norm_mul_linftyNorm (a : α → ℝ) :
+    ‖a‖_[2] ≤ Real.sqrt (‖a‖_[1] * ‖a‖_[⊤]) := by
+  rw [Real.le_sqrt]
+  convert_to ⟪a, a⟫_[ℝ] ≤ ‖a‖_[1] * ‖a‖_[⊤]
+  simp
+  convert l2Inner_le_l1Norm_mul_linftyNorm a a
+  simp
+  simp
+  apply mul_nonneg <;> simp
+
 variable
    (a b : α → ℝ)
 
