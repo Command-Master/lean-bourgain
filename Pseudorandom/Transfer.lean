@@ -24,6 +24,23 @@ theorem comp_transfer [AddCommMonoid γ] [AddCommMonoid γ₂] [FunLike G γ γ�
   ext a
   simp
 
+theorem transfer_transfer [AddCommMonoid γ] [Fintype β] [DecidableEq γ₂]
+    (f : α → β) (g : α → γ) (h : β → γ₂):
+  h # (f # g) = (h ∘ f) # g := by
+  unfold transfer
+  ext a
+  simp
+  rw [Finset.sum_comm' (t' := univ.filter fun y => (h (f y)) = a) (s' := fun x => {f x})]
+  simp
+  aesop
+
+
+theorem transfer_id (f : α → β) [DecidableEq α] [AddCommMonoid β]:
+  id # f = f := by
+  unfold transfer
+  ext a
+  simp [Finset.filter_eq']
+
 theorem transfer_sub [SubtractionCommMonoid γ] (f : α → β) (g h : α → γ) :
   f # (g - h) = f # g - f # h := by
   unfold transfer

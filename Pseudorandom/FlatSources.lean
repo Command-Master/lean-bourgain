@@ -55,7 +55,7 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
   by_cases ev : if h : l < vals.length then a vals[(l : ℕ)] = 0 else True
   · exists Uniform_singleton supp'
     apply DFunLike.ext
-    simp only [instFunLike, FinPMF.linear_combination, Uniform_singleton, Uniform, mem_singleton, card_singleton,
+    simp only [FinPMF.val_apply, FinPMF.linear_combination, Uniform_singleton, Uniform, mem_singleton, card_singleton,
       Nat.cast_one, ne_eq, one_ne_zero, not_false_eq_true, div_self, one_div, mul_ite, ite_mul,
       one_mul, zero_mul, mul_zero]
     intro x
@@ -186,7 +186,7 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
       unfold max_val
       apply ciSup_le
       intro x
-      simp [a', a'', instFunLike]
+      simp [a', a'', FinPMF.val_apply]
       split
       rename_i h₃
       calc (a x - pr / l) / (1 - pr)
@@ -224,7 +224,7 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
         · intro v
           have := large_early l (by assumption) v
           linarith
-        · simp only [instFunLike, vnp, List.get_indexOf, lt_self_iff_false,
+        · simp only [FinPMF.val_apply, vnp, List.get_indexOf, lt_self_iff_false,
             ↓reduceIte, a', a'', List.getElem_eq_get]
           simp only [ge_iff_le, h₂, min_eq_left, sub_sub_cancel, pr]
           simp only [← List.getElem_eq_get]
@@ -243,7 +243,7 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
           have := large_early l.natPred (by linarith) v
           linarith
         · intro _
-          simp only [instFunLike, vnp, List.get_indexOf, lt_self_iff_false,
+          simp only [FinPMF.val_apply, vnp, List.get_indexOf, lt_self_iff_false,
             ↓reduceIte, a', a'', List.getElem_eq_get, pred_lt]
           simp only [div_eq_zero_iff]
           left
@@ -262,7 +262,7 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
         cases v
         · rename_i h₂
           left
-          simp [a', a'', instFunLike]
+          simp [a', a'', FinPMF.val_apply]
           split
           · exfalso
             have := small_late (vals.indexOf x) this (by simp; exact h₂)
@@ -271,7 +271,7 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
             simp [h₂]
         · rename_i h₂
           right
-          simp [a', a'', instFunLike]
+          simp [a', a'', FinPMF.val_apply]
           split
           · change (a x - pr / l) / (1 - pr) = (l : ℝ)⁻¹
             field_simp [h₂]
@@ -286,12 +286,12 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
     apply DFunLike.ext
     intro x
     apply Subtype.ext_iff.mp at hf
-    simp only [instFunLike, FinPMF.linear_combination] at hf
+    simp only [FinPMF.val_apply, FinPMF.linear_combination] at hf
     have hf' := congrFun hf x
     simp only [FinPMF.linear_combination, Fin.sum_univ_two, Fin.isValue, Matrix.cons_val_zero,
       Matrix.cons_val_one, Matrix.head_cons, uniform_single_value, ite_mul, one_mul, zero_mul,
       sum_ite_eq', mem_univ, ↓reduceIte]
-    simp only [instFunLike, Fin.isValue, Matrix.cons_val_zero, Matrix.cons_val_one,
+    simp only [FinPMF.val_apply, Fin.isValue, Matrix.cons_val_zero, Matrix.cons_val_one,
       Matrix.head_cons, Subtype.coe_eta, hf']
     simp [a'']
     split

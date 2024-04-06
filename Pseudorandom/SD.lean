@@ -30,7 +30,7 @@ lemma SD_eq_half_L1 : SD a b = 1/2 * ‖⇑a - ⇑b‖_[1] := by
 theorem SD_linear_combination_le (a : FinPMF α) (f : α → FinPMF β) (b : FinPMF β) :
     SD (a.linear_combination f) b ≤ ∑ x, a x * SD (f x) b := by
   unfold FinPMF.linear_combination SD
-  simp only [instFunLike, mul_sum]
+  simp only [FinPMF.val_apply, mul_sum]
   calc ∑ x, |1/2 * (∑ y, a y * (f y) x - b x)|
     _ = ∑ x, |1/2 * (∑ y, a y * (f y) x - 1 * b x)| := by simp
     _ = ∑ x, |1/2 * (∑ y, a y * (f y) x - (∑ y, a y) * b x)| := by simp
