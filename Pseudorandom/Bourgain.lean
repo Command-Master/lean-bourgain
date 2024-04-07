@@ -223,10 +223,10 @@ theorem bourgain_extractor_aux₁' [Fintype α] [Field α] [Fintype β] [AddComm
   norm_num
 
 
-noncomputable def close_high_entropy [Fintype α] (n : ℕ) (ε : ℝ) (a : FinPMF α) : Prop :=
+noncomputable def close_high_entropy [Fintype α] (n : ℝ) (ε : ℝ) (a : FinPMF α) : Prop :=
   ∀ (H : Finset α), (H.card ≤ n) → ∑ v ∈ H, a v ≤ ε
 
-theorem bourgain_extractor_aux₂ (ε : ℝ) (hε : 0 < ε) (n : ℕ+) [Fintype α] [Field α] [DecidableEq (α × α)] (a b : FinPMF (α × α)) (χ : AddChar α ℂ)
+theorem bourgain_extractor_aux₂ (ε : ℝ) (hε : 0 < ε) (n : ℝ) (hn : 0 < n) [Fintype α] [Field α] [DecidableEq (α × α)] (a b : FinPMF (α × α)) (χ : AddChar α ℂ)
     (h : χ.IsNontrivial) (hA : close_high_entropy n ε a) (hB : close_high_entropy n ε b):
     ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖ ≤ Fintype.card α / n + 2 * ε := calc ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖
   _ = ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y, b y * χ (IP x y) +
@@ -344,13 +344,13 @@ theorem bourgain_extractor_aux₂ (ε : ℝ) (hε : 0 < ε) (n : ℕ+) [Fintype 
       intro
       split
       simp_all only [one_div, Real.norm_eq_abs, ge_iff_le, FinPMF.nonneg, abs_of_nonneg]
-      simp
+      simp [le_of_lt hn]
     }
   _ = (Fintype.card α) * (Real.sqrt (1/n) * Real.sqrt (1 / n)) + 2*ε := by simp [mul_assoc]
-  _ = (Fintype.card α) * (1 / n) + 2*ε := by rw [← sq]; simp
+  _ = (Fintype.card α) * (1 / n) + 2*ε := by rw [← sq]; simp [le_of_lt hn]
   _ = Fintype.card α / n + 2 * ε := by ring
 
-variable {p : ℕ} [Fact p.Prime]
+variable {p : ℕ} [fpprm : Fact p.Prime]
 
 local notation "α" => ZMod p
 
@@ -478,14 +478,14 @@ theorem line_point_large_l2_aux (n : ℕ+) (β : ℝ) (hβ : 0 < β) (hkl : (p^�
       exact hβ
       exact_mod_cast hkl
       exact_mod_cast hku
-      exact hhSz
+      exact_mod_cast hhSz
       exact Finset.card_image_le.trans (Finset.card_image_le.trans hbSz)
     _ = 1/(a'.1.card * b'.1.card) * ST_C * n^(3/2 - ST_prime_field_eps β) := by ring
 
 
 def lmap (x : α × α) : α × α × α := (x.1 + x.2, (2 * (x.1 + x.2), -((x.1 + x.2)^2 + (x.1^2 + x.2^2))))
 
-def decoder (x : α × α) : α × α := (x.1, x.1^2 - x.2)
+def decoder : (α × α) ≃ (α × α) := Function.Involutive.toPerm (fun x => (x.1, x.1^2 - x.2)) (by intro; simp)
 
 lemma jurl (b : FinPMF α) :
     ((b * b * b).apply fun x => (x.1.1 + x.1.2 + x.2, x.1.1^2 + x.1.2^2 + x.2^2)) =
@@ -519,8 +519,15 @@ lemma jurl (b : FinPMF α) :
     congr
     rw [FinPMF.eq_apply_id]
 
-theorem bourgain_extractor (ε : ℝ) (a b : FinPMF α) (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
-    ‖∑ x, a x * ∑ y, b y * χ (x * y + x^2 * y^2)‖ ≤ ε := by
+noncomputable def bourgainβ : ℝ := 1/2
+
+noncomputable def bourgainα : ℝ := ST_prime_field_eps bourgainβ
+
+noncomputable def bourgain_C : ℝ := (4 * ST_C + 1)^(64⁻¹ : ℝ)
+
+theorem bourgain_extractor (ε : ℝ) (a b : FinPMF α) (χ : AddChar α ℂ) (h : χ.IsNontrivial)
+    (n : ℕ) (hn : (p^(1/2 - 2/7 * bourgainα) : ℝ) ≤ n) (hA : max_val a ≤ (1 / n : ℝ)) (hB : max_val b ≤ (1 / n : ℝ)):
+    ‖∑ x, a x * ∑ y, b y * χ (x * y + x^2 * y^2)‖ ≤ bourgain_C * p^(-1/224 * bourgainα) := by
   let a' := a.apply fun x => (x, x^2)
   let b' := b.apply fun x => (x, x^2)
   calc ‖∑ x, a x * ∑ y, b y * χ (x * y + x^2 * y^2)‖
@@ -597,9 +604,32 @@ theorem bourgain_extractor (ε : ℝ) (a b : FinPMF α) (χ : AddChar α ℂ) (h
   _ = ‖∑ y, ((lapply b ((b * b).apply lmap)).apply decoder) y *
       ∑ x, ((lapply a ((a * a).apply lmap)).apply decoder) x * χ (IP y x)‖^(64⁻¹ : ℝ) := by
     simp_rw [jurl]
-  -- _ = ‖∑ y, ((b * b * b).apply fun x => (x.1.1 + x.1.2 + x.2, x.1.1^2 + x.1.2^2 + x.2^2)) y *
-  --     ∑ x, ((a * a * a).apply fun x => (x.1.1 + x.1.2 + x.2, x.1.1^2 + x.1.2^2 + x.2^2)) x * χ (IP y x)‖^(64⁻¹ : ℝ) := by
-  _ ≤ ε := by
-
+  _ ≤ (Fintype.card α / p^(1 + 2/7 * bourgainα) + 2 * (2 * ST_C * p^(-2/7 * bourgainα)))^(64⁻¹ : ℝ) := by
+    gcongr
+    apply bourgain_extractor_aux₂
+    apply mul_pos
+    apply mul_pos
+    norm_num
+    exact_mod_cast ST_C_pos
+    apply Real.rpow_pos_of_pos
+    exact_mod_cast fpprm.out.pos
+    apply Real.rpow_pos_of_pos
+    exact_mod_cast fpprm.out.pos
+    exact h
     sorry
-  _ = ε := rfl
+    sorry
+  _ = (p^(1 : ℝ) / p^(1 + 2/7 * bourgainα) + 2 * (2 * ST_C * p^(-2/7 * bourgainα)))^(64⁻¹ : ℝ) := by
+    congr
+    simp [card_univ]
+  _ = (p^((1 : ℝ) - (1 + 2/7 * bourgainα)) + 2 * (2 * ST_C * p^(-2/7 * bourgainα)))^(64⁻¹ : ℝ) := by
+    rw [← Real.rpow_sub]
+    exact_mod_cast fpprm.out.pos
+  _ = ((4 * ST_C + 1) * p^(-2/7 * bourgainα))^(64⁻¹ : ℝ) := by
+    ring_nf
+  _ = (4 * ST_C + 1)^(64⁻¹ : ℝ) * p^(-1/224 * bourgainα) := by
+    rw [Real.mul_rpow, ← Real.rpow_mul]
+    ring_nf
+    simp
+    positivity
+    apply Real.rpow_nonneg
+    simp

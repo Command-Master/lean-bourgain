@@ -69,6 +69,11 @@ lemma ST_C₅_pos : 0 < ST_C₅ := calc
   0 < 1 := zero_lt_one
   _ ≤ ST_C₅ := one_le_ST_C₅
 
+lemma ST_C_pos : 0 < ST_C := calc
+  0 < 1 := zero_lt_one
+  _ ≤ 1 + ST_C₂ := by simp
+  _ = ST_C := add_comm ..
+
 lemma lemma1 (β : ℝ) :
   1 / 2 + 2 * ST_prime_field_eps₂ β ≤ 1 - 4 * ST_prime_field_eps₃ β := by
   unfold ST_prime_field_eps₂ ST_prime_field_eps₃ ST_prime_field_eps₄ SG_eps SG_eps₂
