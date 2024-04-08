@@ -1,5 +1,6 @@
 import Pseudorandom.Extractor
 import Pseudorandom.XorLemma
+import Pseudorandom.FlatSources
 import Mathlib.LinearAlgebra.BilinearForm.Basic
 import Pseudorandom.Incidence.Incidence
 
@@ -226,6 +227,32 @@ theorem bourgain_extractor_aux₁' [Fintype α] [Field α] [Fintype β] [AddComm
 noncomputable def close_high_entropy [Fintype α] (n : ℝ) (ε : ℝ) (a : FinPMF α) : Prop :=
   ∀ (H : Finset α), (H.card ≤ n) → ∑ v ∈ H, a v ≤ ε
 
+lemma close_high_entropy_apply_equiv [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
+    (n ε : ℝ) (a : FinPMF α)
+    (h : close_high_entropy n ε a) (e : α ≃ β) :
+    close_high_entropy n ε (a.apply e) := by
+  intro H hX
+  simp_rw [FinPMF.apply_equiv]
+  convert_to ∑ x ∈ H.map e.symm, a x ≤ ε
+  simp
+  apply h
+  simp [hX]
+
+lemma close_high_entropy_linear_combination [Fintype α] [Fintype β] (n : ℝ) (ε : ℝ) (a : FinPMF β)
+    (g : β → FinPMF α) (h : ∀ x, close_high_entropy n ε (g x)) :
+  close_high_entropy n ε (a.linear_combination g) := by
+  intro H hH
+  unfold FinPMF.linear_combination
+  change ∑ v ∈ H, ∑ y, a y * (g y) v ≤ ε
+  rw [sum_comm]
+  simp_rw [← mul_sum]
+  calc ∑ x, a x * ∑ i ∈ H, (g x) i
+    _ ≤ ∑ x, a x * ε := by
+      gcongr
+      simp
+      apply h _ _ hH
+    _ = ε := by simp [← sum_mul]
+
 theorem bourgain_extractor_aux₂ (ε : ℝ) (hε : 0 < ε) (n : ℝ) (hn : 0 < n) [Fintype α] [Field α] [DecidableEq (α × α)] (a b : FinPMF (α × α)) (χ : AddChar α ℂ)
     (h : χ.IsNontrivial) (hA : close_high_entropy n ε a) (hB : close_high_entropy n ε b):
     ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖ ≤ Fintype.card α / n + 2 * ε := calc ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖
@@ -358,6 +385,14 @@ local notation "α" => ZMod p
 noncomputable def lapply (a : FinPMF α) (b : FinPMF (α × α × α)) : FinPMF (α × α) :=
   (a * b).apply (fun ⟨x, y⟩ => (x + y.1, y.2.1 * (x + y.1) + y.2.2))
 
+lemma lapply_linear_combination [Fintype γ] [Fintype γ₂]
+    (a : FinPMF γ) (b : FinPMF γ₂)
+    (f : γ → FinPMF α) (g : γ₂ → FinPMF (α × α × α)) :
+  lapply (a.linear_combination f) (b.linear_combination g) =
+  (a*b).linear_combination (fun ⟨x, y⟩ => lapply (f x) (g y)) := by
+  unfold lapply
+  rw [linear_combination_mul, linear_combination_apply]
+
 theorem line_point_large_l2_aux (n : ℕ+) (β : ℝ) (hβ : 0 < β) (hkl : (p^β : ℝ) ≤ n) (hku: n ≤ (p^(2 - β) : ℝ))
     (a' : {x : Finset α // x.Nonempty}) (b' : {x : Finset (α × α × α) // x.Nonempty})
     (hD : Set.InjOn Prod.snd (b' : Set (α × α × α))) (hbSz : b'.1.card ≤ n) :
@@ -482,6 +517,78 @@ theorem line_point_large_l2_aux (n : ℕ+) (β : ℝ) (hβ : 0 < β) (hkl : (p^�
       exact Finset.card_image_le.trans (Finset.card_image_le.trans hbSz)
     _ = 1/(a'.1.card * b'.1.card) * ST_C * n^(3/2 - ST_prime_field_eps β) := by ring
 
+theorem line_point_large_l2 (n : ℕ+) (β : ℝ) (hβ : 0 < β) (hkl : (p^β : ℝ) ≤ n) (hku: n ≤ (p^(2 - β) : ℝ))
+    (a : FinPMF α) (b : FinPMF (α × α × α))
+    (hD : Set.InjOn Prod.snd (Function.support b : Set (α × α × α))) :
+    close_high_entropy n (1 / (⌊1/ max_val a⌋₊ * (min (n : ℕ) ⌊1/ max_val b⌋₊)) * ST_C * n^(3/2 - ST_prime_field_eps β)) (lapply a b) := by
+  let l1 := ⌊1 / max_val a⌋₊.toPNat'
+  let l2 := ⌊1 / max_val b⌋₊.toPNat'
+  obtain ⟨f, hf⟩ := split_to_flat_sources a l1 <| by
+    unfold_let l1
+    simp
+    split
+    calc max_val a
+      _ = ((max_val a)⁻¹)⁻¹ := by simp
+      _ ≤ (⌊(max_val a)⁻¹⌋₊ : ℝ)⁻¹ := by
+        gcongr
+        apply Nat.floor_le
+        simp [le_of_lt (zero_lt_max_val ..)]
+    simp [max_val_le_one _]
+  obtain ⟨f2, hf2⟩ := split_to_flat_sources b l2 <| by
+    unfold_let l2
+    simp
+    split
+    calc max_val b
+      _ = ((max_val b)⁻¹)⁻¹ := by simp
+      _ ≤ (⌊(max_val b)⁻¹⌋₊ : ℝ)⁻¹ := by
+        gcongr
+        apply Nat.floor_le
+        simp [le_of_lt (zero_lt_max_val ..)]
+    simp [max_val_le_one _]
+  convert_to close_high_entropy n (1 / (l1 * l2) * ST_C * n^(3/2 - ST_prime_field_eps β)) (lapply a b)
+  congr
+  · unfold_let l1
+    suffices 0 < ⌊(max_val a)⁻¹⌋₊ by simp [this]
+    rw [Nat.floor_pos, one_le_inv_iff]
+    simp [max_val_le_one _, zero_lt_max_val _]
+  · unfold_let l2
+    suffices 0 < ⌊(max_val b)⁻¹⌋₊ by simp [this]
+    rw [Nat.floor_pos, one_le_inv_iff]
+    simp [max_val_le_one _, zero_lt_max_val _]
+  conv =>
+    rhs
+    rw [← hf, ← hf2]
+  rw [lapply_linear_combination]
+  apply close_high_entropy_linear_combination
+  rintro ⟨x, y⟩
+  convert line_point_large_l2_aux n β hβ hkl hku ⟨x, sorry⟩ ⟨y, sorry⟩ ?_ ?_
+  · simp [x.2]
+  · simp [y.2]
+  · apply Set.InjOn.mono _ hD
+    sorry
+  · simp only [y.2, PNat.coe_le_coe]
+    rw [← PNat.coe_le_coe]
+    rify
+    calc
+      (l2 : ℝ) = ⌊1 / max_val b⌋₊ := by
+        unfold_let l2
+        simp only [one_div, Nat.toPNat'_coe, Nat.cast_ite, Nat.cast_one, ite_eq_left_iff, not_lt,
+          nonpos_iff_eq_zero, Nat.floor_eq_zero]
+        intro v
+        exfalso
+        rw [inv_lt_one_iff] at v
+        cases v
+        · have := zero_lt_max_val b
+          linarith
+        · have := max_val_le_one b
+          linarith
+      _ ≤ 1 / max_val b := by
+        apply Nat.floor_le
+        simp [le_of_lt (zero_lt_max_val _)]
+      _ ≤ 1 / (1 / n) := by
+        gcongr
+        simp
+      _ = n := by simp
 
 def lmap (x : α × α) : α × α × α := (x.1 + x.2, (2 * (x.1 + x.2), -((x.1 + x.2)^2 + (x.1^2 + x.2^2))))
 
@@ -616,7 +723,9 @@ theorem bourgain_extractor (ε : ℝ) (a b : FinPMF α) (χ : AddChar α ℂ) (h
     apply Real.rpow_pos_of_pos
     exact_mod_cast fpprm.out.pos
     exact h
+    apply close_high_entropy_apply_equiv
     sorry
+    apply close_high_entropy_apply_equiv
     sorry
   _ = (p^(1 : ℝ) / p^(1 + 2/7 * bourgainα) + 2 * (2 * ST_C * p^(-2/7 * bourgainα)))^(64⁻¹ : ℝ) := by
     congr

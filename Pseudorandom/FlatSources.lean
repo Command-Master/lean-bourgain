@@ -349,5 +349,5 @@ theorem extractor_suffices_flat_sources [DecidableEq α] [DecidableEq β] [Nonem
   apply sum_le_sum
   rintro ⟨a₁, b₁⟩ _
   gcongr
-  simp
+  simp [-FinPMF.mul_val]
   apply oh

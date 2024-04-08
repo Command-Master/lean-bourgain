@@ -91,6 +91,22 @@ theorem apply_weighted_sum [RCLike 𝕜] (g: α → β) (f : β → 𝕜) : ∑ 
   simp_rw [comp_transfer]
   apply transfer_sum
 
+lemma FinPMF.apply_equiv (f : α ≃ β) : (a.apply f) x = a (f.symm x) := by
+  unfold apply transfer
+  change ∑ y ∈ univ.filter (fun y => f y = x), a y = _
+  convert_to ∑ y ∈ {f.symm x}, a y = _
+  congr
+  ext v
+  constructor
+  · intro o
+    simp only [mem_filter, mem_univ, true_and] at o
+    rw [← o]
+    simp
+  · intro o
+    simp only [mem_singleton] at o
+    simp [o]
+  simp
+
 lemma FinPMF.apply_swap (b : FinPMF β) : (a*b).apply Prod.swap = b*a := by
   apply Subtype.ext
   ext x

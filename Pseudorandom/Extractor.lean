@@ -21,6 +21,13 @@ lemma le_max_val : a x ≤ max_val a := by
   apply le_ciSup
   simp
 
+lemma max_val_le_one : max_val a ≤ 1 := by
+  apply ciSup_le
+  intro x
+  calc a x
+    _ ≤ ∑ x, a x := by apply single_le_sum; intros; simp; simp
+    _ = 1 := by simp
+
 -- The maximum value a PMF takes is greater than zero
 lemma card_inv_le_max_val : (Fintype.card α : ℝ)⁻¹ ≤ max_val a := by
   rw [inv_pos_le_iff_one_le_mul']
