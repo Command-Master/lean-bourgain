@@ -7,10 +7,13 @@ import LeanAPAP.Prereqs.Discrete.Convolution.Basic
 
 open Classical Finset BigOps
 
-variable
-   {α : Type u1} [Nonempty α] [Fintype α]
-   {β : Type u2} [Nonempty β] [Fintype β]
-   (a b : FinPMF α)
+variable {α : Type*} [Fintype α]
+        {β : Type*} [Fintype β]
+        (a : FinPMF α)
+
+section basic
+
+variable [Nonempty α]
 
 -- Definition of PMF over finite types
 def FinPMF (α : Type u) [Fintype α] : Type u :=
@@ -69,6 +72,10 @@ instance instMulFinPMF : HMul (FinPMF α) (FinPMF β) (FinPMF (α × β)) where
 @[simp]
 theorem FinPMF.mul_val (b : FinPMF β) : (a * b) (x, y) = (a x) * (b y) := rfl
 
+end basic
+
+section apply
+
 -- Applying some function to a random variable.
 noncomputable def FinPMF.apply (a : FinPMF α) (f : α → β) : FinPMF β :=
   ⟨f # a, by
@@ -123,7 +130,7 @@ lemma FinPMF.apply_swap (b : FinPMF β) : (a*b).apply Prod.swap = b*a := by
   · intro o
     rw [o]
     rfl
-  simp [Finset.filter_eq', mul_comm]
+  simp [filter_eq', mul_comm]
 
 lemma FinPMF.apply_apply (f : α → β) (g : β → γ) [Nonempty γ] [Fintype γ] :
     (a.apply f).apply g = a.apply (g ∘ f) := by
@@ -133,6 +140,10 @@ lemma FinPMF.apply_apply (f : α → β) (g : β → γ) [Nonempty γ] [Fintype 
 lemma FinPMF.eq_apply_id : a.apply id = a := by
   apply Subtype.ext
   apply transfer_id
+
+end apply
+
+section monoid
 
 -- Subtraction of FinPMFs, treating them as independent.
 noncomputable instance instSubFinPMF [Sub α] : Sub (FinPMF α) where
@@ -283,6 +294,9 @@ lemma FinPMF.apply_add (a : FinPMF α) (b : FinPMF β) (f : α → γ) (g : β �
   rw [FinPMF.add_val, FinPMF.apply_mul, FinPMF.apply_apply]
   rfl
 
+end monoid
+
+section linear_combination
 
 noncomputable def FinPMF.linear_combination (a : FinPMF α) (f : α → FinPMF β) : FinPMF β :=
   ⟨(fun x => ∑ y ∈ univ, (a y) * (f y x)), by
@@ -339,3 +353,72 @@ noncomputable def FinPMF.adjust (a : FinPMF α) (x : α) (p : ℝ) (h₁ : 0 ≤
     rw [Fin.forall_fin_two]
     simp [h₁, h₂]
   ⟩ (![a, Uniform_singleton x] : Fin 2 → FinPMF α)
+
+end linear_combination
+
+section high_entropy
+
+noncomputable def close_high_entropy [Fintype α] (n : ℝ) (ε : ℝ) (a : FinPMF α) : Prop :=
+  ∀ (H : Finset α), (H.card ≤ n) → ∑ v ∈ H, a v ≤ ε
+
+lemma close_high_entropy_of_floor [Fintype α] (n : ℝ) (ε : ℝ) (a : FinPMF α)
+    (h : close_high_entropy ⌊n⌋₊ ε a):
+    close_high_entropy n ε a := by
+  intro H hH
+  apply h
+  simp only [Nat.cast_le]
+  rw [Nat.le_floor_iff]
+  exact hH
+  refine LE.le.trans ?_ hH
+  simp
+
+
+lemma close_high_entropy_apply_equiv [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
+    (n ε : ℝ) (a : FinPMF α)
+    (h : close_high_entropy n ε a) (e : α ≃ β) :
+    close_high_entropy n ε (a.apply e) := by
+  intro H hX
+  simp_rw [FinPMF.apply_equiv]
+  convert_to ∑ x ∈ H.map e.symm, a x ≤ ε
+  simp
+  apply h
+  simp [hX]
+
+lemma close_high_entropy_linear_combination [Fintype α] [Fintype β] [DecidableEq β] (n : ℝ) (ε : ℝ) (a : FinPMF β)
+    (g : β → FinPMF α) (h : ∀ x, 0 < a x → close_high_entropy n ε (g x)) :
+  close_high_entropy n ε (a.linear_combination g) := by
+  intro H hH
+  unfold FinPMF.linear_combination
+  change ∑ v ∈ H, ∑ y, a y * (g y) v ≤ ε
+  rw [sum_comm]
+  simp_rw [← mul_sum]
+  calc ∑ x, a x * ∑ i ∈ H, (g x) i
+    _ = ∑ x ∈ univ.filter (fun x => 0 < a x), a x * ∑ i ∈ H, (g x) i := by
+      apply Eq.symm
+      apply sum_subset_zero_on_sdiff
+      simp
+      intro x hx
+      simp at hx
+      have : 0 ≤ a x := by simp
+      have : 0 = a x := by linarith
+      rw [← this]
+      simp
+      simp
+    _ ≤ ∑ x ∈ univ.filter (fun x => 0 < a x), a x * ε := by
+      gcongr with i hi
+      simp
+      simp only [mem_filter, mem_univ, true_and] at hi
+      apply h i hi _ hH
+    _ = ∑ x, a x * ε := by
+      apply sum_subset_zero_on_sdiff
+      simp
+      intro x hx
+      simp at hx
+      have : 0 ≤ a x := by simp
+      have : 0 = a x := by linarith
+      rw [← this]
+      simp
+      simp
+    _ = ε := by simp [← sum_mul]
+
+end high_entropy
