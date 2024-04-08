@@ -238,8 +238,8 @@ lemma close_high_entropy_apply_equiv [Fintype α] [Nonempty α] [Fintype β] [No
   apply h
   simp [hX]
 
-lemma close_high_entropy_linear_combination [Fintype α] [Fintype β] (n : ℝ) (ε : ℝ) (a : FinPMF β)
-    (g : β → FinPMF α) (h : ∀ x, close_high_entropy n ε (g x)) :
+lemma close_high_entropy_linear_combination [Fintype α] [Fintype β] [DecidableEq β] (n : ℝ) (ε : ℝ) (a : FinPMF β)
+    (g : β → FinPMF α) (h : ∀ x, 0 < a x → close_high_entropy n ε (g x)) :
   close_high_entropy n ε (a.linear_combination g) := by
   intro H hH
   unfold FinPMF.linear_combination
@@ -247,10 +247,32 @@ lemma close_high_entropy_linear_combination [Fintype α] [Fintype β] (n : ℝ) 
   rw [sum_comm]
   simp_rw [← mul_sum]
   calc ∑ x, a x * ∑ i ∈ H, (g x) i
-    _ ≤ ∑ x, a x * ε := by
-      gcongr
+    _ = ∑ x ∈ univ.filter (fun x => 0 < a x), a x * ∑ i ∈ H, (g x) i := by
+      apply Eq.symm
+      apply sum_subset_zero_on_sdiff
       simp
-      apply h _ _ hH
+      intro x hx
+      simp at hx
+      have : 0 ≤ a x := by simp
+      have : 0 = a x := by linarith
+      rw [← this]
+      simp
+      simp
+    _ ≤ ∑ x ∈ univ.filter (fun x => 0 < a x), a x * ε := by
+      gcongr with i hi
+      simp
+      simp only [mem_filter, mem_univ, true_and] at hi
+      apply h i hi _ hH
+    _ = ∑ x, a x * ε := by
+      apply sum_subset_zero_on_sdiff
+      simp
+      intro x hx
+      simp at hx
+      have : 0 ≤ a x := by simp
+      have : 0 = a x := by linarith
+      rw [← this]
+      simp
+      simp
     _ = ε := by simp [← sum_mul]
 
 theorem bourgain_extractor_aux₂ (ε : ℝ) (hε : 0 < ε) (n : ℝ) (hn : 0 < n) [Fintype α] [Field α] [DecidableEq (α × α)] (a b : FinPMF (α × α)) (χ : AddChar α ℂ)
@@ -518,14 +540,14 @@ theorem line_point_large_l2_aux (n : ℕ+) (β : ℝ) (hβ : 0 < β) (hkl : (p^�
     _ = 1/(a'.1.card * b'.1.card) * ST_C * n^(3/2 - ST_prime_field_eps β) := by ring
 
 theorem line_point_large_l2 (n : ℕ+) (β : ℝ) (hβ : 0 < β) (hkl : (p^β : ℝ) ≤ n) (hku: n ≤ (p^(2 - β) : ℝ))
-    (a : FinPMF α) (b : FinPMF (α × α × α))
-    (hD : Set.InjOn Prod.snd (Function.support b : Set (α × α × α))) :
-    close_high_entropy n (1 / (⌊1/ max_val a⌋₊ * (min (n : ℕ) ⌊1/ max_val b⌋₊)) * ST_C * n^(3/2 - ST_prime_field_eps β)) (lapply a b) := by
+    (a : FinPMF α) (b : FinPMF (α × α × α)) (m : ℕ+) (hm : m ≤ n)
+    (hD : Set.InjOn Prod.snd (Function.support b : Set (α × α × α))) (hbSz : max_val b ≤ 1/m) :
+    close_high_entropy n (1 / (⌊1/ max_val a⌋₊ * m) * ST_C * n^(3/2 - ST_prime_field_eps β)) (lapply a b) := by
   let l1 := ⌊1 / max_val a⌋₊.toPNat'
-  let l2 := ⌊1 / max_val b⌋₊.toPNat'
+  let l2 := m
   obtain ⟨f, hf⟩ := split_to_flat_sources a l1 <| by
     unfold_let l1
-    simp
+    simp only [one_div, Nat.toPNat'_coe, Nat.cast_ite, Nat.cast_one]
     split
     calc max_val a
       _ = ((max_val a)⁻¹)⁻¹ := by simp
@@ -536,23 +558,18 @@ theorem line_point_large_l2 (n : ℕ+) (β : ℝ) (hβ : 0 < β) (hkl : (p^β : 
     simp [max_val_le_one _]
   obtain ⟨f2, hf2⟩ := split_to_flat_sources b l2 <| by
     unfold_let l2
-    simp
-    split
+    simp only [one_div]
     calc max_val b
       _ = ((max_val b)⁻¹)⁻¹ := by simp
-      _ ≤ (⌊(max_val b)⁻¹⌋₊ : ℝ)⁻¹ := by
+      _ ≤ (((1/m : ℝ))⁻¹)⁻¹ := by
         gcongr
-        apply Nat.floor_le
-        simp [le_of_lt (zero_lt_max_val ..)]
-    simp [max_val_le_one _]
+        simp
+        apply zero_lt_max_val
+      _ = (m : ℝ)⁻¹ := by simp
   convert_to close_high_entropy n (1 / (l1 * l2) * ST_C * n^(3/2 - ST_prime_field_eps β)) (lapply a b)
   congr
   · unfold_let l1
     suffices 0 < ⌊(max_val a)⁻¹⌋₊ by simp [this]
-    rw [Nat.floor_pos, one_le_inv_iff]
-    simp [max_val_le_one _, zero_lt_max_val _]
-  · unfold_let l2
-    suffices 0 < ⌊(max_val b)⁻¹⌋₊ by simp [this]
     rw [Nat.floor_pos, one_le_inv_iff]
     simp [max_val_le_one _, zero_lt_max_val _]
   conv =>
@@ -560,35 +577,45 @@ theorem line_point_large_l2 (n : ℕ+) (β : ℝ) (hβ : 0 < β) (hkl : (p^β : 
     rw [← hf, ← hf2]
   rw [lapply_linear_combination]
   apply close_high_entropy_linear_combination
-  rintro ⟨x, y⟩
-  convert line_point_large_l2_aux n β hβ hkl hku ⟨x, sorry⟩ ⟨y, sorry⟩ ?_ ?_
+  rintro ⟨x, y⟩ hpos
+  simp only [FinPMF.mul_val, mul_pos_iff] at hpos
+  cases hpos
+  rename_i hpos
+  convert line_point_large_l2_aux n β hβ hkl hku ⟨x, by
+    apply Finset.card_pos.mp
+    rw [x.2]
+    apply PNat.pos
+  ⟩ ⟨y, by
+    apply Finset.card_pos.mp
+    rw [y.2]
+    apply PNat.pos
+  ⟩ ?_ ?_
   · simp [x.2]
   · simp [y.2]
   · apply Set.InjOn.mono _ hD
-    sorry
+    rw [Set.subset_def]
+    intro x2 hx
+    simp only [Function.mem_support, ne_eq]
+    apply_fun (· x2) at hf2
+    rw [← hf2]
+    apply ne_of_gt
+    unfold FinPMF.linear_combination
+    simp only [FinPMF.val_apply]
+    apply sum_pos'
+    intros
+    apply mul_nonneg <;> simp [← FinPMF.val_apply]
+    exists y, mem_univ y
+    apply mul_pos
+    exact hpos.2
+    unfold Uniform
+    dsimp
+    split
+    simp [y.2]
+    contradiction
   · simp only [y.2, PNat.coe_le_coe]
-    rw [← PNat.coe_le_coe]
-    rify
-    calc
-      (l2 : ℝ) = ⌊1 / max_val b⌋₊ := by
-        unfold_let l2
-        simp only [one_div, Nat.toPNat'_coe, Nat.cast_ite, Nat.cast_one, ite_eq_left_iff, not_lt,
-          nonpos_iff_eq_zero, Nat.floor_eq_zero]
-        intro v
-        exfalso
-        rw [inv_lt_one_iff] at v
-        cases v
-        · have := zero_lt_max_val b
-          linarith
-        · have := max_val_le_one b
-          linarith
-      _ ≤ 1 / max_val b := by
-        apply Nat.floor_le
-        simp [le_of_lt (zero_lt_max_val _)]
-      _ ≤ 1 / (1 / n) := by
-        gcongr
-        simp
-      _ = n := by simp
+    exact hm
+  · have : 0 ≤ f x := by simp
+    linarith
 
 def lmap (x : α × α) : α × α × α := (x.1 + x.2, (2 * (x.1 + x.2), -((x.1 + x.2)^2 + (x.1^2 + x.2^2))))
 
