@@ -317,36 +317,3 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
     simp
   termination_by
     measure_complexity a l
-
-#check split_to_flat_sources
-
-theorem extractor_suffices_flat_sources [DecidableEq α] [DecidableEq β] [Nonempty β] [Fintype β] [Fintype γ] [Nonempty γ]
-  (f : (α × β) → γ) (k : ℕ+) (ε : ℝ)
-  (oh : ∀ a : {x : Finset α // x.card = k}, ∀ b : {x : Finset β // x.card = k},
-    (SD (((Uniform ⟨a, by
-    apply Finset.card_pos.mp
-    rw [a.2]
-    apply PNat.pos
-    ⟩) * (Uniform ⟨b, by
-    apply Finset.card_pos.mp
-    rw [b.2]
-    apply PNat.pos
-    ⟩)).apply f) (Uniform ⟨univ, univ_nonempty⟩) ≤ ε) ) :
-  two_extractor f (Real.logb 2 k) ε := by
-  unfold two_extractor
-  intro a b
-  rintro ⟨ha, hb⟩
-  rw [ge_iff_le, ← min_entropy_of_max_val_le] at ha hb
-  simp only [Nat.ofNat_pos, ne_eq, OfNat.ofNat_ne_one, not_false_eq_true, Nat.cast_pos, PNat.pos,
-    Real.rpow_logb] at ha hb
-  have ⟨f₁, h₁⟩ := split_to_flat_sources a k (by simp [ha])
-  have ⟨f₂, h₂⟩ := split_to_flat_sources b k (by simp [hb])
-  rw [← h₁, ← h₂, linear_combination_mul, linear_combination_apply]
-  refine' (SD_linear_combination_le ..).trans _
-  have : ε = ∑ x, (f₁ * f₂) x * ε := by simp [← sum_mul, -Fintype.sum_prod_type]
-  rw [this]
-  apply sum_le_sum
-  rintro ⟨a₁, b₁⟩ _
-  gcongr
-  simp [-FinPMF.mul_val]
-  apply oh

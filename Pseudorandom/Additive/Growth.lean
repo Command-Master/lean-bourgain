@@ -219,8 +219,6 @@ theorem exists_grower : ∃ (a : α), a ≠ 0 ∧ (A + a • A).card ≥ ((min (
   · exists 1
     simp_all
 
-#print exists_grower
-
 theorem GUS (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) : (3 • A^2 - 3 • A^2).card ≥
     ((min (A.card^2) p) / 2 : ℚ) := by
   by_cases cardb : A.card > 1

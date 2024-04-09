@@ -39,14 +39,6 @@ theorem line_point_large_l2_aux (n : ℕ+) (β : ℝ) (hβ : 0 < β) (hkl : (p^�
         ∑ y ∈ univ.filter (fun (⟨z, y⟩ : α×α×α×α) => (z + y.1, y.2.1 * (z + y.1) + y.2.2) = x),
         (if y.1 ∈ a'.1 then 1 / a'.1.card else 0 : ℝ) * (if y.2 ∈ b'.1 then 1 / b'.1.card else 0 : ℝ) := by
       rcongr
-      · unfold_let a
-        unfold Uniform
-        dsimp only [FinPMF.val_apply]
-        congr
-      · unfold_let b
-        unfold Uniform
-        dsimp only [FinPMF.val_apply]
-        congr
     _ = ∑ x ∈ H,
         ∑ y ∈ univ.filter (fun (⟨z, y⟩ : α×α×α×α) => (z + y.1, y.2.1 * (z + y.1) + y.2.2) = x),
         (1/a'.1.card * (if y.1 ∈ a'.1 then 1 else 0 : ℝ)) * (1/b'.1.card * (if y.2 ∈ b'.1 then 1 else 0 : ℝ)) := by
@@ -330,7 +322,6 @@ lemma jurl (b : FinPMF α) :
     rw [FinPMF.apply_mul, FinPMF.apply_apply]
     conv =>
       rhs
-      arg 1
       rw [← FinPMF.apply_swap]
     rw [FinPMF.apply_apply]
     rfl
@@ -396,7 +387,6 @@ lemma max_val_of_apply_lmap (b : FinPMF α) : max_val ((b*b).apply lmap) ≤ (ma
     _ = ∑ y ∈ univ.filter (fun y => lmap y = x), (b * b) y := by
       unfold FinPMF.apply transfer
       dsimp [FinPMF.val_apply]
-      congr
     _ = ∑ y ∈ univ.filter (fun y => lmap y = x), b y.1 * b y.2 := by rfl
     _ ≤ ∑ __ ∈ univ.filter (fun y => lmap y = x), (max_val b) * (max_val b) := by
       gcongr
@@ -679,8 +669,85 @@ theorem bourgain_extractor (a b : FinPMF α)
       apply Real.rpow_nonneg
       simp
 
--- theorem bourgain_extractor_final' (a b : FinPMF α) (χ : AddChar α ℂ) (h : χ.IsNontrivial)
---     (hA : max_val a ≤ (p^(- 1/2 + 2/11 * bourgainα) : ℝ))
---     (hB : max_val b ≤ (p^(- 1/2 + 2/11 * bourgainα) : ℝ)) :
---     SD (((a*b).apply (fun ⟨x, y⟩ => x * y + x^2 * y^2)).apply fun x => (x.val : ZMod 2)) (Uniform ⟨univ, univ_nonempty⟩)
---  ≤ bourgain_C * p^(-1/352 * bourgainα) := by
+theorem bourgain_extractor_final' (a b : FinPMF α)
+    (hA : max_val a ≤ (p^(- 1/2 + 2/11 * bourgainα) : ℝ))
+    (hB : max_val b ≤ (p^(- 1/2 + 2/11 * bourgainα) : ℝ)) (m : ℕ+) :
+    SD ((a*b).apply fun ⟨x, y⟩ => ((x * y + x^2 * y^2).val : ZMod m)) (Uniform ⟨univ, univ_nonempty⟩)
+    ≤ bourgain_C * p^(-1/352 * bourgainα) * Real.sqrt m * (3 * Real.log p + 3) + m / (2 * p) := by
+  convert_to SD (((a*b).apply fun ⟨x, y⟩ => x * y + x^2 * y^2).apply fun x => (x.val : ZMod m)) (Uniform ⟨univ, univ_nonempty⟩) ≤ _
+  rw [FinPMF.apply_apply]
+  rfl
+  have : (p.toPNat fpprm.out.pos) = p := rfl
+  convert generalized_XOR_lemma (p.toPNat fpprm.out.pos) ..
+  apply Eq.symm
+  apply Real.coe_toNNReal
+  apply mul_nonneg
+  unfold bourgain_C
+  positivity
+  positivity
+  intro χ hχ
+  rw [le_div_iff]
+
+  unfold cft nl2Inner
+  simp only [expect_univ, ZMod.card, ← nnratCast_smul_eq_nnqsmul ℝ, NNRat.cast_inv,
+    NNRat.cast_natCast, Complex.real_smul, Complex.ofReal_inv, Complex.ofReal_nat_cast, norm_mul,
+    norm_inv, Complex.norm_nat, Complex.norm_eq_abs, Real.coe_toNNReal', this]
+  rw [Complex.abs_natCast, le_max_iff]
+  left
+  rw [mul_comm, ← mul_assoc, mul_inv_cancel, one_mul, ← Complex.norm_eq_abs]
+  conv =>
+    lhs
+    rhs
+    rhs
+    intro
+    rw [mul_comm, ← AddChar.inv_apply_eq_conj, ← AddChar.inv_apply']
+  conv =>
+    lhs
+    rhs
+    apply apply_weighted_sum
+  rw [Fintype.sum_prod_type]
+  simp only [FinPMF.mul_val, RCLike.ofReal_mul]
+  simp_rw [mul_assoc, ← mul_sum]
+  apply bourgain_extractor
+  assumption
+  assumption
+  rw [AddChar.isNontrivial_iff_ne_trivial, inv_ne_one, ← AddChar.isNontrivial_iff_ne_trivial]
+  exact hχ
+  simp [fpprm.out.ne_zero]
+  simp
+
+
+theorem bourgain_extractor_final (m : ℕ+) :
+    two_extractor (fun (⟨x, y⟩ : α × α) => ((x * y + x^2 * y^2).val : ZMod m))
+    ((1/2 - 2/11 * bourgainα) * Real.logb 2 p) (bourgain_C * p^(-1/352 * bourgainα) * Real.sqrt m * (3 * Real.log p + 3) + m / (2 * p)) := by
+  rintro a b ⟨ha, hb⟩
+  rw [ge_iff_le, ← min_entropy_of_max_val_le] at ha hb
+  convert bourgain_extractor_final' (p := p) a b ?_ ?_ m
+  · convert ha using 1
+    conv =>
+      rhs
+      rhs
+      tactic =>
+        rw [mul_comm, Real.rpow_mul, Real.rpow_logb]
+        norm_num
+        norm_num
+        simp [fpprm.out.pos]
+        norm_num
+    rw [← Real.rpow_neg]
+    congr 1
+    ring
+    simp
+  · convert hb using 1
+    conv =>
+      rhs
+      rhs
+      tactic =>
+        rw [mul_comm, Real.rpow_mul, Real.rpow_logb]
+        norm_num
+        norm_num
+        simp [fpprm.out.pos]
+        norm_num
+    rw [← Real.rpow_neg]
+    congr 1
+    ring
+    simp

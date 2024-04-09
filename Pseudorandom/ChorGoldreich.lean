@@ -146,7 +146,7 @@ theorem bourgain_extractor_aux₀' [Fintype α] [Field α] (a b : (α × α) →
   positivity
   positivity
 
-theorem bourgain_extractor_aux₁ [Fintype α] [Field α] [Fintype β] [AddCommGroup β] [Module α β]
+theorem bourgain_extractor_aux₁ [Fintype α] [Field α] [Fintype β] [AddCommGroup β] [Module α β] [DecidableEq β]
     (a b : FinPMF β) (χ : AddChar α ℂ) (F : BilinForm α β) :
     ‖ ∑ x, a x * ∑ y, b y * χ (F x y)‖^2 ≤ ‖ ∑ x, a x * ∑ y, (b - b) y * χ (F x y)‖ := by
   calc ‖ ∑ x, a x * ∑ y, b y * χ (F x y)‖^2
@@ -226,7 +226,7 @@ theorem bourgain_extractor_aux₁ [Fintype α] [Field α] [Fintype β] [AddCommG
       simp
       rfl
 
-theorem bourgain_extractor_aux₁' [Fintype α] [Field α] [Fintype β] [AddCommGroup β] [Module α β]
+theorem bourgain_extractor_aux₁' [Fintype α] [Field α] [Fintype β] [AddCommGroup β] [Module α β] [DecidableEq β]
     (a b : FinPMF β) (χ : AddChar α ℂ) (F : BilinForm α β) :
     ‖ ∑ x, a x * ∑ y, b y * χ (F x y)‖ ≤ ‖ ∑ x, a x * ∑ y, (b - b) y * χ (F x y)‖^(2⁻¹ : ℝ) := by
   rw [Real.le_rpow_inv_iff_of_pos, Real.rpow_two]
@@ -235,7 +235,7 @@ theorem bourgain_extractor_aux₁' [Fintype α] [Field α] [Fintype β] [AddComm
   simp only [Complex.norm_eq_abs, apply_nonneg]
   norm_num
 
-theorem bourgain_extractor_aux₂ (ε : ℝ) (hε : 0 < ε) (n : ℝ) (hn : 0 < n) [Fintype α] [Field α] [DecidableEq (α × α)] (a b : FinPMF (α × α)) (χ : AddChar α ℂ)
+theorem bourgain_extractor_aux₂ (ε : ℝ) (hε : 0 < ε) (n : ℝ) (hn : 0 < n) [Fintype α] [Field α] [DecidableEq α] (a b : FinPMF (α × α)) (χ : AddChar α ℂ)
     (h : χ.IsNontrivial) (hA : close_high_entropy n ε a) (hB : close_high_entropy n ε b):
     ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖ ≤ Fintype.card α / n + 2 * ε := calc ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖
   _ = ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y, b y * χ (IP x y) +

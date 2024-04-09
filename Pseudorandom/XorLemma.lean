@@ -8,6 +8,7 @@ import LeanAPAP.Prereqs.Discrete.DFT.Compact
 import LeanAPAP.Prereqs.Expect.Basic
 import Mathlib.NumberTheory.Harmonic.Bounds
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
+import Mathlib.Data.Int.CardIntervalMod
 
 open Real Finset BigOps
 
@@ -217,6 +218,87 @@ lemma circle_lower_bound (x : ℝ) :
       rw [abs_of_nonpos]
       ring_nf
       linarith
+
+lemma bound_on_apply_uniform :
+    ‖((fun (x : α) => (x.val : β)) # (Uniform ⟨univ, univ_nonempty⟩)) - ⇑(Uniform ⟨univ, univ_nonempty⟩)‖_[1]
+    ≤ m / n := calc ‖((fun (x : α) => (x.val : β)) # (Uniform ⟨univ, univ_nonempty⟩)) - ⇑(Uniform ⟨univ, univ_nonempty⟩)‖_[1]
+  _ = ∑ x, ‖((fun (x : α) => (x.val : β)) # (Uniform ⟨univ, univ_nonempty⟩)) x - 1/m‖ := by
+    rw [l1Norm_eq_sum]
+    rcongr
+    simp
+  _ = ∑ x : β, ‖∑ y ∈ (univ.filter fun (y : α) => y.val = x), 1/(n : ℝ) - 1/m‖ := by
+    rcongr
+    simp
+  _ = ∑ x : β, ‖(univ.filter fun (y : α) => y.val = x).card / (n : ℝ) - 1/m‖ := by
+    simp [div_eq_mul_inv]
+  _ = ∑ x : β, ‖((range n).filter fun (y : ℕ) => y = x).card / (n : ℝ) - 1/m‖ := by
+    congr with x
+    congr 4
+    apply card_congr (fun x _ => x.val)
+    · intros
+      simp_all [ZMod.val_lt]
+    · intros _ _ _ _ h
+      exact ZMod.val_injective n h
+    · intros a ha
+      exists a
+      simp_all only [mem_filter, mem_range, mem_univ,
+        true_and, exists_prop]
+      rw [ZMod.val_cast_of_lt]
+      exact ⟨ha.2, rfl⟩
+      exact ha.1
+  _ = ∑ x : β, ‖(Nat.count (fun (y : ℕ) => y ≡ x.val [MOD m]) n) / (n : ℝ) - 1/m‖ := by
+    congr with x
+    rw [Nat.count_eq_card_filter_range]
+    congr with y
+    have : x = (x.val) := by simp
+    conv =>
+      lhs
+      rw [this]
+    exact ZMod.eq_iff_modEq_nat m
+  _ = ∑ x : β, ‖⌈(n - (x.val % m : ℕ)) / (m : ℚ)⌉ / (n : ℝ) - 1/m‖ := by
+    rcongr x
+    norm_cast
+    rw [Nat.count_modEq_card_eq_ceil n (r := m) (by simp) x.val]
+    norm_cast
+  _ = ∑ x : β, ‖(⌈(n - (x.val % m : ℕ)) / (m : ℚ)⌉ - n/m) / (n : ℝ)‖ := by
+    rcongr
+    field_simp [mul_comm]
+  _ = (∑ x : β, ‖(⌈(n - (x.val % m : ℕ)) / (m : ℚ)⌉ - n/m : ℝ)‖) / (n : ℝ) := by
+    simp_rw [sum_div, norm_div]
+    rcongr
+    simp
+  _ ≤ (∑ x : β, 1) / (n : ℝ) := by
+    gcongr with x
+    simp only [norm_eq_abs, abs_sub_le_iff]
+    constructor
+    · rw [sub_le_iff_le_add]
+      calc (⌈(n - (x.val % m : ℕ)) / (m : ℚ)⌉ : ℝ)
+        _ ≤ ⌊(n - (x.val % m : ℕ)) / (m : ℚ)⌋ + 1 := by
+          norm_cast
+          apply Int.ceil_le_floor_add_one
+        _ ≤ (n - (x.val % m : ℕ)) / (m : ℚ) + 1 := by
+          norm_cast
+          push_cast
+          rel [Int.floor_le ( Rat.divInt (Int.subNatNat n (x.val % m : ℕ)) m )]
+        _ ≤ n / m + 1 := by
+          gcongr
+          norm_num
+          norm_num
+          rfl
+        _ = 1 + n/m := add_comm ..
+    · rw [sub_le_iff_le_add]
+      calc n / (m : ℝ)
+        _ = 1 + (n - m) / m := by field_simp
+        _ ≤ 1 + (n - (x.val % m : ℕ)) / m := by
+          gcongr
+          norm_cast
+          apply le_of_lt (Nat.mod_lt ..)
+          simp
+        _ ≤ 1 + ⌈(n - (x.val % m : ℕ)) / (m : ℚ)⌉ := by
+          gcongr
+          norm_cast
+          apply Int.le_ceil
+  _ = m / n := by simp [card_univ]
 
 set_option maxHeartbeats 500000
 
@@ -474,12 +556,46 @@ theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : �
     _ ≤ 6 * (1 + Real.log n) := by gcongr; apply harmonic_le_one_add_log
     _ = 6 * Real.log n + 6 := by ring_nf
 
-theorem generalized_XOR_lemma (ε : ℝ)
-    (a : FinPMF α) (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖dft (a ·) χ‖ ≤ ε) :
+theorem generalized_XOR_lemma (ε : NNReal)
+    (a : FinPMF α) (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖cft (a ·) χ‖ ≤ ε / Fintype.card α) :
     SD (a.apply fun x => (x.val : β)) (Uniform ⟨univ, univ_nonempty⟩) ≤
-    ε * Real.sqrt m * (3 * Real.log n + 3) + m / n := calc SD (a.apply fun x => (x.val : β)) (Uniform ⟨univ, univ_nonempty⟩)
+    ε * Real.sqrt m * (3 * Real.log n + 3) + m / (2*n) := calc SD (a.apply fun x => (x.val : β)) (Uniform ⟨univ, univ_nonempty⟩)
   _ = 1/2 * ‖⇑(a.apply fun x => (x.val : β)) - ⇑(Uniform ⟨univ, univ_nonempty⟩)‖_[1] := SD_eq_half_L1 ..
-  _ = 1/2 * ‖((fun x => (x.val : β)) # ⇑a) - ⇑(Uniform ⟨univ, univ_nonempty⟩)‖_[1] := rfl
-  -- _ ≤ 1/2 * (‖⇑(a.apply fun x => (x.val : β)) - ⇑(Uniform ⟨univ, univ_nonempty⟩)‖_[1]) := by
-  --   sorry
-  _ ≤ ε * Real.sqrt m * (3 * Real.log n + 3) + m / n := sorry
+  _ = 1/2 * ‖((fun (x : α) => (x.val : β)) # a) - ⇑(Uniform ⟨univ, univ_nonempty⟩)‖_[1] := rfl
+  _ ≤ 1/2 * (‖((fun (x : α) => (x.val : β)) # a) - ((fun (x : α) => (x.val : β)) # (Uniform ⟨univ, univ_nonempty⟩))‖_[1] +
+      ‖((fun (x : α) => (x.val : β)) # (Uniform ⟨univ, univ_nonempty⟩)) - ⇑(Uniform ⟨univ, univ_nonempty⟩)‖_[1]) := by
+    gcongr
+    apply lpNorm_sub_le_lpNorm_sub_add_lpNorm_sub
+    rfl
+  _ = 1/2 * (‖((fun (x : α) => (x.val : β)) # a) - ((fun (x : α) => (x.val : β)) # (Function.const α (𝔼 x, a x)))‖_[1] +
+      ‖((fun (x : α) => (x.val : β)) # (Uniform ⟨univ, univ_nonempty⟩)) - ⇑(Uniform ⟨univ, univ_nonempty⟩)‖_[1]) := by
+    congr
+    ext
+    congr
+    ext x
+    simp [expect, ← nnratCast_smul_eq_nnqsmul ℝ, card_univ]
+  _ ≤ 1/2 * ((6 * Real.log n + 6).toNNReal * ε * Real.sqrt (Fintype.card β) +
+      ‖((fun (x : α) => (x.val : β)) # (Uniform ⟨univ, univ_nonempty⟩)) - ⇑(Uniform ⟨univ, univ_nonempty⟩)‖_[1]) := by
+    gcongr
+    apply lemma43
+    exact h
+    intro χ
+    simp only [coe_toNNReal', le_max_iff]
+    left
+    apply lemma44
+  _ = 1/2 * ((6 * Real.log n + 6) * ε * Real.sqrt (Fintype.card β) +
+      ‖((fun (x : α) => (x.val : β)) # (Uniform ⟨univ, univ_nonempty⟩)) - ⇑(Uniform ⟨univ, univ_nonempty⟩)‖_[1]) := by
+    congr
+    simp only [coe_toNNReal', max_eq_left_iff]
+    apply add_nonneg
+    simp only [gt_iff_lt, Nat.ofNat_pos, mul_nonneg_iff_of_pos_left]
+    apply Real.log_nonneg
+    norm_cast
+    simp
+    norm_num
+  _ ≤ 1/2 * ((6 * Real.log n + 6) * ε * Real.sqrt (Fintype.card β) + m/n) := by
+    gcongr
+    apply bound_on_apply_uniform
+  _ = ε * Real.sqrt m * (3 * Real.log n + 3) + m / (2*n) := by
+    simp
+    ring_nf
