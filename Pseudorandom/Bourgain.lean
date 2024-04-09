@@ -718,7 +718,7 @@ theorem bourgain_extractor_final' (a b : FinPMF α)
 
 
 theorem bourgain_extractor_final (m : ℕ+) :
-    two_extractor (fun (⟨x, y⟩ : α × α) => ((x * y + x^2 * y^2).val : ZMod m))
+    two_extractor (fun (⟨x, y⟩ : ZMod p × ZMod p) => ((x * y + x^2 * y^2).val : ZMod m))
     ((1/2 - 2/11 * bourgainα) * Real.logb 2 p) (bourgain_C * p^(-1/352 * bourgainα) * Real.sqrt m * (3 * Real.log p + 3) + m / (2 * p)) := by
   rintro a b ⟨ha, hb⟩
   rw [ge_iff_le, ← min_entropy_of_max_val_le] at ha hb
