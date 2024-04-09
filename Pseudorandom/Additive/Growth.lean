@@ -58,7 +58,6 @@ theorem exists_grower : ∃ (a : α), a ≠ 0 ∧ (A + a • A).card ≥ ((min (
     have : 1 ≤ A.card^2 := Nat.one_le_of_lt <| pow_pos ane.card_pos 2
     linarith
   suffices ∃ (a : α), a ≠ 0 ∧ E[A, a • A] ≤ A.card^2 + (A.card^2 * (A.card^2 - 1) / (Fintype.card α - 1) : ℚ) by
-    -- sorry
     have ⟨a, h1, h2⟩ := this
     exists a
     refine' ⟨h1, _⟩
@@ -109,7 +108,6 @@ theorem exists_grower : ∃ (a : α), a ≠ 0 ∧ (A + a • A).card ≥ ((min (
             2 ≤ Fintype.card α := t1
             _ ≤ Fintype.card α + A.card^2 := by simp
   suffices (∑ a : α, if a ≠ 0 then E[A, a • A] else 0 : ℚ) ≤ A.card^2 * (Fintype.card α - 1) + A.card^2 * (A.card^2 - 1) by
-    -- sorry
     by_contra! nh
     suffices A.card^2 * (Fintype.card α - 1) + A.card^2 * (A.card^2 - 1) < (∑ a : α, if a ≠ 0 then E[A, a • A] else 0 : ℚ) by linarith
     calc (A.card^2 * (Fintype.card α - 1) + A.card^2 * (A.card^2 - 1) : ℚ)

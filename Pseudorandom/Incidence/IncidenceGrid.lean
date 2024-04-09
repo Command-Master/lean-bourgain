@@ -48,7 +48,6 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
     apply rpow_nonneg
     simp
   have : ∀ b ∈ B, (4⁻¹ * (n^(2 - 2 * SG_eps₃ β - (1/2 + 2*ST_prime_field_eps₂ β)) : ℝ)) < additiveEnergy A (((b₂ - b) / (b -b₁)) • A) := by
-    -- sorry
     intro b hb
     have nd0 : ¬(b₂ - b = 0) := fun h => hb₂ ((eq_of_sub_eq_zero h) ▸ hb)
     have nd0₂ : ¬(b - b₁ = 0) := fun h => hb₁ ((eq_of_sub_eq_zero h) ▸ hb)
@@ -72,7 +71,6 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
         rw [sum_fiberwise (s := A ×ˢ A) (g := fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2)]
       _ = ∑ (a : α), ∑ x₁ ∈ ((A ×ˢ A).filter fun x₁ => (b - b₁) / (b₂ - b₁) * x₁.1 + (b₂ - b) / (b₂ - b₁) * x₁.2 = a),
           ∑ x₂ ∈ A ×ˢ A, if a = (b - b₁) / (b₂ - b₁) * x₂.1 + (b₂ - b) / (b₂ - b₁) * x₂.2 then 1 else 0 := by
-        -- sorry
         congr
         ext a
         apply sum_congr
@@ -120,7 +118,6 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
       _ = 4⁻¹ * (n^(2 - 2 * SG_eps₃ β - (1/2 + 2*ST_prime_field_eps₂ β)) : ℝ) := by rw [←rpow_sub]; simp
   have ⟨A', hA', x, T', hT, hAsz, hTsz, hStab⟩ :=
     Theorem335 (256 * n^(8 * ST_prime_field_eps₂ β + 2*SG_eps₃ β)) (by
-        -- sorry
         rw [(by norm_num : (1 : ℝ) = 1*1)]
         apply mul_le_mul
         norm_num
@@ -142,7 +139,6 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
         · exact hb₂ ((eq_of_sub_eq_zero v) ▸ hx)
         · exact hb₁ ((eq_of_sub_eq_zero v) ▸ hx))
       (by
-        -- sorry
         intro x' hx'
         simp at hx'
         have ⟨b, hb, h'⟩ := hx'
@@ -320,10 +316,6 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
       simp [instpprime.out.one_le]
       unfold_let β'
       simp
-
-
-
-  -- sorry
   have := Stab_small K' p A' _ (lemma12 β h) fourlt hStab' β' A'large A'small
 
   absurd this

@@ -412,7 +412,6 @@ theorem ST_prime_field_aux₂' (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (
           simp
           apply rpow_pos_of_pos
           simp
-          -- sorry
         _ ≤ (∑ x in P, (IntersectionsL x L).card) / (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ) := by
           simp [sum_div]
           apply sum_le_sum_of_subset_of_nonneg
@@ -423,7 +422,6 @@ theorem ST_prime_field_aux₂' (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (
           simp
           apply rpow_nonneg
           simp
-          -- sorry
         _ = (Intersections P L).card / (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ) := by congr 1; norm_cast; rw [IntersectionsL_sum]
         _ ≤ Real.sqrt (L.card * P.card * (L.card + P.card)) / (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ) := by
           gcongr
@@ -432,12 +430,10 @@ theorem ST_prime_field_aux₂' (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (
           simp
           norm_cast
           simp
-          -- sorry
         _ ≤ Real.sqrt (n * n * (n+n)) / (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ) := by
           gcongr
           apply sqrt_le_sqrt
           gcongr
-          -- sorry
         _ = n^(1 - 2*ST_prime_field_eps₂ β) * (Real.sqrt 2 / 4) := by
           simp [←mul_two, sqrt_eq_rpow]
           ring_nf
@@ -451,7 +447,6 @@ theorem ST_prime_field_aux₂' (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (
             · tactic => simp
           ring_nf
           repeat simp
-          -- sorry
     _ > (n^(1 - 2*ST_prime_field_eps₂ β) * (ST_C₄^2 / 2)  - n^(1 - 2*ST_prime_field_eps₂ β) * (Real.sqrt 2 / 4)) * n^(1/2 - ST_prime_field_eps₂ β) := by
       gcongr
       rw [←gt_iff_lt]

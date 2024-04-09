@@ -51,7 +51,6 @@ theorem claim342_grid (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Lin
   suffices 𝔼 (b₁ ∈ B) (b₂ ∈ B),
       (if b₁ ≠ b₂ then (L.filter (fun l => (∃ p ∈ A ×ˢ {b₁}, p ∈ l) ∧ ∃ p ∈ A ×ˢ {b₂}, p ∈ l)).card else 0)
       > (SG_C₄ * n ^ (1 - SG_eps₂ β) : ℝ) by
-    -- sorry
     by_contra! v
     suffices 𝔼 (b₁ ∈ B) (b₂ ∈ B),
       (if b₁ ≠ b₂ then (L.filter (fun l => (∃ p ∈ A ×ˢ {b₁}, p ∈ l) ∧ ∃ p ∈ A ×ˢ {b₂}, p ∈ l)).card else 0)

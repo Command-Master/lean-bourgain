@@ -216,7 +216,6 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
       unfold measure_complexity
       apply card_lt_card
       rw [ssubset_iff_of_subset]
-      -- sorry
       by_cases h₂ : 1 - l * a vals[(l : ℕ)] ≤ l * a vals[l.natPred]
       · exists vals[(l : ℕ)]
         simp [-List.getElem_eq_get]

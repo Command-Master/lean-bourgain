@@ -73,6 +73,20 @@ theorem apply_inner_product_bijective [Fintype α] [Field α] (χ : AddChar α �
 noncomputable def AddChar.inner_product_equiv [Fintype α] [Field α] (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
   (α × α) ≃ AddChar (α × α) ℂ := Equiv.ofBijective _ (apply_inner_product_bijective χ h)
 
+theorem bourgain_extractor_aux_inner [Fintype α] [Field α] (a b : (α × α) → ℝ) (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
+    ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖ = ‖ l2Inner (Complex.ofReal ∘ a) (fun x => dft (b ·) (χ.inner_product_equiv h x)⁻¹)‖
+        := calc ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖
+  _ = ‖ ∑ x, a x * ∑ y, b y * (χ.inner_product_equiv h x) y‖ := rfl
+  _ = ‖ ∑ x, a x * ∑ y, (χ.inner_product_equiv h x) y * b y‖ := by congr; ext; congr; ext; rw [mul_comm]
+  _ = ‖ ∑ x, a x * ∑ y, conj ((χ.inner_product_equiv h x)⁻¹ y) * b y‖ := by
+    congr; ext; congr; ext
+    rw [AddChar.inv_apply, AddChar.map_neg_eq_conj, RingHomCompTriple.comp_apply, RingHom.id_apply]
+  _ = ‖ ∑ x, a x * (dft (b ·) (χ.inner_product_equiv h x)⁻¹)‖ := rfl
+  _ = ‖ l2Inner (Complex.ofReal ∘ a) (fun x => dft (b ·) (χ.inner_product_equiv h x)⁻¹)‖ := by
+    unfold l2Inner
+    rcongr
+    simp only [Function.comp_apply, Complex.ofReal_eq_coe, Complex.conj_ofReal]
+
 theorem bourgain_extractor_aux₀ [Fintype α] [Field α] (a b : (α × α) → ℝ) (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
     ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖^2 ≤ (Fintype.card α)^2 * ‖a‖_[2]^2 * ‖b‖_[2]^2 :=
       calc ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖^2
@@ -251,7 +265,8 @@ theorem bourgain_extractor_aux₂ (ε : ℝ) (hε : 0 < ε) (n : ℝ) (hn : 0 < 
   _ ≤ ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y, b y * χ (IP x y)‖ + ε := by
     gcongr
     apply hA
-    sorry
+    apply filter_neg_le_inv_card_le
+    assumption
   _ = ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x *
       (∑ y ∈ univ.filter (fun y => b y ≤ 1/n), b y * χ (IP x y) + ∑ y ∈ univ.filter (fun y => ¬b y ≤ 1/n), b y * χ (IP x y))‖ + ε := by
     simp_rw [sum_filter_add_sum_filter_not]
@@ -282,7 +297,8 @@ theorem bourgain_extractor_aux₂ (ε : ℝ) (hε : 0 < ε) (n : ℝ) (hn : 0 < 
     gcongr
     simp
     apply hB
-    sorry
+    apply filter_neg_le_inv_card_le
+    assumption
   _ ≤ ‖ ∑ x ∈ univ.filter (fun x => a x ≤ 1/n), a x * ∑ y ∈ univ.filter (fun y => b y ≤ 1/n), b y * χ (IP x y)‖ +
       ∑ x ∈ univ, a x * ε + ε := by
     gcongr

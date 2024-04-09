@@ -39,7 +39,6 @@ lemma claim_342 (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Lin
     apply rpow_nonneg
     simp only [Nat.cast_nonneg]
   have lne : L.Nonempty := by
-    -- sorry
     by_contra! le
     simp only [not_nonempty_iff_eq_empty] at le
     simp only [le, card_empty, zero_le, Int2_empty, CharP.cast_eq_zero, gt_iff_lt, ne_eq,
@@ -53,7 +52,6 @@ lemma claim_342 (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Lin
   suffices 𝔼 (p₁ ∈ P) (p₂ ∈ P),
       (if p₁ ≠ p₂ then (P.filter (fun x => (∃ l ∈ L, x ∈ l ∧ p₁ ∈ l) ∧ (∃ l ∈ L, x ∈ l ∧ p₂ ∈ l))).card else 0)
       > (ST_C₆ * n ^ (1 - ST_prime_field_eps₄ β) : ℝ) by
-    -- sorry
     by_contra! v
     suffices 𝔼 (p₁ ∈ P) (p₂ ∈ P),
         (if p₁ ≠ p₂ then (P.filter (fun x => (∃ l ∈ L, x ∈ l ∧ p₁ ∈ l) ∧ (∃ l ∈ L, x ∈ l ∧ p₂ ∈ l))).card else 0)

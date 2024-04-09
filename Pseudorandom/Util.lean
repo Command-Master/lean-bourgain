@@ -1,6 +1,5 @@
 import Mathlib.Data.Finset.Card
-import Mathlib.Data.Rat.Order
-import Mathlib.Algebra.Order.Ring.Abs
+import Mathlib.Data.Real.Archimedean
 
 lemma exists_eq_card_filter_of_card_le_one {α : Type*}
   {p : α → Prop} [DecidablePred p] (A : Finset α) (h : (A.filter p).card ≤ 1) :
@@ -27,3 +26,15 @@ lemma min_sq (a b : ℚ) (h₁ : 0 ≤ a) (h₂ : 0 ≤ b) : (min a b)^2 = min (
   rw [sq_le_sq, abs_of_nonneg, abs_of_nonneg]
   assumption
   assumption
+
+open Real
+
+lemma half_le_floor_of_one_le (a : ℝ) (h : 1 ≤ a) :
+    a/2 ≤ ⌊a⌋₊ := by
+  by_cases a < 2
+  calc a / 2
+    _ ≤ 1 := by linarith
+    _ ≤ ⌊a⌋₊ := by simp; linarith
+  calc a / 2
+    _ ≤ a - 1 := by linarith
+    _ ≤ ⌊a⌋₊ := le_of_lt (Nat.sub_one_lt_floor _)

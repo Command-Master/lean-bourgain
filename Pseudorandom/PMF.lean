@@ -5,10 +5,10 @@ import Mathlib.Algebra.BigOperators.Order
 import Mathlib.Data.Real.Basic
 import LeanAPAP.Prereqs.Discrete.Convolution.Basic
 
-open Classical Finset BigOps
+open Finset BigOps
 
-variable {α : Type*} [Fintype α]
-        {β : Type*} [Fintype β]
+variable {α : Type*} [Fintype α] [DecidableEq α]
+        {β : Type*} [Fintype β] [DecidableEq β]
         (a : FinPMF α)
 
 section basic
@@ -132,7 +132,7 @@ lemma FinPMF.apply_swap (b : FinPMF β) : (a*b).apply Prod.swap = b*a := by
     rfl
   simp [filter_eq', mul_comm]
 
-lemma FinPMF.apply_apply (f : α → β) (g : β → γ) [Nonempty γ] [Fintype γ] :
+lemma FinPMF.apply_apply (f : α → β) (g : β → γ) [Nonempty γ] [Fintype γ] [DecidableEq γ] :
     (a.apply f).apply g = a.apply (g ∘ f) := by
   apply Subtype.ext
   apply transfer_transfer
@@ -263,7 +263,8 @@ lemma FinPMF.sub_val [Sub α] : a - b = (a*b).apply (fun x => x.1-x.2) := rfl
 
 lemma FinPMF.add_val [Add α] : a + b = (a*b).apply (fun x => x.1+x.2) := rfl
 
-lemma FinPMF.apply_mul (a : FinPMF α) (b : FinPMF β) (f : α → γ) (g : β → γ₂) [Nonempty γ] [Fintype γ] [Nonempty γ₂] [Fintype γ₂]:
+lemma FinPMF.apply_mul (a : FinPMF α) (b : FinPMF β) (f : α → γ) (g : β → γ₂) [Nonempty γ] [Fintype γ] [DecidableEq γ]
+    [Nonempty γ₂] [Fintype γ₂] [DecidableEq γ₂]:
     a.apply f * b.apply g = (a*b).apply (fun x => (f x.1, g x.2)) := by
   apply Subtype.ext
   ext x
@@ -273,7 +274,7 @@ lemma FinPMF.apply_mul (a : FinPMF α) (b : FinPMF β) (f : α → γ) (g : β �
   apply Eq.symm
   convert_to ∑ y ∈ univ.filter (fun y => (f y.1, g y.2) = (x1, x2)), (a*b) y = _
   unfold apply transfer
-  simp only [filter_congr_decidable, val_apply, Prod.mk.injEq]
+  simp only [filter_congr_decidable]
   calc ∑ y ∈ univ.filter (fun y => (f y.1, g y.2) = (x1, x2)), (a*b) y
     _ = ∑ y ∈ univ.filter (fun y => f y.1 = x1 ∧ g y.2 = x2), (a*b) y := by simp
     _ = ∑ y ∈ (univ ×ˢ univ).filter (fun y => f y.1 = x1 ∧ g y.2 = x2), (a*b) y := by simp
@@ -286,13 +287,16 @@ lemma FinPMF.apply_mul (a : FinPMF α) (b : FinPMF β) (f : α → γ) (g : β �
     _ = (∑ y ∈ univ.filter (fun y => f y = x1), a y) * (∑ y ∈ univ.filter (fun y => g y = x2), b y) := by
       rw [sum_mul_sum]
 
-lemma FinPMF.apply_add (a : FinPMF α) (b : FinPMF β) (f : α → γ) (g : β → γ) [Nonempty γ] [Fintype γ] [Add γ]:
+lemma FinPMF.apply_add (a : FinPMF α) (b : FinPMF β) (f : α → γ) (g : β → γ) [Nonempty γ] [Fintype γ] [Add γ] [DecidableEq γ]:
     a.apply f + b.apply g = (a*b).apply (fun x => f x.1 + g x.2) := by
   apply Subtype.ext
   ext x
   change (apply a f + apply b g) x = _
   rw [FinPMF.add_val, FinPMF.apply_mul, FinPMF.apply_apply]
   rfl
+
+theorem apply_ne_zero (a : FinPMF α) (f : α → β) (x : β)
+    (h : a.apply f x ≠ 0) : ∃ i, x = f i := transfer_ne_zero f a x h
 
 end monoid
 
@@ -320,7 +324,7 @@ theorem linear_combination_linear_combination [Fintype γ] (a : FinPMF α) (f : 
   rw [sum_comm]
   simp [mul_assoc]
 
-theorem linear_combination_apply [Nonempty γ] [Fintype γ] (a : FinPMF α) (f : α → FinPMF β) (g : β → γ) :
+theorem linear_combination_apply [Nonempty γ] [Fintype γ] [DecidableEq γ] (a : FinPMF α) (f : α → FinPMF β) (g : β → γ) :
   (FinPMF.linear_combination a f).apply g = FinPMF.linear_combination a (fun x => (f x).apply g) := by
   unfold FinPMF.apply transfer FinPMF.linear_combination
   apply Subtype.ext
@@ -372,6 +376,11 @@ lemma close_high_entropy_of_floor [Fintype α] (n : ℝ) (ε : ℝ) (a : FinPMF 
   refine LE.le.trans ?_ hH
   simp
 
+lemma close_high_entropy_of_le [Fintype α] (n : ℝ) (ε₁ ε₂ : ℝ) (hε : ε₁ ≤ ε₂) (a : FinPMF α)
+    (h : close_high_entropy n ε₁ a):
+    close_high_entropy n ε₂ a := by
+  intro H hH
+  apply (h H hH).trans hε
 
 lemma close_high_entropy_apply_equiv [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
     (n ε : ℝ) (a : FinPMF α)
@@ -383,6 +392,48 @@ lemma close_high_entropy_apply_equiv [Fintype α] [Nonempty α] [Fintype β] [No
   simp
   apply h
   simp [hX]
+
+lemma add_close_high_entropy [Fintype α] [Nonempty α] [AddCommGroup α]
+    (n ε : ℝ) (a b : FinPMF α)
+    (h : close_high_entropy n ε a) :
+    close_high_entropy n ε (a+b) := by
+  intro H hX
+  change ∑ v ∈ H, ∑ x ∈ univ.filter (fun (x : α × α) => x.1 + x.2 = v), a x.1 * b x.2 ≤ ε
+  convert_to ∑ v ∈ H, ∑ x, a (v - x) * b x ≤ ε
+  congr with v
+  apply sum_nbij' (fun x => x.2) (fun x => (v-x, x))
+  · simp
+  · simp
+  · simp only [mem_filter, mem_univ, true_and, Prod.forall, Prod.mk.injEq, and_true]
+    intros _ _ h
+    rw [← h]
+    abel
+  · simp
+  · simp only [mem_filter, mem_univ, true_and, mul_eq_mul_right_iff, Prod.forall]
+    intros _ _ h
+    left
+    rw [← h]
+    congr
+    abel
+  rw [sum_comm]
+  simp_rw [← sum_mul, mul_comm]
+  convert_to ∑ x, b x * ∑ i ∈ H.image (fun y => y - x), a i ≤ ε
+  congr with x
+  congr 1
+  apply Eq.symm
+  apply sum_image
+  · intros _ _ _ _ h
+    exact sub_left_inj.mp h
+  trans ∑ x, b x * ε
+  gcongr
+  simp
+  apply h
+  trans (H.card : ℝ)
+  exact_mod_cast card_image_le
+  exact hX
+  simp [← sum_mul]
+
+
 
 lemma close_high_entropy_linear_combination [Fintype α] [Fintype β] [DecidableEq β] (n : ℝ) (ε : ℝ) (a : FinPMF β)
     (g : β → FinPMF α) (h : ∀ x, 0 < a x → close_high_entropy n ε (g x)) :
@@ -422,3 +473,17 @@ lemma close_high_entropy_linear_combination [Fintype α] [Fintype β] [Decidable
     _ = ε := by simp [← sum_mul]
 
 end high_entropy
+
+lemma filter_neg_le_inv_card_le (a : FinPMF α) (n : ℝ) (hn : 0 < n) :
+    (univ.filter fun x => ¬a x ≤ 1/n).card ≤ n := calc ((univ.filter fun x => ¬a x ≤ 1/n).card : ℝ)
+  _ = (∑ x ∈ univ.filter (fun x => ¬a x ≤ 1/n), 1 / n) * n := by field_simp
+  _ ≤ (∑ x ∈ univ.filter (fun x => ¬a x ≤ 1/n), a x) * n := by
+    gcongr
+    simp_all [le_of_lt]
+  _ ≤ (∑ x, a x) * n := by
+    gcongr
+    apply sum_le_sum_of_subset_of_nonneg
+    simp
+    intros
+    simp
+  _ = n := by simp

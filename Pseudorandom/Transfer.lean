@@ -72,3 +72,15 @@ theorem transfer_expect [Fintype β] [Semiring γ] [Module NNRat γ] [Nonempty �
   congr
   field_simp
   rw [mul_comm]; rfl
+
+theorem transfer_ne_zero [AddCommMonoid γ] (f : α → β) (g : α → γ) (x : β)
+    (h : (f # g) x ≠ 0) : ∃ i, x = f i := by
+  contrapose h
+  unfold transfer
+  simp only [filter_congr_decidable, ne_eq, not_not]
+  simp only [not_exists] at h
+  convert Finset.sum_empty
+  apply eq_empty_of_forall_not_mem
+  intro x1
+  simp only [mem_filter, mem_univ, true_and]
+  exact Ne.symm (h x1)

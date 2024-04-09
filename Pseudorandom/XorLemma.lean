@@ -9,7 +9,7 @@ import LeanAPAP.Prereqs.Expect.Basic
 import Mathlib.NumberTheory.Harmonic.Bounds
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
 
-open Classical Real Finset BigOps
+open Real Finset BigOps
 
 variable {α : Type*} [αnonempty: Nonempty α] [Fintype α] [AddCommGroup α]
   {β : Type*} [Nonempty β] [Fintype β] [AddCommGroup β]
@@ -48,7 +48,7 @@ theorem L1_le_card_rpow_mul_dft_norm :
       simp
       norm_num
 
-lemma lemma43 (t ε : NNReal)
+lemma lemma43 [DecidableEq β] (t ε : NNReal)
     (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖cft (a ·) χ‖ ≤ ε / (Fintype.card α))
     (σ : α → β) (h₂ : ∀ χ : AddChar β ℂ,
       ‖cft (χ ∘ σ)‖_[1] ≤ t
@@ -474,10 +474,12 @@ theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : �
     _ ≤ 6 * (1 + Real.log n) := by gcongr; apply harmonic_le_one_add_log
     _ = 6 * Real.log n + 6 := by ring_nf
 
-
--- theorem XOR_abelian (ε : ℝ≥0)
---   (a : FinPMF α) (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖dft (a ·) χ‖ ≤ ε) :
---   SD (a.apply fun x => (x.val : β)) (Uniform ⟨univ, univ_nonempty⟩) ≤
---     abelianC * (ε * Real.sqrt m * Real.log n + m / n) := by
-
---   sorry
+theorem generalized_XOR_lemma (ε : ℝ)
+    (a : FinPMF α) (h : ∀ χ : AddChar α ℂ, (AddChar.IsNontrivial χ) → ‖dft (a ·) χ‖ ≤ ε) :
+    SD (a.apply fun x => (x.val : β)) (Uniform ⟨univ, univ_nonempty⟩) ≤
+    ε * Real.sqrt m * (3 * Real.log n + 3) + m / n := calc SD (a.apply fun x => (x.val : β)) (Uniform ⟨univ, univ_nonempty⟩)
+  _ = 1/2 * ‖⇑(a.apply fun x => (x.val : β)) - ⇑(Uniform ⟨univ, univ_nonempty⟩)‖_[1] := SD_eq_half_L1 ..
+  _ = 1/2 * ‖((fun x => (x.val : β)) # ⇑a) - ⇑(Uniform ⟨univ, univ_nonempty⟩)‖_[1] := rfl
+  -- _ ≤ 1/2 * (‖⇑(a.apply fun x => (x.val : β)) - ⇑(Uniform ⟨univ, univ_nonempty⟩)‖_[1]) := by
+  --   sorry
+  _ ≤ ε * Real.sqrt m * (3 * Real.log n + 3) + m / n := sorry
