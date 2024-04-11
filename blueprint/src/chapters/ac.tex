@@ -1,0 +1,112 @@
+\chapter{Additive Combinatorics}
+\label{chap:ac}
+
+\begin{lemma}
+    \label{sub_le_add}
+    \lean{sub_le_add}
+    \leanok
+    For any two sets $A, B$, we have $|A-B| \leq \frac{|A+B|^3}{|A||B|}$
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    By the triangle inequality we have $|A-B| \leq \frac{|A+B| |B+B|}{|B|}$, and from
+    the Plünnecke-Ruzsa inequality we have $|B+B| \leq (\frac{|A+B|}{|A|})^2 |A|$.
+\end{proof}
+
+\begin{lemma}
+    \label{card_of_inv}
+    \lean{card_of_inv}
+    \leanok
+    For any set $A$ and a non-zero value $x$, we have $|xA| = |A|$
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    This is obvious from the bijection of multiplication by $x$.
+\end{proof}
+
+\begin{lemma}
+    \label{neg_inter_distrib}
+    \lean{neg_inter_distrib}
+    \leanok
+    we have $-(A \cap B) = -A \cap -B$
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Trivial from the definitions.
+\end{proof}
+
+\begin{lemma}
+    \label{add_smul_subset_smul_add_smul}
+    \lean{add_smul_subset_smul_add_smul}
+    \leanok
+    For any set $A$ and two values $a, b$, we have $(a+b)A \subseteq aA + bA$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    For any value $(a+b) v$ with $v \in A$ we have $a v \in a A$, $b v \in b A$, and $a v + b v = (a+b)v$
+\end{proof}
+
+\begin{lemma}
+    \label{sub_smul_subset_smul_sub_smul}
+    \lean{sub_smul_subset_smul_sub_smul}
+    \leanok
+    For any set $A$ and two values $a, b$, we have $(a-b)A \subseteq aA - bA$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Exactly the same as the previous lemma.
+\end{proof}
+
+\begin{lemma}
+    \label{add_of_large_intersection}
+    \lean{add_of_large_intersection}
+    \leanok
+    If $A \cap C \neq \emptyset$, we have $|B+C| \leq \frac{|B+A| |C+C|}{|A \cap C|}$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    By the triangle inequality, we have $|B+C| \leq \frac{|B + (A \cap C)| |(A \cap C) + C|}{|A \cap C|}$,
+    and this is less than $\frac{|B+A| |C+C|}{|A \cap C|}$ because
+    $B + (A \cap C)\subseteq B+A$ and $(A \cap C) + C \subseteq C + C$.
+\end{proof}
+
+\begin{lemma}
+    \label{triple_add}
+    \lean{triple_add}
+    \leanok
+    For any three sets $A, B, C$, we have $|A+B+C| \leq \frac{|C+A| |A+B|^8}{|A|^6 |B|^2}$
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    If either $A$ or $B$ are empty this is trivial.
+    Otherwise we have an element $v \in B$. We obviously have $(A + B) \cap (A + \{v\}) = A + \{v\}$, and
+    it is nonempty. So by \ref{lemma:add_of_large_intersection} we have
+    $$
+    |A+B+C| = |C + (A+B)| \leq \frac{|C + A + \{v\}| |(A+B) + (A+B)|}{|A + \{v\}|} = 
+    \frac{|C + A| |(A+B) + (A+B)|}{|A|}
+    $$
+    By Ruzsa's covering lemma we have a set $u$ of size $\leq \frac{|A+B|}{|B|}$ such that $A \subseteq u + B - B$.
+    This gives $\frac{|C + A| |(A+B) + (A+B)|}{|A|} \leq \frac{|C + A| |(u+B-B+B) + (u+B-B+B)|}{|A|} =
+    \frac{|C + A| |2 \cdot u + 4 \cdot B - 2 \cdot B|}{|A|} \leq \frac{|C + A| |u|^2 |4 \cdot B - 2 \cdot B|}{|A|}$.
+    By the Plünnecke-Ruzsa inequality we now have $|4 \cdot B - 2 \cdot B| \leq (\frac{|A+B|}{|A|})^6 |A|$,
+    and the result follows from this and the bound on $|u|$.
+\end{proof}
+
+\begin{lemma}
+    \label{additive_mul_eq}
+    \lean{additive_mul_eq}
+    \leanok
+    We have that $Q(A, x A)$ for $x \neq 0$ is the number of quadruples $(a, b, c, d) \in A^4$ such that $a + x b = c + x d$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    By a direct bijection from quadruples $(a, b, c, d) \in A \times (xA) \times A \times (xA)$ such that $a + b = c + d$.
+\end{proof}

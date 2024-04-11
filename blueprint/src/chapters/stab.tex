@@ -1,0 +1,185 @@
+\chapter{Stabilizer}
+\label{chap:stab}
+
+\begin{definition}
+    \label{Stab}
+    \lean{Stab}
+    \leanok
+    $\Stab_K(A)$ is the set $\{x | |A + x A| \leq K |A|\}$.
+\end{definition}
+
+\begin{lemma}
+    \label{Stab_inv'}
+    \lean{Stab_inv'}
+    \leanok
+    \uses{card_of_inv, Stab}
+    For $a \in \Stab_K(A)$, we also have $a^{-1} \in \Stab_K(A)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    If $a = 0$ this is trivial, otherwise by \ref{card_of_inv} we have $|A + a^{-1}A| = |a(A + a^{-1}A)| = |A + a A| \leq K |A|$.
+\end{proof}
+
+\begin{lemma}
+    \label{one_le_of_mem}
+    \lean{one_le_of_mem}
+    \leanok
+    \uses{Stab}
+    If $A \neq \emptyset$ and $a \in \Stab_K(A)$ then $1 \leq K$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Trivial.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_neg'}
+    \lean{Stab_neg'}
+    \uses{one_le_of_mem, sub_le_add, card_of_inv, Stab}
+    \leanok
+    For $a \in \Stab_K(A)$, we also have $a \in \Stab_{K^3}(A)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    If $a = 0$ or $A = \emptyset$ this is trivial, otherwise by \ref{sub_le_add} and \ref{card_of_inv} we have
+    $$|A - a A| \leq \frac{|A + aA|^3}{|A| |a A|} = \frac{|A + aA|^3}{|A|^2} \leq \frac{K^3 |A|^3}{|A|^2} = K^3 |A|$$
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_neg}
+    \lean{Stab_neg}
+    \leanok
+    \uses{Stab_neg', Stab}
+    We have $-\Stab_{K}(A) \subseteq \Stab_{K^3}(A)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Immediate from \ref{Stab_neg'}.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_add'}
+    \lean{Stab_add'}
+    \leanok
+    \uses{one_le_of_mem, triple_add, add_smul_subset_smul_add_smul, Stab}
+    For $a \in \Stab_{K_1}(A), b \in \Stab_{K_2}(A)$, we have $a+b \in \Stab_{K_1^8 K_2}(A)$.
+\end{lemma}
+
+\begin{proof}
+    If $a = 0$ or $A = \emptyset$ this is trivial. Otherwise, we have $A + (a+b) A \subseteq A + a A + b A$, by \ref{add_smul_subset_smul_add_smul},
+    and by \ref{triple_add} and \ref{card_of_inv} we have $|A + a A + b A| \leq \frac{|A + bA| |A + aA|^8} {|A|^8} \leq K_1^8 K_2 |A|$.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_add}
+    \lean{Stab_add}
+    \leanok
+    \uses{Stab_add', Stab}
+    We have $\Stab_{K_1}(A) + \Stab_{K_2}(A) \subseteq \Stab_{K_1^8 K_2}(A)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Immediate from \ref{Stab_add'}.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_nsmul}
+    \lean{Stab_nsmul}
+    \leanok
+    \uses{Stab_add, Stab}
+    For $n \in \mathbb{N}$ we have $(n+1) \cdot \Stab_{K}(A) \subseteq \Stab_{K^(8n + 1)}(A)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    By induction with \ref{Stab_add}.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_sub}
+    \lean{Stab_sub}
+    \leanok
+    \uses{Stab_add, Stab_neg, Stab}
+    We have $\Stab_{K_1}(A) - \Stab_{K_2}(A) \subseteq \Stab_{K_1^8 K_2^3}(A)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Immediate from \ref{Stab_add} and \ref{Stab_neg}.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_mul'}
+    \lean{Stab_mul'}
+    \leanok
+    \uses{one_le_of_mem, card_of_inv, Stab_inv', Stab}
+    For $a \in \Stab_{K_1}(A), b \in \Stab_{K_2}(A)$, we have $ab \in \Stab_{K_1 K_2}(A)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    If $a = 0$ this is trivial with \ref{one_le_of_mem}. Otherwise, we have, by \ref{card_of_inv}
+    $|A + a b A| = |a^{-1} A + b A|$. By the triangle inequality we have
+    $|a^{-1} A + b A| \leq \frac{|A + a^{-1} A| |A + b A|}{|A|}$, and using \ref{Stab_inv'} we get that this is
+    $\leq K_1 K_2 |A|$.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_mul}
+    \lean{Stab_mul}
+    \leanok
+    \uses{Stab_mul', Stab}
+    We have $\Stab_{K_1}(A) \Stab_{K_2}(A) \subseteq \Stab_{K_1 K_2}(A)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Immediate from \ref{Stab_mul'}.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_le'}
+    \lean{Stab_le'}
+    \leanok
+    \uses{Stab}
+    If $a \in \Stab_K(A)$ and $K \leq K'$ then $a \in \Stab_{K'}(A)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Trivial from the definition.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_le}
+    \lean{Stab_le}
+    \leanok
+    \uses{Stab_le', Stab}
+    If $K \leq K'$ then $\Stab_K(A) \subseteq \Stab_{K'}(A)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Trivial from \ref{Stab_le'}
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_le_2}
+    \lean{Stab_le2}
+    \leanok
+    \uses{Stab_le, one_le_of_mem, Stab}
+    If $1 \leq K$ implies $K \leq K'$ then $\Stab_K(A) \subseteq \Stab_{K'}(A)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    If $A = \emptyset$ this is trivial.
+    Otherwise, if $K < 1$ then from \ref{one_le_of_mem} $\Stab_K(A) = \emptyset$ and this is trivial.
+    Otherwise we get \ref{Stab_le}.
+\end{proof}
+
