@@ -281,7 +281,7 @@ theorem line_point_large_l2 (n : ℝ) (β : ℝ) (hβ : 0 < β) (hβ2 : β < 1)
     ring
   · simp only [Nat.toPNat'_coe, Nat.floor_pos, hm₂, ↓reduceIte]
     exact half_le_floor_of_one_le m hm₂
-  · unfold ST_prime_field_eps ST_prime_field_eps₂ ST_prime_field_eps₃ ST_prime_field_eps₄ SG_eps SG_eps₂
+  · unfold ST_prime_field_eps ST_prime_field_eps₂ ST_prime_field_eps₃ SG_eps SG_eps₂
     have := ntlSGeps β
     linarith
   · have := fpprm.out.one_lt
@@ -329,12 +329,12 @@ lemma jurl (b : FinPMF α) :
     congr
     rw [FinPMF.eq_apply_id]
 
-noncomputable def bourgainβ : ℝ := 107059887596204928/107059887596204929
+noncomputable def bourgainβ : ℝ := 35686629198734976/35686629198734977
 
 noncomputable def bourgainα : ℝ := ST_prime_field_eps bourgainβ
 
 lemma bα_val : bourgainα = 11/2 * (1 - bourgainβ) := by
-  unfold bourgainα ST_prime_field_eps ST_prime_field_eps₂ ST_prime_field_eps₃ ST_prime_field_eps₄ SG_eps SG_eps₂ SG_eps₃
+  unfold bourgainα ST_prime_field_eps ST_prime_field_eps₂ ST_prime_field_eps₃ SG_eps SG_eps₂ SG_eps₃
     full_C full_C₂
   have : ⌈Real.logb (3 / 2) (1 / (bourgainβ / 4))⌉₊ = 4 := by
     unfold bourgainβ
@@ -350,11 +350,11 @@ lemma bα_val : bourgainα = 11/2 * (1 - bourgainβ) := by
 /-
 1 + 2/11 * ST_prime_field_eps bourgainβ = 2 - bourgainβ
 bourgainβ + 2/11 * ST_prime_field_eps bourgainβ = 1
-bourgainβ + 2/1485 * SG_eps₃ bourgainβ = 1
-α + 2/1485 * ((α / 4) / (full_C (α / 4) * 9212 / 45)) = 1
-α + 2/1485 * ((α / 4) / (full_C 1/4 * 9212 / 45)) = 1
-α + α 2/1485 * (45 / (4 * 9 * 374^4 * 9212)) = 1
-α = 1 / (1 + 1/107059887596204928)
+bourgainβ + 2/495 * SG_eps₃ bourgainβ = 1
+α + 2/495 * ((α / 4) / (full_C (α / 4) * 9212 / 45)) = 1
+α + 2/495 * ((α / 4) / (full_C 1/4 * 9212 / 45)) = 1
+α + α 2/495 * (45 / (4 * 9 * 374^4 * 9212)) = 1
+α = 1 / (1 + 1/35686629198734976)
 
 -/
 

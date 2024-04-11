@@ -11,12 +11,12 @@ local notation "α" => (ZMod p)
 set_option maxHeartbeats 1000000
 
 theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nhₗ : (p^β : ℝ) ≤ n)
-  (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ))
-  (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ))
+  (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
+  (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
   (b₁ : α) (hb₁ : ¬b₁ ∈ B) (b₂ : α)
   (hb₂ : ¬b₂ ∈ B) (neq : b₁ ≠ b₂)
   (allInt : ∀ b ∈ B, (n ^ (1 - SG_eps₃ β) : ℝ) < ∑ v ∈ A ×ˢ A, if (b₂ - b) / (b₂ - b₁) * v.1 + (b - b₁) / (b₂ - b₁) * v.2 ∈ A then 1 else 0):
-  B.card < (SG_C₅ * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps₂ β) : ℝ) := by
+  B.card < (SG_C₅ * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps β) : ℝ) := by
   by_cases bne : B.Nonempty
   have nd0₃ : ¬(b₂ - b₁ = 0) := fun v => neq (eq_of_sub_eq_zero v).symm
   have aLarge' : (n^(1 - SG_eps₃ β) : ℝ) < A.card * A.card := by
@@ -47,7 +47,7 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
     refine lt_of_le_of_lt ?_ aLarge
     apply rpow_nonneg
     simp
-  have : ∀ b ∈ B, (4⁻¹ * (n^(2 - 2 * SG_eps₃ β - (1/2 + 2*ST_prime_field_eps₂ β)) : ℝ)) < additiveEnergy A (((b₂ - b) / (b -b₁)) • A) := by
+  have : ∀ b ∈ B, (4⁻¹ * (n^(2 - 2 * SG_eps₃ β - (1/2 + 2*ST_prime_field_eps β)) : ℝ)) < additiveEnergy A (((b₂ - b) / (b -b₁)) • A) := by
     intro b hb
     have nd0 : ¬(b₂ - b = 0) := fun h => hb₂ ((eq_of_sub_eq_zero h) ▸ hb)
     have nd0₂ : ¬(b - b₁ = 0) := fun h => hb₁ ((eq_of_sub_eq_zero h) ▸ hb)
@@ -106,18 +106,18 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
       _ = (A.card : ℝ)⁻¹ * (∑ x₁ ∈ (A ×ˢ A), if (b₂ - b) / (b₂ - b₁) * x₁.1 + (b - b₁) / (b₂ - b₁) * x₁.2 ∈ A then 1 else 0)^2 := by simp [add_comm]
       _ > (A.card : ℝ)⁻¹ * (n^(1 - SG_eps₃ β))^2 := by
         gcongr
-      _ ≥ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ)⁻¹ * (n^(1 - SG_eps₃ β))^2 := by
+      _ ≥ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ)⁻¹ * (n^(1 - SG_eps₃ β))^2 := by
         gcongr
-      _ = (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ)⁻¹ * (n^(2 - 2 * SG_eps₃ β)) := by
+      _ = (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ)⁻¹ * (n^(2 - 2 * SG_eps₃ β)) := by
         congr 1
         rw [←rpow_nat_cast, ←rpow_mul]
         ring_nf
         simp
-      _ = 4⁻¹ * (n^(2 - 2 * SG_eps₃ β) / n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ) := by
+      _ = 4⁻¹ * (n^(2 - 2 * SG_eps₃ β) / n^(1/2 + 2*ST_prime_field_eps β) : ℝ) := by
         ring
-      _ = 4⁻¹ * (n^(2 - 2 * SG_eps₃ β - (1/2 + 2*ST_prime_field_eps₂ β)) : ℝ) := by rw [←rpow_sub]; simp
+      _ = 4⁻¹ * (n^(2 - 2 * SG_eps₃ β - (1/2 + 2*ST_prime_field_eps β)) : ℝ) := by rw [←rpow_sub]; simp
   have ⟨A', hA', x, T', hT, hAsz, hTsz, hStab⟩ :=
-    Theorem335 (256 * n^(8 * ST_prime_field_eps₂ β + 2*SG_eps₃ β)) (by
+    Theorem335 (256 * n^(8 * ST_prime_field_eps β + 2*SG_eps₃ β)) (by
         rw [(by norm_num : (1 : ℝ) = 1*1)]
         apply mul_le_mul
         norm_num
@@ -147,11 +147,11 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
         refine LE.le.trans ?_ this
         rw [inv_mul_le_iff]
         calc (A.card ^ 3 : ℝ)
-          _ ≤ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β))^3 := by gcongr
-          _ = 64 * (n^(1/2 + 2*ST_prime_field_eps₂ β))^3 * 1 := by ring
-          _ = 64 * (n^(3/2 + 6*ST_prime_field_eps₂ β)) *
-            ((n ^ (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps₂ β)) : ℝ)⁻¹ *
-              n ^ (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps₂ β))) := by
+          _ ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β))^3 := by gcongr
+          _ = 64 * (n^(1/2 + 2*ST_prime_field_eps β))^3 * 1 := by ring
+          _ = 64 * (n^(3/2 + 6*ST_prime_field_eps β)) *
+            ((n ^ (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps β)) : ℝ)⁻¹ *
+              n ^ (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps β))) := by
             congr 2
             rw [← rpow_mul_natCast]
             ring_nf
@@ -160,16 +160,16 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
             apply ne_of_gt
             apply rpow_pos_of_pos
             simp
-          _ = 256 * ((n^(3/2 + 6*ST_prime_field_eps₂ β)) /
-            (n ^ (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps₂ β)))) *
-              4⁻¹ * n ^ (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps₂ β)) := by ring
-          _ = 256 * (n^(3/2 + 6*ST_prime_field_eps₂ β- (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps₂ β)))) *
-              4⁻¹ * n ^ (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps₂ β)) := by
+          _ = 256 * ((n^(3/2 + 6*ST_prime_field_eps β)) /
+            (n ^ (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps β)))) *
+              4⁻¹ * n ^ (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps β)) := by ring
+          _ = 256 * (n^(3/2 + 6*ST_prime_field_eps β- (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps β)))) *
+              4⁻¹ * n ^ (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps β)) := by
             congr
             rw [← rpow_sub]
             simp
-          _ = (256 * n^(8 * ST_prime_field_eps₂ β + 2*SG_eps₃ β)) *
-              (4⁻¹ * n ^ (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps₂ β))) := by ring_nf
+          _ = (256 * n^(8 * ST_prime_field_eps β + 2*SG_eps₃ β)) *
+              (4⁻¹ * n ^ (2 - 2 * SG_eps₃ β - (1 / 2 + 2 * ST_prime_field_eps β))) := by ring_nf
         simp only [gt_iff_lt, Nat.ofNat_pos, mul_pos_iff_of_pos_left]
         apply rpow_pos_of_pos
         simp
@@ -191,25 +191,25 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
     intro v
     simp only [eq_of_sub_eq_zero v, ne_eq, not_true_eq_false] at neq
   rw [bieq] at hTsz
-  let K' : ℝ := (2 ^ 110 * (256 * n ^ (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) ^ 42)
+  let K' : ℝ := (2 ^ 110 * (256 * n ^ (8 * ST_prime_field_eps β + 2 * SG_eps₃ β)) ^ 42)
 
   have nhTsz :
     (n ^ (1 / 2 - 439 / 45 * SG_eps₃ β) : ℝ) ≤ T'.card := calc
         (n ^ (1 / 2 - 439 / 45 * SG_eps₃ β) : ℝ)
-    _ = (2 ^ 17)⁻¹ * ((256 * ↑n ^ (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) ^ 4)⁻¹ *
-        (SG_C₅ * ↑↑n ^ (1 / 2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps₂ β)) := by
+    _ = (2 ^ 17)⁻¹ * ((256 * ↑n ^ (8 * ST_prime_field_eps β + 2 * SG_eps₃ β)) ^ 4)⁻¹ *
+        (SG_C₅ * ↑↑n ^ (1 / 2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps β)) := by
       unfold SG_C₅
       field_simp
       ring_nf!
       rw [← rpow_neg, ← rpow_mul_natCast, ← rpow_add]
       congr 1
-      unfold ST_prime_field_eps₂ ST_prime_field_eps₃ ST_prime_field_eps₄ SG_eps SG_eps₂
+      unfold ST_prime_field_eps ST_prime_field_eps₂ ST_prime_field_eps₃ SG_eps SG_eps₂
       ring_nf
       simp
       simp
       simp
     _ ≤
-      (2 ^ 17)⁻¹ * ((256 * ↑↑n ^ (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) ^ 4)⁻¹ *
+      (2 ^ 17)⁻¹ * ((256 * ↑↑n ^ (8 * ST_prime_field_eps β + 2 * SG_eps₃ β)) ^ 4)⁻¹ *
       B.card := by gcongr
     _ ≤ T'.card := by
       exact hTsz
@@ -230,7 +230,7 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
     rify
     calc
       (4 : ℝ) ≤ SG_C₅ * (1 / 4) := by unfold SG_C₅; norm_num
-      _ ≤ n ^ (ST_prime_field_eps₂ β * 6 + SG_eps₂ β + SG_eps β) := nLarge
+      _ ≤ n ^ (ST_prime_field_eps β * 6 + SG_eps₂ β + SG_eps β) := nLarge
       _ ≤ n^(1/2 - 439/45 * SG_eps₃ β) := by gcongr; norm_cast; simp; apply lemma13
       _ ≤ (Stab K' A').card := hStab
 
@@ -246,24 +246,24 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
   have A'small : A'.card ≤ (p^(1 - β') : ℝ) :=
     calc
       (A'.card : ℝ) ≤ A.card := by gcongr
-      _ ≤ 4 * n ^ (1/2 + 2 * ST_prime_field_eps₂ β) := hA
-      _ ≤ (SG_C₅ * (1 / 4)) * n ^ (1/2 + 2 * ST_prime_field_eps₂ β) := by
+      _ ≤ 4 * n ^ (1/2 + 2 * ST_prime_field_eps β) := hA
+      _ ≤ (SG_C₅ * (1 / 4)) * n ^ (1/2 + 2 * ST_prime_field_eps β) := by
         gcongr
         unfold SG_C₅
         norm_num
-      _ ≤ n^(ST_prime_field_eps₂ β * 6 + SG_eps₂ β + SG_eps β) * n ^ (1/2 + 2 * ST_prime_field_eps₂ β) := by
+      _ ≤ n^(ST_prime_field_eps β * 6 + SG_eps₂ β + SG_eps β) * n ^ (1/2 + 2 * ST_prime_field_eps β) := by
         gcongr
-      _ = n^(1/2 + 8 * ST_prime_field_eps₂ β + SG_eps₂ β + SG_eps β) := by
+      _ = n^(1/2 + 8 * ST_prime_field_eps β + SG_eps₂ β + SG_eps β) := by
         rw [← rpow_add]
         ring_nf
         simp
-      _ ≤ (p^(2 - β))^(1/2 + 8 * ST_prime_field_eps₂ β + SG_eps₂ β + SG_eps β) := by
+      _ ≤ (p^(2 - β))^(1/2 + 8 * ST_prime_field_eps β + SG_eps₂ β + SG_eps β) := by
         gcongr
         exact lemma15 β h
       _ = p^(1 - (β/2 - 17/15 * (2 - β) * SG_eps₃ β)) := by
         rw [← rpow_mul]
         congr 1
-        unfold ST_prime_field_eps₂ ST_prime_field_eps₃ ST_prime_field_eps₄ SG_eps SG_eps₂
+        unfold ST_prime_field_eps ST_prime_field_eps₂ ST_prime_field_eps₃ SG_eps SG_eps₂
         ring_nf
         simp
       _ ≤ p^(1 - β') := by
@@ -274,19 +274,19 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
 
   have A'large : A'.card ≥ (p^β' : ℝ) :=
     calc
-    (A'.card : ℝ) ≥ (2 ^ 4)⁻¹ * (256 * n ^ (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β) : ℝ)⁻¹ * A.card := hAsz
-    _ ≥ (2 ^ 4)⁻¹ * (256 * n ^ (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β) : ℝ)⁻¹ * n^(1/2 - 1/2 * SG_eps₃ β) := by
+    (A'.card : ℝ) ≥ (2 ^ 4)⁻¹ * (256 * n ^ (8 * ST_prime_field_eps β + 2 * SG_eps₃ β) : ℝ)⁻¹ * A.card := hAsz
+    _ ≥ (2 ^ 4)⁻¹ * (256 * n ^ (8 * ST_prime_field_eps β + 2 * SG_eps₃ β) : ℝ)⁻¹ * n^(1/2 - 1/2 * SG_eps₃ β) := by
       gcongr
-    _ = (2 ^ 12)⁻¹ * (n^(1/2 - 1/2 * SG_eps₃ β) / n ^ (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) := by
+    _ = (2 ^ 12)⁻¹ * (n^(1/2 - 1/2 * SG_eps₃ β) / n ^ (8 * ST_prime_field_eps β + 2 * SG_eps₃ β)) := by
       ring_nf
-    _ = (2 ^ 12)⁻¹ * n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) := by
+    _ = (2 ^ 12)⁻¹ * n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps β + 2 * SG_eps₃ β)) := by
       rw [← rpow_sub]
       simp
-    _ ≥ (SG_C₅ * (1 / 4))⁻¹ * n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) := by
+    _ ≥ (SG_C₅ * (1 / 4))⁻¹ * n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps β + 2 * SG_eps₃ β)) := by
       gcongr
       unfold SG_C₅
       norm_num
-    _ ≥ (n^(ST_prime_field_eps₂ β * 6 + SG_eps₂ β + SG_eps β) : ℝ)⁻¹ * n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) := by
+    _ ≥ (n^(ST_prime_field_eps β * 6 + SG_eps₂ β + SG_eps β) : ℝ)⁻¹ * n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps β + 2 * SG_eps₃ β)) := by
       gcongr
       push_cast
       rw [inv_le_inv]
@@ -295,14 +295,14 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
       simp
       unfold SG_C₅
       norm_num
-    _ = n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β)) / n^(ST_prime_field_eps₂ β * 6 + SG_eps₂ β + SG_eps β) := by
+    _ = n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps β + 2 * SG_eps₃ β)) / n^(ST_prime_field_eps β * 6 + SG_eps₂ β + SG_eps β) := by
       ring
-    _ = n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps₂ β + 2 * SG_eps₃ β) - (ST_prime_field_eps₂ β * 6 + SG_eps₂ β + SG_eps β)) := by
+    _ = n^(1/2 - 1/2 * SG_eps₃ β - (8 * ST_prime_field_eps β + 2 * SG_eps₃ β) - (ST_prime_field_eps β * 6 + SG_eps₂ β + SG_eps β)) := by
       rw [← rpow_sub]
       simp
     _ = n^(1/2 - 113/30 * SG_eps₃ β) := by
       congr 1
-      unfold ST_prime_field_eps₂ ST_prime_field_eps₃ ST_prime_field_eps₄ SG_eps SG_eps₂
+      unfold ST_prime_field_eps ST_prime_field_eps₂ ST_prime_field_eps₃ SG_eps SG_eps₂
       ring_nf
     _ ≥ (p^β)^(1/2 - 113/30 * SG_eps₃ β) := by
       gcongr
@@ -334,8 +334,8 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
     simp
 
 theorem ST_grid_aux₂ (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line α)) (n : ℕ+) (nhₗ : (p^β : ℝ) ≤ n)
-  (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ))
-  (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ)) (h₂ : L.card ≤ n)
+  (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
+  (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ)) (h₂ : L.card ≤ n)
   (hC : ∀ l ∈ L, (n ^ (1/2 - SG_eps β) : ℝ) < (IntersectionsP (A ×ˢ B) l).card)
   (hHoriz : ∀ l ∈ L, ¬l.horiz)
   :
@@ -470,43 +470,43 @@ theorem ST_grid_aux₂ (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Li
           Nat.cast_mul, mul_one]
     _ ≤ B.card * (n^(1 - SG_eps₃ β) : ℝ) +
         JSS'.card * (A.card * A.card) := by gcongr; simp only [filter_subset, JSS]
-    _ ≤ 4*n^(1/2 + 2*ST_prime_field_eps₂ β) * n^(1 - SG_eps₃ β) +
-        JSS'.card * ((4 * n^(1/2 + 2*ST_prime_field_eps₂ β)) * (4 * n^(1/2 + 2*ST_prime_field_eps₂ β))) := by
+    _ ≤ 4*n^(1/2 + 2*ST_prime_field_eps β) * n^(1 - SG_eps₃ β) +
+        JSS'.card * ((4 * n^(1/2 + 2*ST_prime_field_eps β)) * (4 * n^(1/2 + 2*ST_prime_field_eps β))) := by
       gcongr
-    _ = 4 * (n^(1/2 + 2*ST_prime_field_eps₂ β) * n^(1 - SG_eps₃ β)) +
-        16 * JSS'.card * (n^(1/2 + 2*ST_prime_field_eps₂ β) * n^(1/2 + 2*ST_prime_field_eps₂ β)) := by ring
-    _ = 4 * (n^(1/2 + 2*ST_prime_field_eps₂ β + (1 - SG_eps₃ β))) +
-        16 * JSS'.card * n^(1/2 + 2*ST_prime_field_eps₂ β + (1/2 + 2*ST_prime_field_eps₂ β)) := by
+    _ = 4 * (n^(1/2 + 2*ST_prime_field_eps β) * n^(1 - SG_eps₃ β)) +
+        16 * JSS'.card * (n^(1/2 + 2*ST_prime_field_eps β) * n^(1/2 + 2*ST_prime_field_eps β)) := by ring
+    _ = 4 * (n^(1/2 + 2*ST_prime_field_eps β + (1 - SG_eps₃ β))) +
+        16 * JSS'.card * n^(1/2 + 2*ST_prime_field_eps β + (1/2 + 2*ST_prime_field_eps β)) := by
       simp [←rpow_add]
-    _ = 4 * (n^(3/2 + 2*ST_prime_field_eps₂ β - SG_eps₃ β)) +
-        16 * JSS'.card * n^(1 + 4*ST_prime_field_eps₂ β) := by ring_nf
-  have eq : 3/2 + 2*ST_prime_field_eps₂ β - SG_eps₃ β = 3/2 - SG_eps₂ β - SG_eps β := by
-    simp [ST_prime_field_eps₂, ST_prime_field_eps₃, ST_prime_field_eps₄, SG_eps, SG_eps₂]
+    _ = 4 * (n^(3/2 + 2*ST_prime_field_eps β - SG_eps₃ β)) +
+        16 * JSS'.card * n^(1 + 4*ST_prime_field_eps β) := by ring_nf
+  have eq : 3/2 + 2*ST_prime_field_eps β - SG_eps₃ β = 3/2 - SG_eps₂ β - SG_eps β := by
+    simp [ST_prime_field_eps, ST_prime_field_eps₂, ST_prime_field_eps₃, SG_eps, SG_eps₂]
     ring
   rw [eq] at this
   let JSS'' := JSS' \ {b₁, b₂}
-  have := calc (((SG_C₄ - 4) / 16 - 2) * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps₂ β) : ℝ)
-    _ = (SG_C₄ - 4) / 16 * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps₂ β) - 2 *
-        n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps₂ β) := by ring
-    _ ≤ (SG_C₄ - 4) / 16 * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps₂ β) - 2 * 1 := by
+  have := calc (((SG_C₄ - 4) / 16 - 2) * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps β) : ℝ)
+    _ = (SG_C₄ - 4) / 16 * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps β) - 2 *
+        n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps β) := by ring
+    _ ≤ (SG_C₄ - 4) / 16 * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps β) - 2 * 1 := by
       gcongr
       apply one_le_rpow
       norm_cast
       simp
       apply lemma8
-    _ = ((SG_C₄ - 4) * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps₂ β)) / 16 - 2 := by field_simp
-    _ = ((SG_C₄ - 4) * (n^(3/2 - SG_eps₂ β - SG_eps β) / n ^ (1 + 4 * ST_prime_field_eps₂ β))) / 16 - 2 := by
+    _ = ((SG_C₄ - 4) * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps β)) / 16 - 2 := by field_simp
+    _ = ((SG_C₄ - 4) * (n^(3/2 - SG_eps₂ β - SG_eps β) / n ^ (1 + 4 * ST_prime_field_eps β))) / 16 - 2 := by
       congr
       rw [←rpow_sub]
       ring_nf
       simp
-    _ = (SG_C₄ * n^(3/2 - SG_eps₂ β - SG_eps β) - 4 * n^(3/2 - SG_eps₂ β - SG_eps β)) / (16 * n^(1 + 4 * ST_prime_field_eps₂ β)) - 2 := by
+    _ = (SG_C₄ * n^(3/2 - SG_eps₂ β - SG_eps β) - 4 * n^(3/2 - SG_eps₂ β - SG_eps β)) / (16 * n^(1 + 4 * ST_prime_field_eps β)) - 2 := by
       field_simp
       ring_nf
-    _ ≤ ((4 * n^(3/2 - SG_eps₂ β - SG_eps β) + 16 * JSS'.card * n^(1 + 4 * ST_prime_field_eps₂ β)) -
-        4 * n^(3/2 - SG_eps₂ β - SG_eps β)) / (16 * n^(1 + 4 * ST_prime_field_eps₂ β)) - 2 := by
+    _ ≤ ((4 * n^(3/2 - SG_eps₂ β - SG_eps β) + 16 * JSS'.card * n^(1 + 4 * ST_prime_field_eps β)) -
+        4 * n^(3/2 - SG_eps₂ β - SG_eps β)) / (16 * n^(1 + 4 * ST_prime_field_eps β)) - 2 := by
       gcongr
-    _ = JSS'.card * ((16 * n^(1 + 4 * ST_prime_field_eps₂ β)) / (16 * n^(1 + 4 * ST_prime_field_eps₂ β))) - 2 := by
+    _ = JSS'.card * ((16 * n^(1 + 4 * ST_prime_field_eps β)) / (16 * n^(1 + 4 * ST_prime_field_eps β))) - 2 := by
       ring_nf
     _ = JSS'.card - 2 := by
       rw [div_self]
@@ -519,9 +519,9 @@ theorem ST_grid_aux₂ (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Li
     _ = JSS'.card - ({b₁, b₂} : Finset _).card := by congr; simp only [mem_singleton, neq,
       not_false_eq_true, card_insert_of_not_mem, card_singleton, Nat.reduceAdd, Nat.cast_ofNat]
     _ ≤ JSS''.card := by rw [sub_le_iff_le_add]; norm_cast; apply card_le_card_sdiff_add_card
-  suffices JSS''.card < (((SG_C₄ - 4) / 16 - 2) * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps₂ β) : ℝ) by
+  suffices JSS''.card < (((SG_C₄ - 4) / 16 - 2) * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps β) : ℝ) by
     linarith
-  convert_to JSS''.card < (SG_C₅ * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps₂ β) : ℝ)
+  convert_to JSS''.card < (SG_C₅ * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps β) : ℝ)
   · simp [SG_C₄]; left
     ring_nf
   apply ST_grid_final β h A JSS'' n nhₗ nhᵤ hA _ b₁ _ b₂ _ _
@@ -546,8 +546,8 @@ theorem ST_grid_aux₂ (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Li
 
 
 theorem ST_grid_aux (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line α)) (n : ℕ+) (nhₗ : (p^β : ℝ) ≤ n)
-  (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ))
-  (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ)) (h₂ : L.card ≤ n)
+  (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
+  (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ)) (h₂ : L.card ≤ n)
   (hC : ∀ l ∈ L, (n ^ (1/2 - SG_eps β) : ℝ) < (IntersectionsP (A ×ˢ B) l).card)
   :
   (Intersections (A ×ˢ B) L).card ≤ (SG_C₂ * n ^ (3/2 - SG_eps β) : ℝ) := by classical
@@ -613,10 +613,10 @@ theorem ST_grid_aux (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line 
       simp_all
       intros
       simp_all
-    _ ≤ (4 * n^(1/2 + 2 * ST_prime_field_eps₂ β))^2 + SG_C₃ * n ^ (3/2 - SG_eps β) := by
+    _ ≤ (4 * n^(1/2 + 2 * ST_prime_field_eps β))^2 + SG_C₃ * n ^ (3/2 - SG_eps β) := by
       simp only [sq]
       gcongr
-    _ = 16 * n^(1 + 4 * ST_prime_field_eps₂ β) + SG_C₃ * n ^ (3/2 - SG_eps β) := by
+    _ = 16 * n^(1 + 4 * ST_prime_field_eps β) + SG_C₃ * n ^ (3/2 - SG_eps β) := by
       congr
       simp [mul_pow]
       congr 1
@@ -633,8 +633,8 @@ theorem ST_grid_aux (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line 
     _ = SG_C₂ * n ^ (3/2 - SG_eps β) := by simp [SG_C₂]; ring_nf
 
 theorem ST_grid (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line α)) (n : ℕ+) (nhₗ : (p^β : ℝ) ≤ n)
-  (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ))
-  (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ)) (h₂ : L.card ≤ n) :
+  (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
+  (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ)) (h₂ : L.card ≤ n) :
   (Intersections (A ×ˢ B) L).card ≤ (SG_C * n ^ (3/2 - SG_eps β) : ℝ) := by
   calc ((Intersections (A ×ˢ B) L).card : ℝ)
     _ = ∑ l ∈ L, (IntersectionsP (A ×ˢ B) l).card := by norm_cast; apply IntersectionsP_sum

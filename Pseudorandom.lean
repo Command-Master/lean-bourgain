@@ -17,8 +17,11 @@ import Pseudorandom.PMF
 import Pseudorandom.SD
 import Pseudorandom.Util
 import Pseudorandom.XorLemma
+import Pseudorandom.Transfer
+import Pseudorandom.LpLemmas
+import Pseudorandom.Bourgain
 
-#print axioms _root_.nnratCast_smul_eq_nnqsmul
-#print axioms claim342_grid
-#print axioms ST_prime_field
-#check claim342_grid
+-- #print axioms _root_.nnratCast_smul_eq_nnqsmul
+-- #print axioms claim342_grid
+-- #print axioms ST_prime_field
+-- #check claim342_grid

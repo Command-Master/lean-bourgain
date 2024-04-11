@@ -22,7 +22,7 @@ variable {α : Type*} [Field α] [Fintype α]
 set_option maxHeartbeats 1000000
 
 theorem claim342_grid (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line α)) (n : ℕ+)
-  (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ)) (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ))
+  (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ)) (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
   (h₂ : L.card ≤ n)
   (nHoriz : ∀ l ∈ L, ¬l.horiz)
   -- (hC : ∀ l ∈ L, (n ^ (1/2 - SG_eps β) : ℝ) < (IntersectionsP (A ×ˢ B) l).card)
@@ -173,25 +173,25 @@ theorem claim342_grid (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Lin
         (B.card : ℝ)⁻¹ * L.card := rfl
     _ = (L.card : ℝ)⁻¹ * ((B.card : ℝ)⁻¹ * (Intersections (A ×ˢ B) L).card)^2 -
         (B.card : ℝ)⁻¹ * L.card := by simp [IntersectionsP_sum]
-    _ ≥ (n : ℝ)⁻¹ * ((4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ)⁻¹ * (Intersections (A ×ˢ B) L).card)^2 -
+    _ ≥ (n : ℝ)⁻¹ * ((4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ)⁻¹ * (Intersections (A ×ˢ B) L).card)^2 -
         (B.card : ℝ)⁻¹ * n := by
       gcongr
-    _ > (n : ℝ)⁻¹ * ((4 * n^(1/2 + 2*ST_prime_field_eps₂ β) : ℝ)⁻¹ * (SG_C₃ * n ^ (3/2 - SG_eps β)))^2 -
+    _ > (n : ℝ)⁻¹ * ((4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ)⁻¹ * (SG_C₃ * n ^ (3/2 - SG_eps β)))^2 -
         (B.card : ℝ)⁻¹ * n := by
       gcongr
       simp
       simp [rpow_pos_of_pos]
-    _ = SG_C₃^2 * 16⁻¹ * (n^(-1 : ℝ) * ((n^(-1/2 - 2*ST_prime_field_eps₂ β) : ℝ) * n ^ (3/2 - SG_eps β))^2) -
+    _ = SG_C₃^2 * 16⁻¹ * (n^(-1 : ℝ) * ((n^(-1/2 - 2*ST_prime_field_eps β) : ℝ) * n ^ (3/2 - SG_eps β))^2) -
         (B.card : ℝ)⁻¹ * n := by simp [rpow_neg_one, ←rpow_neg]; ring_nf
-    _ = SG_C₃^2 * 16⁻¹ * (n^(-1 : ℝ) * (n^(-1/2 - 2*ST_prime_field_eps₂ β + (3/2 - SG_eps β)))^2) -
+    _ = SG_C₃^2 * 16⁻¹ * (n^(-1 : ℝ) * (n^(-1/2 - 2*ST_prime_field_eps β + (3/2 - SG_eps β)))^2) -
         (B.card : ℝ)⁻¹ * n := by simp [←rpow_add]
-    _ = SG_C₃^2 * 16⁻¹ * (n^(-1 : ℝ) * n^((-1/2 - 2*ST_prime_field_eps₂ β + (3/2 - SG_eps β)) * 2)) -
+    _ = SG_C₃^2 * 16⁻¹ * (n^(-1 : ℝ) * n^((-1/2 - 2*ST_prime_field_eps β + (3/2 - SG_eps β)) * 2)) -
         (B.card : ℝ)⁻¹ * n := by simp only [←rpow_nat_cast (n := 2)]; rw [←rpow_mul]; congr; simp only [Nat.cast_nonneg]
-    _ = SG_C₃^2 * 16⁻¹ * n^(-1 + (-1/2 - 2*ST_prime_field_eps₂ β + (3/2 - SG_eps β)) * 2) -
+    _ = SG_C₃^2 * 16⁻¹ * n^(-1 + (-1/2 - 2*ST_prime_field_eps β + (3/2 - SG_eps β)) * 2) -
         (B.card : ℝ)⁻¹ * n := by rw [←rpow_add]; simp
-    _ = SG_C₃^2 * 16⁻¹ * n^(1 - 4*ST_prime_field_eps₂ β - 2 * SG_eps β) -
+    _ = SG_C₃^2 * 16⁻¹ * n^(1 - 4*ST_prime_field_eps β - 2 * SG_eps β) -
         (B.card : ℝ)⁻¹ * n := by ring_nf
-    _ > SG_C₃^2 * 16⁻¹ * n^(1 - 4*ST_prime_field_eps₂ β - 2 * SG_eps β) -
+    _ > SG_C₃^2 * 16⁻¹ * n^(1 - 4*ST_prime_field_eps β - 2 * SG_eps β) -
         (SG_C₃ * n ^ (1/2 - SG_eps β) : ℝ)⁻¹ * n := by
       gcongr
       simp
@@ -225,14 +225,14 @@ theorem claim342_grid (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Lin
         _ = ((n : ℝ)⁻¹ * L.card) * B.card := by simp; ring
         _ ≤ ((n : ℝ)⁻¹ * n) * B.card := by gcongr
         _ = B.card := by simp
-    _ = SG_C₃^2 * 16⁻¹ * n^(1 - 4*ST_prime_field_eps₂ β - 2 * SG_eps β) -
+    _ = SG_C₃^2 * 16⁻¹ * n^(1 - 4*ST_prime_field_eps β - 2 * SG_eps β) -
         SG_C₃⁻¹ * (n ^ (-1/2 + SG_eps β) * n) := by
       simp [←rpow_neg]
       ring_nf
-    _ = SG_C₃^2 * 16⁻¹ * n^(1 - 4*ST_prime_field_eps₂ β - 2 * SG_eps β) -
+    _ = SG_C₃^2 * 16⁻¹ * n^(1 - 4*ST_prime_field_eps β - 2 * SG_eps β) -
         SG_C₃⁻¹ * (n ^ ((-1/2 + SG_eps β) + 1)) := by simp [rpow_add_one]
-    _ ≥ SG_C₃^2 * 16⁻¹ * n^(1 - 4*ST_prime_field_eps₂ β - 2 * SG_eps β) -
-        1 * n ^ (1 - 4*ST_prime_field_eps₂ β - 2 * SG_eps β) := by
+    _ ≥ SG_C₃^2 * 16⁻¹ * n^(1 - 4*ST_prime_field_eps β - 2 * SG_eps β) -
+        1 * n ^ (1 - 4*ST_prime_field_eps β - 2 * SG_eps β) := by
       gcongr
       apply inv_le_one
       norm_cast
@@ -241,12 +241,12 @@ theorem claim342_grid (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Lin
       simp
       ring_nf
       apply lemma7
-    _ = (SG_C₃^2 * 16⁻¹ - 1) * n^(1 - 4*ST_prime_field_eps₂ β - 2 * SG_eps β) := by ring
+    _ = (SG_C₃^2 * 16⁻¹ - 1) * n^(1 - 4*ST_prime_field_eps β - 2 * SG_eps β) := by ring
     _ = SG_C₄ * n ^ (1 - SG_eps₂ β) := by
       congr 2
       simp [SG_C₃, -coe_sqrt, mul_pow]
       rw [←NNReal.coe_pow]
       simp
       ring
-      simp [ST_prime_field_eps₂, ST_prime_field_eps₃, ST_prime_field_eps₄, SG_eps]
+      simp [ST_prime_field_eps, ST_prime_field_eps₂, ST_prime_field_eps₃, SG_eps]
       ring_nf
