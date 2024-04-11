@@ -18,10 +18,10 @@ import LeanAPAP.Mathlib.Combinatorics.Additive.Energy
 
 open NNRat Classical Real BigOps Finset Pointwise
 
-variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
+variable {α : Type*} [Fintype α] [DecidableEq α]
   (A B C : Finset α)
 
-lemma sub_le_add : (A - B).card ≤ ((A + B).card^3 / (A.card * B.card) : ℚ) := by
+lemma sub_le_add [AddCommGroup α] : (A - B).card ≤ ((A + B).card^3 / (A.card * B.card) : ℚ) := by
   by_cases A.Nonempty
   by_cases B.card ≠ 0
   calc ((A - B).card : ℚ≥0)
@@ -39,7 +39,7 @@ lemma sub_le_add : (A - B).card ≤ ((A + B).card^3 / (A.card * B.card) : ℚ) :
   · simp_all
   · simp_all
 
-lemma card_of_inv (a : α) (h : a ≠ 0) : (a • A).card = A.card := by
+lemma card_of_inv [GroupWithZero α] (a : α) (h : a ≠ 0) : (a • A).card = A.card := by
   apply Eq.symm
   apply card_congr (fun x _ => a * x)
   · intros a ha
@@ -56,11 +56,11 @@ lemma card_of_inv (a : α) (h : a ≠ 0) : (a • A).card = A.card := by
     assumption
 
 
-lemma neg_inter_distrib : (-A ∩ -B) = -(A ∩ B) := by
+lemma neg_inter_distrib [InvolutiveNeg α] : (-A ∩ -B) = -(A ∩ B) := by
   ext x
   simp
 
-lemma add_smul_subset_smul_add_smul (a b : α) : (a + b) • A ⊆ a • A + b • A := by
+lemma add_smul_subset_smul_add_smul [CommSemiring α] (a b : α) : (a + b) • A ⊆ a • A + b • A := by
   rw [subset_iff]
   intro x hx
   rw [mem_smul_finset] at hx
@@ -69,7 +69,7 @@ lemma add_smul_subset_smul_add_smul (a b : α) : (a + b) • A ⊆ a • A + b �
   rw [← hx]
   simp only [add_mem_add, smul_mem_smul_finset, hy]
 
-lemma sub_smul_subset_smul_sub_smul (a b : α) : (a - b) • A ⊆ a • A - b • A := by
+lemma sub_smul_subset_smul_sub_smul [CommRing α] (a b : α) : (a - b) • A ⊆ a • A - b • A := by
   rw [subset_iff]
   intro x hx
   rw [mem_smul_finset] at hx
@@ -78,7 +78,7 @@ lemma sub_smul_subset_smul_sub_smul (a b : α) : (a - b) • A ⊆ a • A - b �
   rw [← hx]
   simp only [sub_mem_sub, smul_mem_smul_finset, hy]
 
-lemma add_of_large_intersection (h : (A ∩ C).Nonempty) : (B+C).card ≤ ((B + A).card * (C+C).card / (A ∩ C).card : ℚ) := by
+lemma add_of_large_intersection [AddCommGroup α] (h : (A ∩ C).Nonempty) : (B+C).card ≤ ((B + A).card * (C+C).card / (A ∩ C).card : ℚ) := by
   calc
     ((B+C).card : ℚ≥0) = (B+C).card * (A ∩ C).card / (A ∩ C).card := by field_simp
     _ ≤ ((B + (A ∩ C)).card * ((A ∩ C) + C).card) / (A ∩ C).card := by
@@ -92,7 +92,7 @@ lemma add_of_large_intersection (h : (A ∩ C).Nonempty) : (B+C).card ≤ ((B + 
       apply add_subset_add_right
       apply inter_subset_right
 
-lemma triple_add :
+lemma triple_add [AddCommGroup α] :
     (A + B + C).card ≤ ((C + A).card * (A+B).card^8 / (A.card^6 * B.card^2) : ℚ) := by
   by_cases hA : A.Nonempty
   by_cases hB : B.Nonempty
@@ -150,7 +150,7 @@ lemma triple_add :
   · simp_all
   · simp_all
 
-lemma additive_mul_eq (C : α) (h : C ≠ 0) : E[A, C • A] = ((((A ×ˢ A) ×ˢ A ×ˢ A)).filter
+lemma additive_mul_eq [Field α] (C : α) (h : C ≠ 0) : E[A, C • A] = ((((A ×ˢ A) ×ˢ A ×ˢ A)).filter
     fun x : (α × α) × α × α => x.1.1 + C * x.1.2 = x.2.1 + C * x.2.2).card := calc
   _ = (((A ×ˢ A) ×ˢ (C • A) ×ˢ (C • A)).filter
       fun x : (α × α) × α × α => x.1.1 + x.2.1 = x.1.2 + x.2.2).card := rfl
@@ -165,7 +165,7 @@ lemma additive_mul_eq (C : α) (h : C ≠ 0) : E[A, C • A] = ((((A ×ˢ A) ×�
         Prod.smul_snd, true_and, and_true]
       constructor <;> (apply smul_mem_smul_finset; simp only [ha])
     · intros a c ha hc h
-      simp at h
+      simp only [Prod.mk.injEq] at h
       cases a
       cases c
       rw [smul_right_inj] at h
