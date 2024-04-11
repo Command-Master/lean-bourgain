@@ -1,0 +1,58 @@
+\chapter{Growth}
+\label{chap:growth}
+
+\begin{theorem}
+    \label{exists_grower}
+    \lean{exists_grower}
+    \leanok
+    For any set $A$ over a finite field of size $q$ there is a value $a \neq 0$ such that
+    $|A + a A| \geq \frac{\min(|A|^2, q)}2$.
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{additive_mul_eq}
+    First, we show it's sufficient for $a$ to have $Q(A, aA) \leq |A|^2 + \frac{|A|^2 (|A|^2 - 1)}{q-1}$.
+    We have $|A + a A| \geq \frac{|A|^2 |a A|^2}{Q(A, aQ)} \geq \frac{|A|^4}{|A|^2 + \frac{|A|^2 (|A|^2 - 1)}{q-1}}$.
+    We need to show $\frac{x^2}{x + \frac{x(x-1)}{q-1}} \geq \frac{\min(x, q)}2$.
+    If $x < q$ then
+    $$\frac{x^2}{x + \frac{x (x - 1)}{q-1}} \geq \frac{x^2}{x + \frac{x^2}{x}} = \frac x2$$.
+    Otherwise, if $q \leq x$, we need to show
+        $$ \frac{x^2}{x + \frac{x (x - 1)}{q-1}} - \frac q2 \geq 0. $$
+    By directly expanding, we have
+        $$\frac{x^2}{x + \frac{x (x - 1)}{q-1}} - \frac q2 = \frac{(q-2) (x - q)}{2 (q + x - 2)}$$
+    We have $2 \leq q$, so this value is nonnegative.
+    Now to show that for some $a$, $Q(A, aA) \leq |A|^2 + \frac{|A|^2 (|A|^2 - 1)}{q-1}$.
+    Now we show it suffices to show that $\sum_{a \neq 0} Q(A, a A) \leq |A|^2 (q-1) + |A|^2 (|A|^2 - 1)$.
+    This is because if all values were larger than $|A|^2 + \frac{|A|^2 (|A|^2 - 1)}{q-1}$, the sum couldn't've been so some.
+
+    To show $\sum_{a \neq 0} Q(A, a A) \leq |A|^2 (q-1) + |A|^2 (|A|^2 - 1)$, we can use \ref{additive_mul_eq}.
+    The quadruples with $a = c, b = d$ contribute at most $|A|^2 (q-1)$, and the other quadruples contribute at most
+    $|A|^2 (|A|^2 - 1)$, because they determine a unique $a$.
+\end{proof}
+
+\begin{theorem}
+    \label{GUS}
+    \lean{GUS}
+    \leanok
+    For any set $A$ in $\mathbb{F}_p$ (for $p$ prime), we have $|3 A^2 - 3 A^2| \geq \frac{\min(|A|^2, p)}2$.
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{exists_grower, card_of_inv, sub_smul_subset_smul_sub_smul, add_smul_subset_smul_add_smul}
+    If $|A| \leq 1$ then $|3 A^2 - 3 A^2| = |A|$, and this is greater than $|A|^2 / 2$.
+    Otherwise, we split into cases by whether $\frac{A - A}{A - A}$ is the entire universe.
+    If it is, then by \ref{exists_grower} we have some value $v = (a-b)/(c-d)$ such that
+    $|A + vA| \geq \frac{\min(|A|^2, p)}2$. By \ref{card_of_inv}, we have $|A + vA| = |(c-d) A + (a-b) A|$.
+    Now $(c-d) A + (a-b) A$, by \ref{sub_smul_subset_smul_sub_smul}, this is a subset of 
+    $c A + a A - d A - b A$, which is a subset of $2 A^2 - 2 A^2$, and then
+    $|3A^2 - 3A^2| = |A^2 - A^2 + 2 A^2 - 2 A^2| \geq |2 A^2 - 2 A^2| \geq \frac{\min(|A|^2, p)}2$.
+
+    Otherwise, there must be some value such that $v = (a-b)/(c-d)$ such that
+    $(a-b+c-d)/(c-d) = (a-b)/(c-d)+1 \notin \frac{A - A}{A - A}$.
+    Because of that $|A + (a-b+c-d)/(c-d) A| = |A|^2$, so
+    $|(c-d) A + (a-b+c-d) A| = |A|^2$. 
+    Using \ref{sub_smul_subset_smul_sub_smul} and \ref{add_smul_subset_smul_add_smul} we have
+    $(c-d) A + (a-b+c-d) A \subseteq 3A^2 - 3A^2$, so $|3A^2 - 3A^2| \geq |A|^2 \geq \frac{|A|^2}2$.
+\end{proof}

@@ -1,0 +1,48 @@
+\chapter{Lines}
+\label{chap:line}
+
+TOOD: Figure out how to write blueprints about definitions
+
+\begin{definition}
+    \label{Line}
+    \lean{Line}
+    \leanok
+    A line over a finite ({\textcolor{red} TODO: remove finiteness from this file}) field $\mathbb{F}$ is a
+    linear subspace of $\mathbb{F}^3$ of dimension 2.
+\end{definition}
+
+\begin{definition}
+    \label{Line_mem}
+    \lean{mem2}
+    \leanok
+    \uses{Line}
+    A value $(x, y) \in \mathbb{F}^2$ is in a line $L$ iff $(x, y, 1) \in L$.
+\end{definition}
+
+\begin{definition}
+    \label{line_apply}
+    \lean{Line.apply}
+    \leanok
+    \uses{Line}
+    Given a linear equivalence and a line we can apply the equivalence to the line.
+\end{definition}
+
+\begin{proof}
+    \leanok
+    This is a valid line because linear equivalences preserve dimension.
+\end{proof}
+
+\begin{lemma}
+    \label{apply_injective}
+    \lean{apply_injective}
+    \leanok
+    \uses{Line, line_apply}
+    For any linear equivalence, applying it to lines is injective.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    From the injectivity of linear transformation.
+\end{proof}
+
+TODO

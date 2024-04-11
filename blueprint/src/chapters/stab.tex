@@ -12,12 +12,13 @@
     \label{Stab_inv'}
     \lean{Stab_inv'}
     \leanok
-    \uses{card_of_inv, Stab}
+    \uses{Stab}
     For $a \in \Stab_K(A)$, we also have $a^{-1} \in \Stab_K(A)$.
 \end{lemma}
 
 \begin{proof}
     \leanok
+    \uses{card_of_inv}
     If $a = 0$ this is trivial, otherwise by \ref{card_of_inv} we have $|A + a^{-1}A| = |a(A + a^{-1}A)| = |A + a A| \leq K |A|$.
 \end{proof}
 
@@ -37,13 +38,14 @@
 \begin{lemma}
     \label{Stab_neg'}
     \lean{Stab_neg'}
-    \uses{one_le_of_mem, sub_le_add, card_of_inv, Stab}
+    \uses{Stab}
     \leanok
     For $a \in \Stab_K(A)$, we also have $a \in \Stab_{K^3}(A)$.
 \end{lemma}
 
 \begin{proof}
     \leanok
+    \uses{one_le_of_mem, sub_le_add, card_of_inv}
     If $a = 0$ or $A = \emptyset$ this is trivial, otherwise by \ref{sub_le_add} and \ref{card_of_inv} we have
     $$|A - a A| \leq \frac{|A + aA|^3}{|A| |a A|} = \frac{|A + aA|^3}{|A|^2} \leq \frac{K^3 |A|^3}{|A|^2} = K^3 |A|$$
 \end{proof}
@@ -52,12 +54,13 @@
     \label{Stab_neg}
     \lean{Stab_neg}
     \leanok
-    \uses{Stab_neg', Stab}
+    \uses{Stab}
     We have $-\Stab_{K}(A) \subseteq \Stab_{K^3}(A)$.
 \end{lemma}
 
 \begin{proof}
     \leanok
+    \uses{Stab_neg'}
     Immediate from \ref{Stab_neg'}.
 \end{proof}
 
@@ -65,11 +68,13 @@
     \label{Stab_add'}
     \lean{Stab_add'}
     \leanok
-    \uses{one_le_of_mem, triple_add, add_smul_subset_smul_add_smul, Stab}
+    \uses{Stab}
     For $a \in \Stab_{K_1}(A), b \in \Stab_{K_2}(A)$, we have $a+b \in \Stab_{K_1^8 K_2}(A)$.
 \end{lemma}
 
 \begin{proof}
+    \leanok
+    \uses{one_le_of_mem, triple_add, add_smul_subset_smul_add_smul}
     If $a = 0$ or $A = \emptyset$ this is trivial. Otherwise, we have $A + (a+b) A \subseteq A + a A + b A$, by \ref{add_smul_subset_smul_add_smul},
     and by \ref{triple_add} and \ref{card_of_inv} we have $|A + a A + b A| \leq \frac{|A + bA| |A + aA|^8} {|A|^8} \leq K_1^8 K_2 |A|$.
 \end{proof}
@@ -78,12 +83,13 @@
     \label{Stab_add}
     \lean{Stab_add}
     \leanok
-    \uses{Stab_add', Stab}
+    \uses{Stab}
     We have $\Stab_{K_1}(A) + \Stab_{K_2}(A) \subseteq \Stab_{K_1^8 K_2}(A)$.
 \end{lemma}
 
 \begin{proof}
     \leanok
+    \uses{Stab_add'}
     Immediate from \ref{Stab_add'}.
 \end{proof}
 
@@ -91,12 +97,13 @@
     \label{Stab_nsmul}
     \lean{Stab_nsmul}
     \leanok
-    \uses{Stab_add, Stab}
+    \uses{Stab}
     For $n \in \mathbb{N}$ we have $(n+1) \cdot \Stab_{K}(A) \subseteq \Stab_{K^(8n + 1)}(A)$.
 \end{lemma}
 
 \begin{proof}
     \leanok
+    \uses{Stab_add}
     By induction with \ref{Stab_add}.
 \end{proof}
 
@@ -104,12 +111,13 @@
     \label{Stab_sub}
     \lean{Stab_sub}
     \leanok
-    \uses{Stab_add, Stab_neg, Stab}
+    \uses{Stab}
     We have $\Stab_{K_1}(A) - \Stab_{K_2}(A) \subseteq \Stab_{K_1^8 K_2^3}(A)$.
 \end{lemma}
 
 \begin{proof}
     \leanok
+    \uses{Stab_add, Stab_neg}
     Immediate from \ref{Stab_add} and \ref{Stab_neg}.
 \end{proof}
 
@@ -117,12 +125,13 @@
     \label{Stab_mul'}
     \lean{Stab_mul'}
     \leanok
-    \uses{one_le_of_mem, card_of_inv, Stab_inv', Stab}
+    \uses{Stab}
     For $a \in \Stab_{K_1}(A), b \in \Stab_{K_2}(A)$, we have $ab \in \Stab_{K_1 K_2}(A)$.
 \end{lemma}
 
 \begin{proof}
     \leanok
+    \uses{one_le_of_mem, card_of_inv, Stab_inv'}
     If $a = 0$ this is trivial with \ref{one_le_of_mem}. Otherwise, we have, by \ref{card_of_inv}
     $|A + a b A| = |a^{-1} A + b A|$. By the triangle inequality we have
     $|a^{-1} A + b A| \leq \frac{|A + a^{-1} A| |A + b A|}{|A|}$, and using \ref{Stab_inv'} we get that this is
@@ -133,12 +142,13 @@
     \label{Stab_mul}
     \lean{Stab_mul}
     \leanok
-    \uses{Stab_mul', Stab}
+    \uses{Stab}
     We have $\Stab_{K_1}(A) \Stab_{K_2}(A) \subseteq \Stab_{K_1 K_2}(A)$.
 \end{lemma}
 
 \begin{proof}
     \leanok
+    \uses{Stab_mul'}
     Immediate from \ref{Stab_mul'}.
 \end{proof}
 
@@ -159,12 +169,13 @@
     \label{Stab_le}
     \lean{Stab_le}
     \leanok
-    \uses{Stab_le', Stab}
+    \uses{Stab}
     If $K \leq K'$ then $\Stab_K(A) \subseteq \Stab_{K'}(A)$.
 \end{lemma}
 
 \begin{proof}
     \leanok
+    \uses{Stab_le'}
     Trivial from \ref{Stab_le'}
 \end{proof}
 
@@ -172,14 +183,145 @@
     \label{Stab_le_2}
     \lean{Stab_le2}
     \leanok
-    \uses{Stab_le, one_le_of_mem, Stab}
+    \uses{Stab}
     If $1 \leq K$ implies $K \leq K'$ then $\Stab_K(A) \subseteq \Stab_{K'}(A)$.
 \end{lemma}
 
 \begin{proof}
     \leanok
+    \uses{Stab_le, one_le_of_mem}
     If $A = \emptyset$ this is trivial.
     Otherwise, if $K < 1$ then from \ref{one_le_of_mem} $\Stab_K(A) = \emptyset$ and this is trivial.
     Otherwise we get \ref{Stab_le}.
 \end{proof}
 
+\begin{lemma}
+    \label{Stab_subset}
+    \lean{Stab_subset}
+    \leanok
+    \uses{Stab}
+    We have $3 \Stab_K(A)^2 - 3 \Stab_K(A)^2 \subseteq \Stab_{K^374}(A)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{Stab_nsmul, Stab_sub, Stab_mul}
+    Immediate from \ref{Stab_nsmul}, \ref{Stab_sub} and \ref{Stab_mul}.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_card_inc}
+    \lean{Stab_card_inc}
+    \leanok
+    \uses{Stab}
+    We have $\frac{\min(|\Stab_K(A)|^2, p) / 2} \leq |\Stab_{K^374}(A)|$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{Stab_subset, GUS}
+    Immediate from \ref{Stab_subset} and \ref{GUS}.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_card_inc'}
+    \lean{Stab_card_inc'}
+    \leanok
+    \uses{Stab}
+    If $4 \leq |\Stab_K(A)|$, then $\min(|\Stab_K(A)|^{\frac32}, \frac p2) \leq |\Stab_{K^374}(A)|$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{Stab_card_inc}
+    From direct calculation using \ref{Stab_card_inc}.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_card_inc_rep}
+    \lean{Stab_card_inc_rep}
+    \leanok
+    \uses{Stab}
+    If $4 \leq |\Stab_K(A)|$ and for all $n \in \mathbb{N}$,
+    $\min(|\Stab_K(A)|^{\left(\frac32\right)^n}, \frac p2) \leq |\Stab_{K^{374^n}}(A)|$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{Stab_card_inc'}
+    By induction on \ref{Stab_card_inc'}.
+\end{proof}
+
+\begin{definition}
+    \label{StabC_2}
+    \lean{full_C₂}
+    \leanok
+    $\mathrm{StabC}_2(\beta) = 374^{\lceil \log_{\frac32}(1 / \beta) \rceil}$
+\end{definition}
+
+\begin{lemma}
+    \label{Stab_full'}
+    \lean{Stab_full'}
+    \leanok
+    \uses{Stab, StabC_2}
+    If $4 \leq |\Stab_K(A)|$ and $p^\beta \leq |\Stab_K(A)|$,
+    then $\frac{p}2 \leq |\Stab_{K^{\mathrm{StabC}_2(\beta)}}|$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{Stab_card_inc_rep}
+    By setting $n = \mathrm{StabC}_2(\beta)$ at \ref{Stab_card_inc_rep}.
+\end{proof}
+
+\begin{definition}
+    \label{StabC}
+    \lean{full_C}
+    \leakok
+    \uses{StabC_2}
+    $\mathrm{StabC}(\beta) = 9 \mathrm{StabC}_2(\beta)$
+\end{definition}
+
+\begin{lemma}
+    \label{Stab_full}
+    \lean{Stab_full}
+    \leanok
+    \uses{Stab, StabC}
+    If $4 \leq |\Stab_K(A)|$ and $p^\beta \leq |\Stab_K(A)|$,
+    then $\Stab_{K^{\mathrm{StabC}(\beta)}} (A) = \mathbb{F}$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{Stab_full', Stab_add}
+    By Cauchy-Davenport and \ref{Stab_add} after \ref{Stab_full'}.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_no_full}
+    \lean{Stab_no_full}
+    \leanok
+    \uses{Stab}
+    If $p^\beta \leq |A| \leq p^(1 - \beta)$ and $K < \frac{p^\beta}2$, then
+    $\Stab_K(A) \neq \mathbb{F}$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{exists_grower}
+    \ref{exists_grower} gives a value $a$ which by direct computation we can show isn't in $\Stab_K(A)$.
+\end{proof}
+
+\begin{lemma}
+    \label{Stab_small}
+    \lean{Stab_small}
+    \leanok
+    If $4 \leq |\Stab_K(A)|, p^\beta \leq |\Stab_K(A)|, p^\gamma \leq |A| \leq p^(1 - \gamma)$
+    then $\frac{p^\gamma}2 \leq K^{\mathrm{StabC}(\beta)}$
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{Stab_full, Stab_no_full}
+    By applying \ref{Stab_full} and \ref{Stab_no_full}.
+\end{proof}
