@@ -32,7 +32,7 @@ theorem ST_prime_field_proj (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L :
     (nml₂ : (IntersectionsL p₂ L).card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
     (all_int : ∀ p ∈ P, (∃ l ∈ L, p ∈ l ∧ p₁ ∈ l) ∧ ∃ l ∈ L, p ∈ l ∧ p₂ ∈ l)
     (nl : ∀ p ∈ P, ¬p ∈ Line.of p₁ p₂ neq):
-      (Intersections P L).card ≤ (ST_C₅ * n ^ (3/2 - 13/12 * ST_prime_field_eps₃ β) : ℝ)
+      (Intersections P L).card ≤ (SG_C * n ^ (3/2 - SG_eps β) : ℝ)
     := by
   let proj := projective_transform p₁ p₂ neq
   let Pn := P.image (fun (x : α × α) ↦ Vnorm (proj (x.1, x.2, 1)))
@@ -231,10 +231,8 @@ theorem ST_prime_field_proj (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L :
       calc
         Ln.card ≤ L.card := Finset.card_image_le ..
         _ ≤ n := h₂
-    _ = ST_C₅ * n ^ (3/2 - 13/12 * ST_prime_field_eps₃ β) := by
-      simp [ST_C₅, ST_prime_field_eps₃]
-      left
-      ring_nf
+    _ = SG_C * n ^ (3/2 - SG_eps β) := by
+      simp [ST_prime_field_eps₃]
 
 
 theorem ST_prime_field_aux (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Line α)) (n : ℕ+)
@@ -264,11 +262,11 @@ theorem ST_prime_field_aux (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : 
       apply rpow_pos_of_pos
       simp
     _ = ST_C₄ * (n ^ (1 - ST_prime_field_eps₃ β) * n^(1/2 - ST_prime_field_eps β)) := by ring
-    _ = ST_C₄ * n ^ (3/2 - 13/12 * ST_prime_field_eps₃ β) := by
+    _ = ST_C₄ * n ^ (3/2 - SG_eps β) := by
       congr
       rw [←rpow_add]
       congr 1
-      simp [ST_prime_field_eps, ST_prime_field_eps₂]
+      simp [ST_prime_field_eps, ST_prime_field_eps₂, ST_prime_field_eps₃]
       ring
       simp
   let l := Line.of p₁ p₂ neq
@@ -280,18 +278,18 @@ theorem ST_prime_field_aux (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : 
       simp [P'']
     _ = (Intersections P' L).card - (Intersections (P'.filter (fun x => x ∈ l)) L).card := by
       simp [IntersectionsL_sum]
-    _ > ST_C₄ * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) - (Intersections (P'.filter (fun x => x ∈ l)) L).card := by
+    _ > ST_C₄ * n ^ (3 / 2 - SG_eps β) - (Intersections (P'.filter (fun x => x ∈ l)) L).card := by
       gcongr
-    _ = ST_C₄ * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) - ∑ l₂ ∈ L, (IntersectionsP (P'.filter (fun x => x ∈ l)) l₂).card := by
+    _ = ST_C₄ * n ^ (3 / 2 - SG_eps β) - ∑ l₂ ∈ L, (IntersectionsP (P'.filter (fun x => x ∈ l)) l₂).card := by
       congr
       rw [IntersectionsP_sum]
-    _ ≥ ST_C₄ * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) - ∑ l₂ ∈ (L ∪ {l}), (IntersectionsP (P'.filter (fun x => x ∈ l)) l₂).card := by
+    _ ≥ ST_C₄ * n ^ (3 / 2 - SG_eps β) - ∑ l₂ ∈ (L ∪ {l}), (IntersectionsP (P'.filter (fun x => x ∈ l)) l₂).card := by
       gcongr
       apply sum_le_sum_of_subset_of_nonneg
       apply subset_union_left
       intros
       simp
-    _ = ST_C₄ * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) -
+    _ = ST_C₄ * n ^ (3 / 2 - SG_eps β) -
       (∑ l₂ ∈ L \ {l}, (IntersectionsP (P'.filter (fun x => x ∈ l)) l₂).card + (IntersectionsP (P'.filter (fun x => x ∈ l)) l).card) := by
       congr
       norm_cast
@@ -299,20 +297,20 @@ theorem ST_prime_field_aux (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : 
       congr 2
       apply union_sdiff_right
       simp
-    _ = ST_C₄ * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) -
+    _ = ST_C₄ * n ^ (3 / 2 - SG_eps β) -
       (∑ l₂ ∈ L \ {l}, ((P'.filter (fun x => x ∈ l)).filter (fun x => x ∈ l₂)).card + (IntersectionsP (P'.filter (fun x => x ∈ l)) l).card) := by
       rfl
-    _ = ST_C₄ * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) -
+    _ = ST_C₄ * n ^ (3 / 2 - SG_eps β) -
       (∑ l₂ ∈ L \ {l}, (P'.filter (fun x => x ∈ l ∧ x ∈ l₂)).card + (IntersectionsP (P'.filter (fun x => x ∈ l)) l).card) := by
       congr
       ext l₂
       rw [filter_filter]
-    _ ≥ ST_C₄ * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) -
+    _ ≥ ST_C₄ * n ^ (3 / 2 - SG_eps β) -
       (∑ l₂ ∈ L \ {l}, (univ.filter (fun x => x ∈ l ∧ x ∈ l₂)).card + P'.card) := by
       gcongr
       simp
       simp [IntersectionsP]
-    _ ≥ ST_C₄ * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) -
+    _ ≥ ST_C₄ * n ^ (3 / 2 - SG_eps β) -
       (∑ l₂ ∈ L \ {l}, 1 + P.card) := by
       gcongr
       norm_cast
@@ -323,7 +321,7 @@ theorem ST_prime_field_aux (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : 
       simp at hi
       simp [hi]
       simp [P']
-    _ ≥ ST_C₄ * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) -
+    _ ≥ ST_C₄ * n ^ (3 / 2 - SG_eps β) -
       (n + n) := by
       gcongr
       simp
@@ -331,8 +329,8 @@ theorem ST_prime_field_aux (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : 
       calc
         (L \ {l}).card ≤ L.card := by gcongr; simp
         _ ≤ n := by assumption
-    _ ≥ ST_C₄ * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) -
-      (n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) + n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β)) := by
+    _ ≥ ST_C₄ * n ^ (3 / 2 - SG_eps β) -
+      (n ^ (3 / 2 - SG_eps β) + n ^ (3 / 2 - SG_eps β)) := by
       gcongr
       repeat {
       conv =>
@@ -343,9 +341,9 @@ theorem ST_prime_field_aux (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : 
       simp
       apply lemma4
       }
-    _ = (ST_C₄ - 2) * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) := by ring
-    _ = ST_C₅ * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) := by simp [ST_C₄]
-  suffices ((Intersections P'' L).card : ℝ) ≤ ST_C₅ * n ^ (3 / 2 - 13 / 12 * ST_prime_field_eps₃ β) by linarith
+    _ = (ST_C₄ - 2) * n ^ (3 / 2 - SG_eps β) := by ring
+    _ = SG_C * n ^ (3 / 2 - SG_eps β) := by simp [ST_C₄]
+  suffices ((Intersections P'' L).card : ℝ) ≤ SG_C * n ^ (3 / 2 - SG_eps β) by linarith
   apply ST_prime_field_proj (p₁ := p₁) (p₂ := p₂) <;> try assumption
   calc
     P''.card ≤ P'.card := by gcongr; simp [P'']
@@ -365,7 +363,6 @@ theorem ST_prime_field_aux (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : 
 
 theorem ST_prime_field_aux₂' (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Line α)) (n : ℕ+)
   (nhₗ : (p^β : ℝ) ≤ n) (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (h₁ : P.card ≤ n) (h₂ : L.card ≤ n)
-    -- (hb : ∀ l ∈ L, (IntersectionsP P l).card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
     (hc : ∀ l ∈ P, (n^(1/2 - ST_prime_field_eps β) : ℝ) ≤ (IntersectionsL l L).card)
   :
   (Intersections P L).card ≤ (ST_C₂ * n ^ (3/2 - ST_prime_field_eps β) : ℝ) := by

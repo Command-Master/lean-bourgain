@@ -5,10 +5,8 @@ def SG_C₅ : NNReal := 2^49
 noncomputable def SG_C₄ : NNReal := 4+16*(SG_C₅+2)
 noncomputable def SG_C₃ : NNReal := 4 * NNReal.sqrt (SG_C₄ + 1)
 noncomputable def SG_C₂ : NNReal := SG_C₃ + 16
--- noncomputable def SG_V : NNReal := ((SG_C₄ - 4) / 16 - 2)
 noncomputable def SG_C :  NNReal := SG_C₂ + 1
-noncomputable def ST_C₅ : NNReal := SG_C
-noncomputable def ST_C₄ : NNReal := ST_C₅ + 2
+noncomputable def ST_C₄ : NNReal := SG_C + 2
 noncomputable def ST_C₃ : NNReal := (ST_C₄ + 73 : NNReal)^(1/4 : ℝ)
 noncomputable def ST_C₂ : NNReal := NNReal.sqrt (2*(ST_C₃ + NNReal.sqrt 2 / 4))
 noncomputable def ST_C : NNReal := ST_C₂ + 1
@@ -90,16 +88,15 @@ lemma lemma3 (β : ℝ) :
   linarith
 
 lemma lemma4 (β : ℝ) :
-  1 ≤ 3 / 2 - 13 / 12 * ST_prime_field_eps₃ β := by
-  unfold ST_prime_field_eps₃ SG_eps SG_eps₂
+  1 ≤ 3 / 2 - SG_eps β := by
+  unfold SG_eps SG_eps₂
   have := ntlSGeps β
   linarith
 
 lemma lemma5 (β : ℝ) :
   1 + (2⁻¹ - SG_eps β) ≠ 0 := by
-  apply ne_of_gt
-  unfold SG_eps SG_eps₂
-  have := ntlSGeps β
+  have := lemma4 β
+  ring_nf
   linarith
 
 lemma lemma6 (β : ℝ) :
