@@ -137,3 +137,70 @@ We can directly transfer all theorems on $f \# g$ to finite PMFs.
     By calculation.
 \end{proof}
 
+\begin{definition}
+    \label{close_high_entropy}
+    \lean{close_high_entropy}
+    \leanok
+    \usees{FinPMF}
+    We say that a distribution $a$ is $\varepsilon$-close to $N$ entropy if for all sets $|A| \leq N$,
+    $\sum_{x \in A} a(x) \leq \varepsilon$. Note that this is a bit different than the usual definition.
+\end{definition}
+
+\begin{proposition}
+    \label{close_high_entropy_of_floor}
+    \lean{close_high_entropy_of_floor}
+    \leanok
+    \uses{close_high_entropy}
+    If $a$ is $\varepsilon$-close to $\lfloor n \rfloor$ entropy it's also $\varepsilon$-close to $n$ entropy.
+\end{proposition}
+
+\begin{proposition}
+    \label{close_high_entropy_of_le}
+    \lean{close_high_entropy_of_le}
+    \leanok
+    \uses{close_high_entropy}
+    If $a$ is $\varepsilon_1$-close to $n$ entropy and $\varepsilon_1 \leq \varepsilon_2$ it's also $\varepsilon_2$-close to $n$ entropy.
+\end{proposition}
+
+\begin{lemma}
+    \label{close_high_entropy_apply_equiv}
+    \lean{close_high_entropy_apply_equiv}
+    \leanok
+    \uses{close_high_entropy, FinPMF.apply}
+    If $e$ is an isomorphism and $a$ is $\varepsilon$-close to $n$ entropy, $e \# a$ is also $\varepsilon$-close to $n$ entropy.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{equiv_transfer}
+    By definition, after using \ref{equiv_transfer}.
+\end{proof}
+
+\begin{lemma}
+    \label{add_close_high_entropy}
+    \lean{add_close_high_entropy}
+    \leanok
+    \uses{close_high_entropy, instAddFinPMF}
+    If $a$ is $\varepsilon$-close to $n$ entropy, then for any PMF $b$, $a+b$ is also $\varepsilon$-close to $n$ entropy.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    $$\sum_{x\in H}(a+b)(x) = \sum_{x \in H}\sum_v{b(v) a(x - v)} = \sum_v b(v) \sum_{x \in H}{a(x - v)} = \sum_v b(v) \sum_{x \in H - v}{a(x)} \leq
+    \sum_v b(v) \varepsilon = \varepsilon$$
+\end{proof}
+
+\begin{proposition}
+    \label{close_high_entropy_linear_combination}
+    \lean{close_high_entropy_linear_combination}
+    \leanok
+    If, for all $x$ such that $0 < f(x)$, we have that $g(x)$ is $\varepsilon$-close to $n$ entropy, then
+    $f(g)$ is $\varepsilon$-close to $n$ entropy.
+\end{proposition}
+
+\begin{proposition}
+    \label{filter_neg_le_inv_card_le}
+    \lean{filter_neg_le_inv_card_le}
+    \leanok
+    For any probability distribution $a$, there are at most $n$ values such that $a(x) > 1/n$.
+\end{proposition}

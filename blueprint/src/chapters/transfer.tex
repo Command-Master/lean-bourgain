@@ -30,7 +30,15 @@
     \lean{comp_transfer}
     \leanok
     \uses{transfer}
-    If $h$ is a homomorphism we have $h \circ (f \# g) = f \# (g \circ h)$.
+    If $h$ is an additive homomorphism we have $h \circ (f \# g) = f \# (g \circ h)$.
+\end{proposition}
+
+\begin{proposition}
+    \label{equiv_transfer}
+    \lean{equiv_transfer}
+    \leanok
+    \uses{transfer}
+    If $f$ is a bijection we have $(f \# g)(x) = g (f^{-1}(x))$.
 \end{proposition}
 
 \begin{lemma}
