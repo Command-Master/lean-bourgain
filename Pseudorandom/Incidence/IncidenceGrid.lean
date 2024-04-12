@@ -333,12 +333,6 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
     apply rpow_pos_of_pos
     simp
 
-/-
-theorem ST_grid_aux (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line α)) (n : ℕ+) (nhₗ : (p^β : ℝ) ≤ n)
-  (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
-  (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ)) (h₂ : L.card ≤ n)
-  (hC : ∀ l ∈ L, (n ^ (1/2 - SG_eps β) : ℝ) < (IntersectionsP (A ×ˢ B) l).card)
--/
 theorem ST_grid_aux₂ (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line α)) (n : ℕ+) (nhₗ : (p^β : ℝ) ≤ n)
   (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
   (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ)) (h₂ : L.card ≤ n)

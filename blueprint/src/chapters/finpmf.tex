@@ -1,0 +1,139 @@
+\chapter{Finite Probability Distributions}
+\label{chap:finpmf}
+
+\begin{definition}
+    \label{FinPMF}
+    \lean{FinPMF}
+    \leanok
+    A finite probability distribution is a function $f : A \to \mathbb{R}$ from a finite type $A$, such that $f$ is nonnegative and the sum of $f$ is
+    1.
+\end{definition}
+
+\begin{definition}
+    \label{Uniform}
+    \lean{Uniform}
+    \leanok
+    \uses{FinPMF}
+    The uniform distribution on a nonempty set $A$ assigns $\frac1{|A|}$ to all values in $A$ and $0$ to other values.
+\end{definition}
+
+\begin{definition}
+    \label{instMulFinPMF}
+    \lean{instMulFinPMF}
+    \leanok
+    \uses{FinPMF}
+    Given two finite probability distributions $f: A \to \mathbb{R}, g : B \to \mathbb{R}$, we have a probability distribution
+    from $A \times B$ defines as $(f \times g)(x, y) = f(x) g(y)$.
+\end{definition}
+
+\begin{definition}
+    \label{FinPMF.apply}
+    \lean{FinPMF.apply}
+    \leanok
+    \uses{FinPMF, transfer}
+    Given a finite probability distribution $f: A \to \mathbb{R}$ and a function $g : A \to B$, we can apply $g$ to the random variable
+    represented by $f$. This gives the distribution $g \# f$.
+\end{definition}
+
+We can directly transfer all theorems on $f \# g$ to finite PMFs.
+
+\begin{definition}
+    \label{instSubFinPMF}
+    \lean{instSubFinPMF}
+    \leanok
+    \uses{FinPMF, FinPMF.apply, instMulFinPMF}
+    Given two finite probability distributions $f: A \to \mathbb{R}, g : A \to \mathbb{R}$, we have a probability distribution
+    defines as $f-g = s \# (f \times g)$ with $s(x, y) = x-y$.
+\end{definition}
+
+\begin{definition}
+    \label{instAddFinPMF}
+    \lean{instAddFinPMF}
+    \leanok
+    \uses{FinPMF, FinPMF.apply, instMulFinPMF}
+    Given two finite probability distributions $f: A \to \mathbb{R}, g : A \to \mathbb{R}$, we have a probability distribution
+    defines as $f+g = a \# (f \times g)$ with $a(x, y) = x+y$.
+\end{definition}
+
+\begin{definition}
+    \label{instNegFinPMF}
+    \lean{instNegFinPMF}
+    \leanok
+    \uses{FinPMF, FinPMF.apply, instMulFinPMF}
+    Given a finite probability distribution $f: A \to \mathbb{R}$, we have a probability distribution
+    defines as $-f = n \# f$ with $n(x) = -x$.
+\end{definition}
+
+\begin{proposition}
+    \label{FinPMFCommMonoid}
+    \lean{FinPMFCommMonoid}
+    \leanok
+    \uses{instAddFinPMF, instSubFinPMF, instNegFinPMF}
+    These operations define a commutative monoid.
+\end{proposition}
+
+
+\begin{lemma}
+    \label{FinPMF.apply_mul}
+    \lean{FinPMF.apply_mul}
+    \leanok
+    \uses{FinPMF, FinPMF.apply, instMulFinPMF}
+    We have $(f \# a) \times (g \# b) = h \# (a \times b)$, with $h(x, y) = (f(x), g(y))$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    By calculation.
+\end{proof}
+
+\begin{lemma}
+    \label{FinPMF.apply_add}
+    \lean{FinPMF.apply_add}
+    \leanok
+    \uses{FinPMF, FinPMF.apply, instMulFinPMF, instAddFinPMF}
+    We have $(f \# a) + (g \# b) = h \# (a \times b)$, with $h(x, y) = f(x) + g(y)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{FinPMF.apply_mul}
+    By simplification after \ref{FinPMF.apply_mul}.
+\end{proof}
+
+\begin{definition}
+    \label{FinPMF.linear_combination}
+    \lean{FinPMF.linear_combination}
+    \leanok
+    \uses{FinPMF}
+    Given a finite probability distribution $f: A \to \mathbb{R}$ and a list of finite probability distributions on $B$, indexed by
+    elements of $A$, $g$, we can define $g(f)$ as the probability distribution obtained by sampling an element from $f$, and then
+    sampling an elemente from the corresponding distribution in $g$.
+\end{definition}
+
+
+\begin{lemma}
+    \label{linear_combination_linear_combination}
+    \lean{linear_combination_linear_combination}
+    \leanok
+    \uses{FinPMF, FinPMF.linear_combination}
+    We have $f(g(a)) = h(a)$ with $h(x) = g(f(x))$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    By calculation.
+\end{proof}
+
+\begin{lemma}
+    \label{linear_combination_apply}
+    \lean{linear_combination_apply}
+    \leanok
+    \uses{FinPMF, FinPMF.linear_combination, FinPMF.apply}
+    We have $g \# f(a) = h(a)$ with $h(x) = g\# f(x)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    By calculation.
+\end{proof}
+

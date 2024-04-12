@@ -9,43 +9,29 @@
     $f \# g(x) = \sum_{f(y) = x}g(y)$.
 \end{definition}
 
-\begin{lemma}
+\begin{proposition}
     \label{transfer_add}
     \lean{transfer_add}
     \leanok
     \uses{transfer}
     We have $f \# (g + h) = f \# g + f \# h$.
-\end{lemma}
+\end{proposition}
 
-\begin{proof}
-    \leanok
-    Trivial.
-\end{proof}
-
-\begin{lemma}
+\begin{proposition}
     \label{transfer_sub}
     \lean{transfer_sub}
     \leanok
     \uses{transfer}
     We have $f \# (g - h) = f \# g - f \# h$.
-\end{lemma}
-\begin{proof}
-    \leanok
-    Trivial.
-\end{proof}
+\end{proposition}
 
-\begin{lemma}
+\begin{proposition}
     \label{comp_transfer}
     \lean{comp_transfer}
     \leanok
     \uses{transfer}
     If $h$ is a homomorphism we have $h \circ (f \# g) = f \# (g \circ h)$.
-\end{lemma}
-
-\begin{proof}
-    \leanok
-    Trivial.
-\end{proof}
+\end{proposition}
 
 \begin{lemma}
     \label{transfer_transfer}
@@ -57,34 +43,25 @@
 
 \begin{proof}
     \leanok
-    By swapping the order of the summation, with the inner sum being a singleton.
+    $$\sum_{y \in h^{-1}(x)} \sum_{z \in f^{-1}(y)} g(z) = \sum_{z} \sum_{y \in h^{-1}(x), z \in f^{-1}(y)} g(z) = 
+    \sum_{z} [h(f(z)) = x] g(z) = \sum_{z \in (h \circ f)^{-1}(x)} g(z) = ((h \circ f) \# g) (x)$$
 \end{proof}
 
-\begin{lemma}
+\begin{proposition}
     \label{transfer_id}
     \lean{transfer_id}
     \leanok
     \uses{transfer}
     $\mathrm{id} \# f = f$
-\end{lemma}
+\end{proposition}
 
-\begin{proof}
-    \leanok
-    Trivial.
-\end{proof}
-
-\begin{lemma}
+\begin{proposition}
     \label{transfer_sum}
     \lean{transfer_sum}
     \leanok
     \uses{transfer}
     $$\sum_x {(f \# g) (x) h(x)} = \sum_x {g(x) h(f(x))}$$
-\end{lemma}
-
-\begin{proof}
-    \leanok
-    Trivial.
-\end{proof}
+\end{proposition}
 
 \begin{lemma}
     \label{transfer_expect}
@@ -101,16 +78,10 @@
 \end{proof}
 
 
-
-\begin{lemma}
+\begin{proposition}
     \label{transfer_ne_zero}
     \lean{transfer_ne_zero}
     \leanok
     \uses{transfer}
-    if $(f \# g) (x) \neq 0$ then $x$ has a preimage
-\end{lemma}
-
-\begin{proof}
-    \leanok
-    Trivial.
-\end{proof}
+    if $(f \# g) (x) \neq 0$ then $\exists y, f(y) = x$.
+\end{proposition}

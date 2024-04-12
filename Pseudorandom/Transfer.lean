@@ -24,6 +24,24 @@ theorem comp_transfer [AddCommMonoid γ] [AddCommMonoid γ₂] [FunLike G γ γ�
   ext a
   simp
 
+theorem equiv_transfer [AddCommMonoid γ]
+    (f : α ≃ β) (g : α → γ) (x : β):
+  (f # g) x = g (f.symm x) := by
+  unfold transfer
+  change ∑ y ∈ univ.filter (fun y => f y = x), g y = _
+  convert_to ∑ y ∈ {f.symm x}, g y = _
+  congr
+  ext v
+  constructor
+  · intro o
+    simp only [mem_filter, mem_univ, true_and] at o
+    rw [← o]
+    simp
+  · intro o
+    simp only [mem_singleton] at o
+    simp [o]
+  simp
+
 theorem transfer_transfer [AddCommMonoid γ] [Fintype β] [DecidableEq γ₂]
     (f : α → β) (g : α → γ) (h : β → γ₂):
   h # (f # g) = (h ∘ f) # g := by

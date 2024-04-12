@@ -4,6 +4,7 @@
 \DeclareMathOperator{\stpfone}{\varepsilon}
 \DeclareMathOperator{\stpftwo}{\varepsilon_2}
 \DeclareMathOperator{\sgone}{\varepsilon'}
+\DeclareMathOperator{\sgtwo}{\varepsilon'_2}
 
 \begin{definition}
     \label{ST_C}
@@ -86,22 +87,72 @@
 \end{proof}
 
 \begin{theorem}
-    \label{ST_prime_field_proj}
-    \lean{ST_prime_field_proj}
+    \label{ST_grid}
+    \lean{ST_grid}
     \leanok
-    Let there be a set $P$ of points and a set $L$ of lines over a prime field, 
-    with $|P| \leq n, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$,
-    and each point contained in at least $n^{\frac12 - \stpfone(\beta)}$ lines
-    and at most $4 n^{\frac12 + \stpfone(\beta)}$. Additionally, let there be two different points,
-    $a, b$, such that not points in $P$ are on the line between $a$ and $b$, but all of them are one a line from $L$
-    passing through $a$ and on a line from $L$ passing through $b$.
+    Let there be two sets $A, B$ and a set $L$ of lines over a prime field, 
+    with $|A| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |B| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$.
     Then the number of intersections is at most $C' n^{\frac32 - \sgone(\beta)}$.
 \end{theorem}
 
 \begin{proof}
     \leanok
-    \uses{projective_transform, ST_grid}
-    We use \ref{projective_transform} to apply a projective transformation to our lines and points.
-    We want to argue that it moves the points to a grid, and preserves incidences, and then use
-    \ref{ST_grid}.
+    \uses{ST_grid_aux}
+    We reduce to \ref{ST_grid_aux} by removing all lines which contain too few points.
+\end{proof}
+
+\begin{theorem}
+    \label{ST_grid_aux}
+    \lean{ST_grid_aux}
+    \leanok
+    Let there be two sets $A, B$ and a set $L$ of lines over a prime field, 
+    with $|A| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |B| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$.
+    Additionally, suppose there are at least $n^{\frac12 - \sgone(\beta)}$ points on each line.
+    Then the number of intersections is at most $C'_2 n^{\frac32 - \sgone(\beta)}$.
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{ST_grid_aux₂}
+    We now remove all horizontal lines, to reduce to \ref{ST_grid_aux₂}.
+    This doesn't remove many intersections because each point can intersect at most one horizontal line.
+\end{proof}
+
+\begin{theorem}
+    \label{ST_grid_aux₂}
+    \lean{ST_grid_aux₂}
+    \leanok
+    Let there be two sets $A, B$ and a set $L$ of non-horizontal lines over a prime field, 
+    with $|A| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |B| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$.
+    Additionally, suppose there are at least $n^{\frac12 - \sgone(\beta)}$ points on each line.
+    Then the number of intersections is at most $C'_2 n^{\frac32 - \sgone(\beta)}$.
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{claim_342_grid, ST_grid_final}
+    We apply \ref{claim_342_grid} to get two values $b_1, b_2 \in B$ such that many lines pass
+    through these rows. Because there are many points on each line, only keeping those still gives many
+    incidences. Now, a line can be described as two points $a_1, a_2$, and the line would be the line passing through
+    $(a_1, b_1), (a_2, b_2)$. Suppose it passes through a given point $(a, b)$. This gives
+    $a = \frac{b_2 - b}{b_2 - b_1} a_1 + \frac{b - b_1}{b_2 - b_1} a_2$, so
+    $\frac{b_2 - b}{b_2 - b_1} a_1 + \frac{b - b_1}{b_2 - b_1} a_2 \in A$. Equivalently, there are many ($N^{3/2 - \epsilon}$) triplets
+    $(b, a_1, a_2) \in B \times A \times A$ such that $\frac{b_2 - b}{b_2 - b_1} a_1 + \frac{b - b_1}{b_2 - b_1} a_2 \in A$.
+    This implies that there must be many ($N^{1/2 - \epsilon}$) values of $b$ such that there is a large number of pairs
+    $(a_1, a_2)$ with this property. Now we can only keep those, remove $b_1, b_2$, and apply \ref{ST_grid_final}
+\end{proof}
+
+\begin{theorem}
+    \label{ST_grid_final}
+    \lean{ST_grid_final}
+    \leanok
+    Let there be two sets $A, B$ and a set $L$ of non-horizontal lines over a prime field, 
+    with $|A| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |B| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$.
+    Suppose there are at least $n^{\frac12 - \sgone(\beta)}$ points on each line, and lastly,
+    suppose there are two values $b_1, b_2 \notin B$, .
+    Then $|B|$ is at most $C'_5 n^{1/2 - \sgtwo(\beta) - \sgone(\beta) - 4 \stpfone(\beta)}$.
+\end{theorem}
+
+\begin{proof}
+    \leanok
 \end{proof}
