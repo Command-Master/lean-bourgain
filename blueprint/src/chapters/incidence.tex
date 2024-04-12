@@ -1,10 +1,107 @@
 \chapter{Incidence}
 \label{chap:inc}
 
-TODO
+\DeclareMathOperator{\stpfone}{\varepsilon}
+\DeclareMathOperator{\stpftwo}{\varepsilon_2}
+\DeclareMathOperator{\sgone}{\varepsilon'}
+
+\begin{definition}
+    \label{ST_C}
+    \lean{ST_C}
+    \leanok
+    \uses{ST_C2}
+    $C = C_2 + 1$
+\end{definition}
+
+\begin{definition}
+    \lean{ST_prime_field_eps}
+    \leanok
+    $\stpfone(\beta) = \stpftwo(\beta) / 3$
+\end{definition}
 
 \begin{theorem}
-    \label{ST_grid_final}
-    \lean{ST_grid_final}
+    \label{ST_prime_field}
+    \lean{ST_prime_field}
     \leanok
+    Let there be a set $P$ of points and a set $L$ of lines over a prime field, 
+    with $|P| \leq n, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$.
+    Then the number of intersections is at most $ C n^{\frac32 - \stpfone(\beta)} $.
 \end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{ST_prime_field_aux₂'}
+    We reduce this to \ref{ST_prime_field_aux₂'}, by removing all points contained in at most
+    $n^{\frac12 - \stpfone(\beta)}$ lines. This removes at most $n^{\frac32 - \stpfone(\beta)}$
+    points, which is corrected for with $C = C_2 + 1$.
+\end{proof}
+
+\begin{definition}
+    \label{ST_C2}
+    \lean{ST_C₂}
+    \leanok
+    $C_2 = \sqrt{2(C_3 + \frac{\sqrt2}4)}$
+\end{definition}
+
+\begin{theorem}
+    \label{ST_prime_field_aux₂'}
+    \lean{ST_prime_field_aux₂'}
+    \leanok
+    Let there be a set $P$ of points and a set $L$ of lines over a prime field, 
+    with $|P| \leq n, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$,
+    and each point intersecting with at least $n^{\frac12 - \stpfone(\beta)}$ lines.
+    Then the number of intersections is at most $C_2 n^{\frac32 - \stpfone(\beta)}$.
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{ST_prime_field_aux₂, CS_UB}
+    We reduce this to \ref{ST_prime_field_aux₂}, by removing all points contained in more than 
+    $4 n^{\frac12 + \stpfone(\beta)}$ lines. There can be at most
+    $n^{1 - 2 \stpfone(\beta)} \frac{\sqrt2}4$ such points, by \ref{CS_UB}.
+    Therefore, there are still many remaining points, and because each point has at least
+    $n^{\frac12 - \stpfone(\beta)}$ lines there are still many intersections.
+\end{proof}
+
+\begin{theorem}
+    \label{ST_prime_field_aux}
+    \lean{ST_prime_field_aux}
+    \leanok
+    Let there be a set $P$ of points and a set $L$ of lines over a prime field, 
+    with $|P| \leq n, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$,
+    and each point contained in at least $n^{\frac12 - \stpfone(\beta)}$ lines
+    and at most $4 n^{\frac12 + \stpfone(\beta)}$.
+    Then the number of intersections is at most $C_3 n^{\frac32 - \stpftwo(\beta)}$.
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{claim_342, ST_prime_field_proj}
+    We use \ref{claim_342} to claim that there exist two points, $a, b$ such that for a large number of 
+    points they are both on a line from $a$ and a line from $b$.
+    We only keep those, and because all points are contained in $n^{\frac12 - \stpfone(\beta)}$ lines there are still many intersections.
+    Then we remove all points on the line between $a$ and $b$. Because all lines, expect maybe one, intersect at most one such point,
+    this step doesn't remove many intersections.
+    Now we can apply \ref{ST_prime_field_proj}.
+\end{proof}
+
+\begin{theorem}
+    \label{ST_prime_field_proj}
+    \lean{ST_prime_field_proj}
+    \leanok
+    Let there be a set $P$ of points and a set $L$ of lines over a prime field, 
+    with $|P| \leq n, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$,
+    and each point contained in at least $n^{\frac12 - \stpfone(\beta)}$ lines
+    and at most $4 n^{\frac12 + \stpfone(\beta)}$. Additionally, let there be two different points,
+    $a, b$, such that not points in $P$ are on the line between $a$ and $b$, but all of them are one a line from $L$
+    passing through $a$ and on a line from $L$ passing through $b$.
+    Then the number of intersections is at most $C' n^{\frac32 - \sgone(\beta)}$.
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{projective_transform, ST_grid}
+    We use \ref{projective_transform} to apply a projective transformation to our lines and points.
+    We want to argue that it moves the points to a grid, and preserves incidences, and then use
+    \ref{ST_grid}.
+\end{proof}

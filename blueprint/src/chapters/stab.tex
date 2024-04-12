@@ -98,7 +98,7 @@
     \lean{Stab_nsmul}
     \leanok
     \uses{Stab}
-    For $n \in \mathbb{N}$ we have $(n+1) \cdot \Stab_{K}(A) \subseteq \Stab_{K^(8n + 1)}(A)$.
+    For $n \in \mathbb{N}$ we have $(n+1) \cdot \Stab_{K}(A) \subseteq \Stab_{K^{8n + 1}}(A)$.
 \end{lemma}
 
 \begin{proof}
@@ -200,7 +200,7 @@
     \lean{Stab_subset}
     \leanok
     \uses{Stab}
-    We have $3 \Stab_K(A)^2 - 3 \Stab_K(A)^2 \subseteq \Stab_{K^374}(A)$.
+    We have $3 \Stab_K(A)^2 - 3 \Stab_K(A)^2 \subseteq \Stab_{K^{374}}(A)$.
 \end{lemma}
 
 \begin{proof}
@@ -214,7 +214,7 @@
     \lean{Stab_card_inc}
     \leanok
     \uses{Stab}
-    We have $\frac{\min(|\Stab_K(A)|^2, p) / 2} \leq |\Stab_{K^374}(A)|$.
+    We have $\frac{\min(|\Stab_K(A)|^2, p)}2 \leq |\Stab_{K^{374}}(A)|$.
 \end{lemma}
 
 \begin{proof}
@@ -228,7 +228,7 @@
     \lean{Stab_card_inc'}
     \leanok
     \uses{Stab}
-    If $4 \leq |\Stab_K(A)|$, then $\min(|\Stab_K(A)|^{\frac32}, \frac p2) \leq |\Stab_{K^374}(A)|$.
+    If $4 \leq |\Stab_K(A)|$, then $\min(|\Stab_K(A)|^{\frac32}, \frac p2) \leq |\Stab_{K^{374}}(A)|$.
 \end{lemma}
 
 \begin{proof}
@@ -242,7 +242,7 @@
     \lean{Stab_card_inc_rep}
     \leanok
     \uses{Stab}
-    If $4 \leq |\Stab_K(A)|$ and for all $n \in \mathbb{N}$,
+    If $4 \leq |\Stab_K(A)|$ for all $n \in \mathbb{N}$,
     $\min(|\Stab_K(A)|^{\left(\frac32\right)^n}, \frac p2) \leq |\Stab_{K^{374^n}}(A)|$.
 \end{lemma}
 
@@ -265,7 +265,7 @@
     \leanok
     \uses{Stab, StabC_2}
     If $4 \leq |\Stab_K(A)|$ and $p^\beta \leq |\Stab_K(A)|$,
-    then $\frac{p}2 \leq |\Stab_{K^{\mathrm{StabC}_2(\beta)}}|$.
+    then $\frac{p}2 \leq |\Stab_{K^{\mathrm{StabC}_2(\beta)}}(A)|$.
 \end{lemma}
 
 \begin{proof}
@@ -277,7 +277,7 @@
 \begin{definition}
     \label{StabC}
     \lean{full_C}
-    \leakok
+    \leanok
     \uses{StabC_2}
     $\mathrm{StabC}(\beta) = 9 \mathrm{StabC}_2(\beta)$
 \end{definition}
@@ -302,7 +302,7 @@
     \lean{Stab_no_full}
     \leanok
     \uses{Stab}
-    If $p^\beta \leq |A| \leq p^(1 - \beta)$ and $K < \frac{p^\beta}2$, then
+    If $p^\beta \leq |A| \leq p^{1 - \beta}$ and $K < \frac{p^\beta}2$, then
     $\Stab_K(A) \neq \mathbb{F}$.
 \end{lemma}
 
@@ -316,7 +316,7 @@
     \label{Stab_small}
     \lean{Stab_small}
     \leanok
-    If $4 \leq |\Stab_K(A)|, p^\beta \leq |\Stab_K(A)|, p^\gamma \leq |A| \leq p^(1 - \gamma)$
+    If $4 \leq |\Stab_K(A)|, p^\beta \leq |\Stab_K(A)|, p^\gamma \leq |A| \leq p^{1 - \gamma}$
     then $\frac{p^\gamma}2 \leq K^{\mathrm{StabC}(\beta)}$
 \end{lemma}
 

@@ -7,7 +7,7 @@ TOOD: Figure out how to write blueprints about definitions
     \label{Line}
     \lean{Line}
     \leanok
-    A line over a finite ({\textcolor{red} TODO: remove finiteness from this file}) field $\mathbb{F}$ is a
+    A line over a finite ({\color{red} TODO: remove finiteness from this file}) field $\mathbb{F}$ is a
     linear subspace of $\mathbb{F}^3$ of dimension 2.
 \end{definition}
 
@@ -24,12 +24,12 @@ TOOD: Figure out how to write blueprints about definitions
     \lean{Line.apply}
     \leanok
     \uses{Line}
-    Given a linear equivalence and a line we can apply the equivalence to the line.
+    Given a linear isomorphism $P$ and a line $L$, we have a line $PL$.
 \end{definition}
 
 \begin{proof}
     \leanok
-    This is a valid line because linear equivalences preserve dimension.
+    This is a valid line because linear isomorphism preserves dimension.
 \end{proof}
 
 \begin{lemma}
@@ -42,7 +42,15 @@ TOOD: Figure out how to write blueprints about definitions
 
 \begin{proof}
     \leanok
-    From the injectivity of linear transformation.
+    From the injectivity of linear isomorphisms.
 \end{proof}
+
+\begin{theorem}
+    \label{CS_UB}
+    \lean{CS_UB}
+    \leanok
+    Given a set $P$ of points and a set $L$ of lines, the number of incidences is at most
+    $\sqrt{|L| |P| (|P| + |L|)}$.
+\end{theorem}
 
 TODO
