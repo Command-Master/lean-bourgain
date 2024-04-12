@@ -1,0 +1,116 @@
+\chapter{Transfer operator}
+\label{chap:transfer}
+
+\begin{definition}
+    \label{transfer}
+    \lean{transfer}
+    \leanok
+    For $f : A \to B, G : A \to C$ we have $f \# g$ is a function $B \to C$ defined by
+    $f \# g(x) = \sum_{f(y) = x}g(y)$.
+\end{definition}
+
+\begin{lemma}
+    \label{transfer_add}
+    \lean{transfer_add}
+    \leanok
+    \uses{transfer}
+    We have $f \# (g + h) = f \# g + f \# h$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Trivial.
+\end{proof}
+
+\begin{lemma}
+    \label{transfer_sub}
+    \lean{transfer_sub}
+    \leanok
+    \uses{transfer}
+    We have $f \# (g - h) = f \# g - f \# h$.
+\end{lemma}
+\begin{proof}
+    \leanok
+    Trivial.
+\end{proof}
+
+\begin{lemma}
+    \label{comp_transfer}
+    \lean{comp_transfer}
+    \leanok
+    \uses{transfer}
+    If $h$ is a homomorphism we have $h \circ (f \# g) = f \# (g \circ h)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Trivial.
+\end{proof}
+
+\begin{lemma}
+    \label{transfer_transfer}
+    \lean{transfer_transfer}
+    \leanok
+    \uses{transfer}
+    We have $h \# (f \# g) = (h \circ f) \# g$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    By swapping the order of the summation, with the inner sum being a singleton.
+\end{proof}
+
+\begin{lemma}
+    \label{transfer_id}
+    \lean{transfer_id}
+    \leanok
+    \uses{transfer}
+    $\mathrm{id} \# f = f$
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Trivial.
+\end{proof}
+
+\begin{lemma}
+    \label{transfer_sum}
+    \lean{transfer_sum}
+    \leanok
+    \uses{transfer}
+    $$\sum_x {(f \# g) (x) h(x)} = \sum_x {g(x) h(f(x))}$$
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Trivial.
+\end{proof}
+
+\begin{lemma}
+    \label{transfer_expect}
+    \lean{transfer_expect}
+    \leanok
+    \uses{transfer}
+    $$E[(f \# g) (x) h(x)] = \frac{|A|}{|B|} E[g(x) h(f(x))]$$
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{transfer_sum}
+    By unfolding the expectation and using \ref{transfer_sum}.
+\end{proof}
+
+
+
+\begin{lemma}
+    \label{transfer_ne_zero}
+    \lean{transfer_ne_zero}
+    \leanok
+    \uses{transfer}
+    if $(f \# g) (x) \neq 0$ then $x$ has a preimage
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Trivial.
+\end{proof}

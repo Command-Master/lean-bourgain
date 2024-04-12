@@ -1,0 +1,17 @@
+\chapter{Incidence on a Grid}
+\label{chap:inc_grid}
+
+\begin{theorem}
+    \label{ST_prime_field_proj}
+    \lean{ST_prime_field_proj}
+    \leanok
+    Let there be a set $P$ of points and a set $L$ of lines over a prime field, 
+    with $|P| \leq n, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$,
+    and each point contained in at least $n^{\frac12 - \stpfone(\beta)}$ lines
+    and at most $4 n^{\frac12 + \stpfone(\beta)}$. Additionally, let there be two different points,
+    $a, b$, such that not points in $P$ are on the line between $a$ and $b$, but all of them are one a line from $L$
+    passing through $a$ and on a line from $L$ passing through $b$.
+    Then the number of intersections is at most $C' n^{\frac32 - \sgone(\beta)}$.
+\end{theorem}
+
+% TODO: skip grid_aux
