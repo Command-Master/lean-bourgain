@@ -24,6 +24,9 @@ jobs:
 
       - name: Update checkdecls
         run: ~/.elan/bin/lake update checkdecls
+      
+      - name: Update doc-gen
+        run: ~/.elan/bin/lake update doc-gen4
 
       - name: Get cache
         run: ~/.elan/bin/lake -Kenv=dev exe cache get || true
