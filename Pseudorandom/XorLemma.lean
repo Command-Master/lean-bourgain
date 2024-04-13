@@ -126,7 +126,6 @@ variable (n m : ℕ+) (hₘ : m ≤ n)
 
 local notation "α" => ZMod n
 local notation "β" => ZMod m
-def lemma44C : ℝ := 1
 
 lemma range_eq_zmod_image : range ↑n = image (fun t => ZMod.val t) (univ : Finset α) := by
   ext x

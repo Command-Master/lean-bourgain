@@ -40,60 +40,57 @@ theorem ST_prime_field_proj (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L :
   have : (Intersections P L).card = (Intersections Pn Ln).card := by
     apply Finset.card_congr (fun (p, l) __ => (Vnorm (proj (p.1, p.2, 1)), l.apply proj))
     intros a ha
-    simp
-    simp [Intersections]
-    simp [Intersections] at ha
+    simp only [Intersections, mem_filter, mem_product]
+    simp only [Intersections, mem_filter, mem_product] at ha
     constructor
-    simp [Pn, Ln]
-    constructor
-    exists a.1.1, a.1.2
-    simp_all
-    exists a.2
-    simp_all
-    rw [←norm_mem]
-    simp [Line.apply, instSetLike]
-    exact ha.2
-    apply non_erasing
-    apply nl
-    exact ha.1.1
-    intros a b ha hb
-    simp
-    simp [Intersections] at ha
-    simp [Intersections] at hb
-    intros eq1 eq2
-    apply vnorm_eq_vnorm at eq1
-    have ⟨r, muleq⟩ := eq1 (non_erasing p₁ p₂ a.1 neq (nl a.1 ha.1.1)) (non_erasing p₁ p₂ b.1 neq (nl b.1 hb.1.1))
-    rw [←LinearEquiv.map_smul] at muleq
-    apply LinearEquiv.injective at muleq
-    simp at muleq
-    have := muleq.2.2
-    rw [this] at muleq
-    simp at muleq
-    apply apply_injective at eq2
-    aesop
-    intros b hb
-    simp
-    simp [Pn, Ln, Intersections] at hb
-    have ⟨⟨⟨a1, a2, ha⟩, ⟨l, hl⟩⟩, hi⟩ := hb
-    exists a1, a2, l
-    constructor
-    simp [Intersections]
-    constructor
-    exact ⟨ha.1, hl.1⟩
-    rw [←ha.2, ←hl.2] at hi
-    simp [mem2]
-    change (a1, a2, (1: α)) ∈ (l : (Set _))
-    rw [←norm_mem] at hi
-    simp [Line.apply] at hi
-    apply Submodule.mem_map.mp at hi
-    have ⟨y, hy1, hy2⟩ := hi
-    simp at hy2
-    rw [hy2] at hy1
-    exact hy1
-    apply non_erasing (x := (a1, a2))
-    apply nl
-    exact ha.1
-    simp_all
+    · simp only [mem_image, Pn, Ln]
+      refine ⟨⟨a.1, ?_⟩, ⟨a.2, ?_⟩⟩
+      simp_all
+      simp_all
+    · rw [←norm_mem]
+      simp [Line.apply, instSetLike]
+      exact ha.2
+      apply non_erasing
+      apply nl
+      exact ha.1.1
+    · intros a b ha hb
+      simp only [Prod.mk.injEq, and_imp]
+      simp only [Intersections, mem_filter, mem_product] at ha
+      simp only [Intersections, mem_filter, mem_product] at hb
+      intros eq1 eq2
+      apply vnorm_eq_vnorm at eq1
+      have ⟨r, muleq⟩ := eq1 (non_erasing p₁ p₂ a.1 neq (nl a.1 ha.1.1)) (non_erasing p₁ p₂ b.1 neq (nl b.1 hb.1.1))
+      rw [←LinearEquiv.map_smul] at muleq
+      apply LinearEquiv.injective at muleq
+      simp at muleq
+      have := muleq.2.2
+      rw [this] at muleq
+      simp at muleq
+      apply apply_injective at eq2
+      aesop
+    · intros b hb
+      simp
+      simp [Pn, Ln, Intersections] at hb
+      have ⟨⟨⟨a1, a2, ha⟩, ⟨l, hl⟩⟩, hi⟩ := hb
+      exists a1, a2, l
+      constructor
+      simp [Intersections]
+      constructor
+      exact ⟨ha.1, hl.1⟩
+      rw [←ha.2, ←hl.2] at hi
+      simp [mem2]
+      change (a1, a2, (1: α)) ∈ (l : (Set _))
+      rw [←norm_mem] at hi
+      simp [Line.apply] at hi
+      apply Submodule.mem_map.mp at hi
+      have ⟨y, hy1, hy2⟩ := hi
+      simp at hy2
+      rw [hy2] at hy1
+      exact hy1
+      apply non_erasing (x := (a1, a2))
+      apply nl
+      exact ha.1
+      simp_all
   let A := Pn.image (fun x => x.1)
   let B := Pn.image (fun x => x.2)
   have As : A.card ≤ (IntersectionsL p₂ L).card := by
