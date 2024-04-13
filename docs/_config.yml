@@ -22,7 +22,7 @@ title: The Bourgain Extractor in Lean
 #email: your-email@example.com
 description: A digitisation of the proof of the Bourgain Extractor in Lean
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://commandmaster.github.io/leanbourgain/" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://command-master.github.io/lean-bourgain/" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: jekyllrb
 github_username: Command-Master
 repository: Command-Master/lean-bourgain
