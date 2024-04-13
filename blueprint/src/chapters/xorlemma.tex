@@ -101,11 +101,11 @@ In the following, we consider $\sigma: \mathbb{Z}_N \to \mathbb{Z}_M$ defined as
     If $\rho(\frac{w N - t M}{N M}) = 1$, this is trivially correct. Otherwise, this is a geometric sum, and then we can use
     \ref{le_add_div_add_of_le_of_le}.
     We easily have $|\rho(\frac{w N - t M}{N M})^N - 1| + 1 \leq 3$, and now we need to bound
-    $\frac1N\sum_{t \in \mathbb{Z}_N} \frac1{|\rho(\frac{w N - t M}{N M}) - 1| + 1/N} = \frac1N\sum_{t \in \mathbb{Z}_N} \frac1{|\langle\rho(\frac{w N / M - t}{N}\rangle) - 1| + 1/N}$.
-    We can use \ref{circle_lower_bound} to bound this as $\frac1N\sum_{t \in \mathbb{Z}_N} \frac1{(2 - |4(\langle{w N / M - t}{N}\rangle) - 2|) + 1/N}$
+    $\frac1N\sum_{t \in \mathbb{Z}_N} \frac1{|\rho(\frac{w N - t M}{N M}) - 1| + 1/N} = \frac1N\sum_{t \in \mathbb{Z}_N} \frac1{|\rho(\langle\frac{w N / M - t}{N}\rangle) - 1| + 1/N}$.
+    We can use \ref{circle_lower_bound} to bound this as $\frac1N\sum_{t \in \mathbb{Z}_N} \frac1{(2 - |4(\langle\frac{w N / M - t}{N}\rangle) - 2|) + 1/N}$
     By writing $w N / M = \lfloor w N / M \rfloor + \langle w N / M \rangle$, this is equal to
-    $\sum_{t \in \mathbb{Z}_N} \frac1{2N - |4(\langle{w N / M}{N}\rangle + t) - 2N| + 1}$
-    Now by splitting to cases and calculating we can see that $\frac1{2N - |4(\langle{w N / M}{N}\rangle + t) - 2N| + 1} \leq \frac1{4t+1} + \frac1{4(n-1-t)+1}$.
+    $\sum_{t \in \mathbb{Z}_N} \frac1{2N - |4(\langle{w N / M}\rangle + t) - 2N| + 1}$
+    Now by splitting to cases and calculating we can see that $\frac1{2N - |4(\langle{w N / M}\rangle + t) - 2N| + 1} \leq \frac1{4t+1} + \frac1{4(n-1-t)+1}$.
     Applying bonuds on the harmonic sum, we get the desired result.
 \end{proof}
 
