@@ -1,0 +1,69 @@
+\chapter{Lemmas about LP Norm}
+\label{chap:lplemmas}
+
+\begin{theorem}
+    \label{l1Norm_le_sqrt_card_mul_l2Norm}
+    \lean{l1Norm_le_sqrt_card_mul_l2Norm}
+    \leanok
+    For a function $f$ with domain $A$
+    $$\lVert f \rVert_{\ell^1} \leq \sqrt{|A|} \lVert f \rVert_{\ell^2}$$
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    This is a particular case of the Cauchy-Schwartz inequality.
+\end{proof}
+
+
+\begin{lemma}
+    \label{lpNorm_eq_card_rpow_mul_nlpNorm}
+    \lean{lpNorm_eq_card_rpow_mul_nlpNorm}
+    \leanok
+    For a function $f$ with domain $A$
+    $$\lVert f \rVert_{\ell^p} = |A|^{1/p} \lVert f \rVert_{L^p}$$
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    Trivial from the definition of $\lVert \cdot \rVert_{L^p}$.
+\end{proof}
+
+\begin{lemma}
+    \label{lpNorm_le_card_rpow_mul_linftyNorm}
+    \lean{lpNorm_le_card_rpow_mul_linftyNorm}
+    \leanok
+    $$\lVert f \rVert_{\ell^p} \leq |A|^{1/p} \lVert f \rVert_{\ell^\infty}$$
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    $$(\sum_{x} |f(x)|^p)^{1/p} \leq (\sum_{x} \lVert f \rVert_{\ell^\infty}^p)^{1/p} = (|A| \lVert f \rVert_{\ell^\infty}^p)^{1/p} =
+    |A|^{1/p} \lVert f \rVert_{\ell^\infty}$$.
+\end{proof}
+
+\begin{lemma}
+    \label{l2Inner_le_l1Norm_mul_linftyNorm}
+    \lean{l2Inner_le_l1Norm_mul_linftyNorm}
+    \leanok
+    Note that in this lemma $\langle f, g \rangle$ is $\sum_x \bar{f(x)} {g(x)}$.
+    $$|\langle f, g \rangle| \leq \lVert f \rVert_{\ell^1} \lVert g \rVert_{\ell^\infty}$$
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    $$|\sum_x \bar{f(x)} {g(x)}| \leq \sum_x |\bar{f(x)} {g(x)}| \leq \sum_x |f(x)| \lVert g \rVert_{\ell^\infty} =
+    \lVert f \rVert_{\ell^1} \lVert g \rVert_{\ell^\infty}$$
+\end{proof}
+
+\begin{lemma}
+    \label{l2Norm_le_sqrt_l1Norm_mul_linftyNorm}
+    \lean{l2Norm_le_sqrt_l1Norm_mul_linftyNorm}
+    \leanok
+    $$\lVert a \rVert_{\ell^2} \leq \sqrt{\lVert a \rVert_{\ell^1} \lVert a \rVert_{\ell^\infty}}$$
+\end{lemma}
+
+\begin{proof}
+    \uses{l2Inner_le_l1Norm_mul_linftyNorm}
+    \leanok
+    Trivial with \ref{l2Inner_le_l1Norm_mul_linftyNorm} and $\lVert a \rVert_{\ell^2} = \sqrt{\langle a, a \rangle}$
+\end{proof}

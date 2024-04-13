@@ -23,7 +23,7 @@ I remember seeing the proof used for showing every source is a convex combinatio
 
 ## The result
 
-The final result of this project is [bourgain_extractor_final](./docs/Pseudorandom/Bourgain.html#bourgain_extractor_final), which states that for any prime $$p$$, not equal to 2, and any positive integer $$m$$, the function $$f(x, y) = (xy + x^2 y^2 \mod p) \mod{m}$$ is a two source extractor, with
+The final result of this project is [bourgain_extractor_final](./docs/Pseudorandom/Bourgain.html#bourgain_extractor_final), which states that for any prime $$p$$, not equal to 2, and any positive integer $$m$$, the function $$f(x, y) = (xy + x^2 y^2 \bmod p) \bmod{m}$$ is a two source extractor, with
 $$k = (1/2 - 1/35686629198734977) \log(p),$$ 
 and $$\varepsilon = C p^{-1/2283944268719038528} \sqrt{m} (3 \ln(p) + 3) + \frac{m}{2p},$$ where $$C = \left( 16 \left(\sqrt{2\left((4\sqrt{16(2^{49}+2) + 5} + 92)^{1/4} + \frac{\sqrt2}4\right)} + 1\right) + 1\right)^{1/64} \approx 1.09 .$$
 It can be noted that these values are quite worse than what appears in the literature, which I believe is mostly due to not attempting to optimize them at all.

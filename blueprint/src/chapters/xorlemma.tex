@@ -1,0 +1,112 @@
+\chapter{XOR Lemma}
+\label{chap:xorlemma}
+
+Most of the material in here was taken from [Rao07].
+
+\begin{theorem}
+    \label{L1_le_card_rpow_mul_dft_norm}
+    \lean{L1_le_card_rpow_mul_dft_norm}
+    \leanok
+    For a function $f$ with domain $A$,
+    $$\lVert f \rVert_{\ell^1} \leq |A|^{3/2} \lVert \hat f \rVert_{\ell^\infty}$$
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{l1Norm_le_sqrt_card_mul_l2Norm, lpNorm_eq_card_rpow_mul_nlpNorm, lpNorm_le_card_rpow_mul_linftyNorm}
+    By \ref{l1Norm_le_sqrt_card_mul_l2Norm} we have $\lVert f \rVert_{\ell^1} \leq \sqrt{|A|} \lVert f \rVert_{\ell^2}$.
+    Then using \ref{lpNorm_eq_card_rpow_mul_nlpNorm} this is $|A| \lVert f \rVert_{L^2}$. By Parceval's theorem,
+    this is $|A| \lVert \hat f \rVert_{\ell^2}$. By \ref{lpNorm_le_card_rpow_mul_linftyNorm}, we have 
+    $\lVert \hat f \rVert_{\ell^2} \leq \sqrt{|A|} \lVert \hat f \rVert_{\ell^\infty}$, which combines to the desired conclusion.
+\end{proof}
+
+\begin{lemma}
+    \label{lemma43}
+    \lean{lemma43}
+    \leanok
+    This is a very slight generalization of Lemma 4.3 in [Rao07]:
+
+    Let $G, H$ be finite abelian groups. Let $X$ be a function $G \to R$ such that for every nontrivial character $\chi$,
+    $\hat{X}(\chi) \leq \frac{\varepsilon}{|G|}$ and let $U$ be the function with constant value $E_x[X(x)]$. Let $\sigma: G \to H$ be a
+    function such that for every character $\phi$, we have $\lVert \widehat{\phi \circ \sigma} \rVert_{\ell^1} \leq \tau$.
+    Then $\lVert \sigma \# X - \sigma \# U \rVert_{\ell^1} \leq \tau \varepsilon \sqrt{|H|}$
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{L1_le_card_rpow_mul_dft_norm}
+    The proof is identical to the proof in [Rao07], using \ref{L1_le_card_rpow_mul_dft_norm}.
+\end{proof}
+
+\begin{lemma}
+    \label{le_add_div_add_of_le_of_le}
+    \lean{le_add_div_add_of_le_of_le}
+    \leanok
+    If $a, b, n$ are reals, $b, n$ are positive, and $\frac ab \leq n$, then $\frac ab \leq \frac{a+1}{b + 1/n}$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    By direct calculation (alternatively, this can be seen as an instance of the mediant inequality).
+\end{proof}
+
+\begin{lemma}
+    \label{circle_lower_bound}
+    \lean{circle_lower_bound}
+    \leanok
+    For a real $x$, we have $2 - |4x - 2| \leq |e^{x 2\pi i} - 1|$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    We have $|e^{x 2\pi i} - 1| = |\cos(2 \pi x) - 1 + i \sin(2 \pi x)| =
+    \sqrt{(\cos(2 \pi x) - 1)^2 + \sin^2(2 \pi x)} = \sqrt{2 - 2\cos(2\pi x)}$.
+    WLOG, it's sufficient to consider the range $0 \leq x \leq \frac12$.
+    In this range, we have the inequality $\cos(2 \pi x) \leq 1 - \frac{2}{\pi^2} (2 \pi x)^2 = 1 - 8 x^2$,
+    from which the result quickly follows.
+\end{proof}
+
+In the following, we consider $\sigma: \mathbb{Z}_N \to \mathbb{Z}_M$ defined as $\sigma(x) = x \bmod M$.
+
+\begin{lemma}
+    \label{bound_on_apply_uniform}
+    \lean{bound_on_apply_uniform}
+    \leanok
+    We have $\lVert \sigma \# U - U \rVert_{\ell^1} \leq \frac nm$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    We can easily bound each difference by $\frac1n$ using $(\sigma \# U)(x) = \frac{\lceil \frac{N - (x \bmod M)}{M} \rceil}N$ and $U(x) = \frac{\frac NM}N$.
+\end{proof}
+
+\begin{theorem}
+    \label{lemma44}
+    \lean{lemma44}
+    \leanok
+    This is Lemma 4.4 in [Rao07] with explicit constants:
+
+    For any character $\chi$ of $\mathbb{Z}_M$, $\lVert \widehat{\chi \circ \sigma}\rVert_{\ell^1} \leq 6 \ln(N) + 6$
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{circle_lower_bound, le_add_div_add_of_le_of_le}
+    Let $\rho(x) = e^{x 2\pi i}$. We can find a value $w$ such that $\chi(x) = \rho(w x / M)$. Then $\chi(\tau(x)) = \rho(w x / M)$.
+    Now we have
+    $$\lVert \widehat{\chi \circ \sigma}\rVert_{\ell^1} = \frac{1}{N} \sum_{t \in \mathbb{Z}_N} |\sum_{x \in \mathbb{Z}_N} \rho(w x / M) \rho(- tx/N)| =
+    \frac{1}{N} \sum_{t \in \mathbb{Z}_N} |\sum_{x \in \mathbb{Z}_N} \rho(\frac{w N - t M}{N M})^x|$$
+    We now want to claim $|\sum_{x \in \mathbb{Z}_N} \rho(\frac{w N - t M}{N M})^x| \leq
+        \frac{|\rho(\frac{w N - t M}{N M})^N - 1| + 1}{|\rho(\frac{w N - t M}{N M}) - 1| + 1/N}$
+    If $\rho(\frac{w N - t M}{N M}) = 1$, this is trivially correct. Otherwise, this is a geometric sum, and then we can use
+    \ref{le_add_div_add_of_le_of_le}.
+    We easily have $|\rho(\frac{w N - t M}{N M})^N - 1| + 1 \leq 3$, and now we need to bound
+    $\frac1N\sum_{t \in \mathbb{Z}_N} \frac1{|\rho(\frac{w N - t M}{N M}) - 1| + 1/N} = \frac1N\sum_{t \in \mathbb{Z}_N} \frac1{|\langle\rho(\frac{w N / M - t}{N}\rangle) - 1| + 1/N}$.
+    We can use \ref{circle_lower_bound} to bound this as $\frac1N\sum_{t \in \mathbb{Z}_N} \frac1{(2 - |4(\langle{w N / M - t}{N}\rangle) - 2|) + 1/N}$
+    By writing $w N / M = \lfloor w N / M \rfloor + \langle w N / M \rangle$, this is equal to
+    $\sum_{t \in \mathbb{Z}_N} \frac1{2N - |4(\langle{w N / M}{N}\rangle + t) - 2N| + 1}$
+    Now by splitting to cases and calculating we can see that $\frac1{2N - |4(\langle{w N / M}{N}\rangle + t) - 2N| + 1} \leq \frac1{4t+1} + \frac1{4(n-1-t)+1}$.
+    Applying bonuds on the harmonic sum, we get the desired result.
+\end{proof}
+
+[Rao07]: Rao, Anup. “An Exposition of Bourgain's 2-Source Extractor.” Electron. Colloquium Comput. Complex. TR07 (2007): n. pag.
