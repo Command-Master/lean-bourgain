@@ -10,14 +10,14 @@ usemathjax: true
 
 # Lean Bourgain
 
-The purpose of this repository is to formalize the Bourgain extractor, and as a part of that Szemeredi-Trotter in finite fields ([BKT04]),
+The purpose of this repository is to formalize the Bourgain extractor, and as a part of that Szemeredi-Trotter in finite fields (\[BKT04\]),
 in Lean 4.
 
 ## The source
 
-Most definitions, theorems and proofs in this project have been taken from [Dvi12].
+Most definitions, theorems and proofs in this project have been taken from \[Dvi12\].
 
-Additionally, some proofs were taken from the course "Selected Topics in Pseudorandomess" in Ben-Gurion University of the Negev, which exposed me to this subject and this formalization was a project for, and the proofs about the generalized XOR lemma were taken from [Rao07].
+Additionally, some proofs were taken from the course "Selected Topics in Pseudorandomess" in Ben-Gurion University of the Negev, which exposed me to this subject and this formalization was a project for, and the proofs about the generalized XOR lemma were taken from \[Rao07\].
 
 I remember seeing the proof used for showing every source is a convex combination of flat sources, by repeatedly taking a flat source of the highest K values with the maximum possibile coefficient, in some paper, but I couldn't locate it. If anyone is aware where this proof appeared, please inform me.
 
@@ -42,8 +42,8 @@ The infrastructure for this webpage was mostly taken from [LeanAPAP](https://yae
 
 ## Sources
 
-[Dvi12]: Dvir, Zeev. Incidence Theorems and Their Applications , now, 2012, doi: 10.1561/0400000056.
+\[Dvi12\]: Dvir, Zeev. Incidence Theorems and Their Applications , now, 2012, doi: 10.1561/0400000056.
 
-[Rao07]: Rao, Anup. “An Exposition of Bourgain's 2-Source Extractor.” Electron. Colloquium Comput. Complex. TR07 (2007): n. pag.
+\[Rao07\]: Rao, Anup. “An Exposition of Bourgain's 2-Source Extractor.” Electron. Colloquium Comput. Complex. TR07 (2007): n. pag.
 
-[BKT04]: Bourgain, J., Katz, N. & Tao, T. A sum-product estimate in finite fields, and applications. Geom. funct. anal. 14, 27–57 (2004). https://doi.org/10.1007/s00039-004-0451-1
+\[BKT04\]: Bourgain, J., Katz, N. & Tao, T. A sum-product estimate in finite fields, and applications. Geom. funct. anal. 14, 27–57 (2004). https://doi.org/10.1007/s00039-004-0451-1
