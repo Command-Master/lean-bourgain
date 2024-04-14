@@ -1,0 +1,79 @@
+\chapter{Bourgain Extractor}
+\label{chap:bourgain}
+
+\begin{definition}
+    \label{lapply}
+    \lean{lapply}
+    \leanok
+    \uses{FinPMF, FinPMF.apply, instMulFinPMF}
+    Given a distribution $A$ on $\mathbb{F}$, and a distribution $B$ on $\mathbb{F}^3$, we define a distribution $L(A, B)$
+    by sampling $x$ from $A$, sampling $(y, z, w)$ from $B$, and outputting
+    $(x + y, z(x + y) + w)$.
+\end{definition}
+
+\begin{lemma}
+    \label{lapply_linear_combination}
+    \lean{lapply_linear_combination}
+    \leanok
+    \uses{lapply, FinPMF.linear_combination}
+    We have $L(f(A), g(B)) = L'(A\times B)$ with $L'(x, y) = L(f(x), g(y))$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{linear_combination_mul, linear_combination_apply}
+    Trivial with \ref{linear_combination_mul} and \ref{linear_combination_apply}.
+\end{proof}
+
+\begin{theorem}
+    \label{line_point_large_l2_aux}
+    \lean{line_point_large_l2_aux}
+    \leanok
+    \uses{lapply}
+    Given an integer $N$ and a real number $\beta$ such that $p^\beta \leq N \leq p^{2 - \beta}$, and
+    two nonempty sets $A' \subseteq \mathbb{F}, B'\subseteq \mathbb{F}^3$, such that $|B'| \leq N$ and 
+    the last two values in every element of $B'$ are unique, then
+    $L(\Uniform(A'), \Uniform(B'))$ is $\frac{C}{|A'| |B'|} N^{3/2 - \stpfone(\beta)}$-close to $N$ entropy.
+\end{theorem}
+
+\begin{theorem}
+    \label{line_point_large_l2t}
+    \lean{line_point_large_l2'}
+    \leanok
+    \uses{lapply}
+    TODO
+\end{theorem}
+
+\begin{theorem}
+    \label{line_point_large_l2}
+    \lean{line_point_large_l2}
+    \leanok
+    \uses{lapply}
+    TODO
+\end{theorem}
+
+\begin{definition}
+    \label{lmap}
+    \lean{lmap}
+    \leanok
+    $M(x, y) = (x+y, 2(x+y), -((x+y)^2 + x^2 + y^2))$
+\end{definition}
+
+\begin{definition}
+    \label{decoder}
+    \lean{decoder}
+    \leanok
+    $D(x,y) = (x, x^2 - y)$.
+\end{definition}
+
+\begin{lemma}
+    \label{jurl}
+    \lean{jurl}
+    \leanok
+    $f \# (b \times b \times b) = D \# L(b, M \# (b \times b))$, with $f(x, y, z) = (x+y+z, x^2+y^2+z^2)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    By direct calculation.
+\end{proof}
