@@ -15,7 +15,7 @@ Most of the material in here was taken from [Rao07].
     \leanok
     \uses{l1Norm_le_sqrt_card_mul_l2Norm, lpNorm_eq_card_rpow_mul_nlpNorm, lpNorm_le_card_rpow_mul_linftyNorm}
     By \ref{l1Norm_le_sqrt_card_mul_l2Norm} we have $\lVert f \rVert_{\ell^1} \leq \sqrt{|A|} \lVert f \rVert_{\ell^2}$.
-    Then using \ref{lpNorm_eq_card_rpow_mul_nlpNorm} this is $|A| \lVert f \rVert_{L^2}$. By Parceval's theorem,
+    Then using \ref{lpNorm_eq_card_rpow_mul_nlpNorm} this is $|A| \lVert f \rVert_{L^2}$. By Parseval's theorem,
     this is $|A| \lVert \hat f \rVert_{\ell^2}$. By \ref{lpNorm_le_card_rpow_mul_linftyNorm}, we have 
     $\lVert \hat f \rVert_{\ell^2} \leq \sqrt{|A|} \lVert \hat f \rVert_{\ell^\infty}$, which combines to the desired conclusion.
 \end{proof}
@@ -26,7 +26,7 @@ Most of the material in here was taken from [Rao07].
     \leanok
     This is a very slight generalization of Lemma 4.3 in [Rao07]:
 
-    Let $G, H$ be finite abelian groups. Let $X$ be a function $G \to R$ such that for every nontrivial character $\chi$,
+    Let $G, H$ be finite abelian groups. Let $X$ be a function $G \to \mathbb{R}$ such that for every nontrivial character $\chi$,
     $\hat{X}(\chi) \leq \frac{\varepsilon}{|G|}$ and let $U$ be the function with constant value $E_x[X(x)]$. Let $\sigma: G \to H$ be a
     function such that for every character $\phi$, we have $\lVert \widehat{\phi \circ \sigma} \rVert_{\ell^1} \leq \tau$.
     Then $\lVert \sigma \# X - \sigma \# U \rVert_{\ell^1} \leq \tau \varepsilon \sqrt{|H|}$
@@ -107,6 +107,20 @@ In the following, we consider $\sigma: \mathbb{Z}_N \to \mathbb{Z}_M$ defined as
     $\sum_{t \in \mathbb{Z}_N} \frac1{2N - |4(\langle{w N / M}\rangle + t) - 2N| + 1}$
     Now by splitting to cases and calculating we can see that $\frac1{2N - |4(\langle{w N / M}\rangle + t) - 2N| + 1} \leq \frac1{4t+1} + \frac1{4(n-1-t)+1}$.
     Applying bonuds on the harmonic sum, we get the desired result.
+\end{proof}
+
+\begin{theorem}
+    \label{generalized_XOR_lemma}
+    \lean{generalized_XOR_lemma}
+    \leanok
+    Let $X$ be a distribution $\mathbb{Z}_N$ such that for every nontrivial character $\chi$,
+    $\hat{X}(\chi) \leq \frac{\varepsilon}{|G|}$. Then $\SD(\sigma \# X, U) \leq \varepsilon \sqrt{M} (3\ln(N) + 3) + \frac{M}{2N}$.
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{lemma44, lemma43, bound_on_apply_uniform}
+    Trivial with $\SD(A, B) = \lVert A - B \rVert_{\ell^1}$, the triangle inequality with \ref{bound_on_apply_uniform}, \ref{lemma43} and \ref{lemma44}.
 \end{proof}
 
 [Rao07]: Rao, Anup. “An Exposition of Bourgain's 2-Source Extractor.” Electron. Colloquium Comput. Complex. TR07 (2007): n. pag.

@@ -18,6 +18,8 @@ $$k = (1/2 - 1/35686629198734977) \log(p),$$
 and $$\varepsilon = C p^{-1/2283944268719038528} \sqrt{m} (3 \ln(p) + 3) + \frac{m}{2p},$$ where $$C = \left( 16 \left(\sqrt{2\left((4\sqrt{16(2^{49}+2) + 5} + 92)^{1/4} + \frac{\sqrt2}4\right)} + 1\right) + 1\right)^{1/64} \approx 1.09 .$$
 It can be noted that these values are quite worse than what appears in the literature, which I believe is mostly due to not attempting to optimize them at all.
 
+**Note**: the proof isn't fully sound yet, due to some theorems we depend on in LeanAPAP which depend on [a pull request to Mathlib](https://github.com/leanprover-community/mathlib4/pull/11203).
+
 ## Acknowledgements
 
 I'd like to thank Dean Doron for introducting me to this interesting subject, pointing me to the relevant papers, and helping with anything I had trouble understanding in them.
@@ -32,8 +34,8 @@ The infrastructure for the webpage was mostly taken from [LeanAPAP](https://yael
 
 ## Sources
 
+\[BKT04\]: Bourgain, J., Katz, N. & Tao, T. A sum-product estimate in finite fields, and applications. Geom. funct. anal. 14, 27–57 (2004). https://doi.org/10.1007/s00039-004-0451-1
+
 \[Dvi12\]: Dvir, Zeev. Incidence Theorems and Their Applications , now, 2012, doi: 10.1561/0400000056.
 
 \[Rao07\]: Rao, Anup. “An Exposition of Bourgain's 2-Source Extractor.” Electron. Colloquium Comput. Complex. TR07 (2007): n. pag.
-
-\[BKT04\]: Bourgain, J., Katz, N. & Tao, T. A sum-product estimate in finite fields, and applications. Geom. funct. anal. 14, 27–57 (2004). https://doi.org/10.1007/s00039-004-0451-1

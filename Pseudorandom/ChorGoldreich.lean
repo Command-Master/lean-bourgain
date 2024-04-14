@@ -4,7 +4,7 @@ import Mathlib.LinearAlgebra.BilinearForm.Basic
 
 open BigOps ComplexConjugate Finset
 
-theorem AddChar.eq_iff [AddGroup α] [GroupWithZero R] (χ : AddChar α R) : χ a = χ b ↔ χ (a - b) = 1 := by
+lemma AddChar.eq_iff [AddGroup α] [GroupWithZero R] (χ : AddChar α R) : χ a = χ b ↔ χ (a - b) = 1 := by
   simp [sub_eq_add_neg, AddChar.map_add_mul, AddChar.map_neg_inv]
   apply Iff.symm
   apply mul_inv_eq_one₀
@@ -23,7 +23,7 @@ lemma IP_comm [CommSemiring α] (a b : α × α) : IP a b = IP b a := by
   unfold IP
   simp [mul_comm]
 
-theorem apply_inner_product_injective [Field α] (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
+lemma apply_inner_product_injective [Field α] (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
     Function.Injective (fun x : α × α => {
       toFun := fun y : α × α => χ (IP x y)
       map_zero_one' := by simp
@@ -60,7 +60,7 @@ theorem apply_inner_product_injective [Field α] (χ : AddChar α ℂ) (h : χ.I
       ring_nf
     simp [this] at hx
 
-theorem apply_inner_product_bijective [Fintype α] [Field α] (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
+lemma apply_inner_product_bijective [Fintype α] [Field α] (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
     Function.Bijective (fun x : α × α => {
       toFun := fun y : α × α => χ (IP x y)
       map_zero_one' := by simp
@@ -74,15 +74,15 @@ noncomputable def AddChar.inner_product_equiv [Fintype α] [Field α] (χ : AddC
   (α × α) ≃ AddChar (α × α) ℂ := Equiv.ofBijective _ (apply_inner_product_bijective χ h)
 
 theorem bourgain_extractor_aux_inner [Fintype α] [Field α] (a b : (α × α) → ℝ) (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
-    ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖ = ‖ l2Inner (Complex.ofReal ∘ a) (fun x => dft (b ·) (χ.inner_product_equiv h x)⁻¹)‖
-        := calc ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖
-  _ = ‖ ∑ x, a x * ∑ y, b y * (χ.inner_product_equiv h x) y‖ := rfl
-  _ = ‖ ∑ x, a x * ∑ y, (χ.inner_product_equiv h x) y * b y‖ := by congr; ext; congr; ext; rw [mul_comm]
-  _ = ‖ ∑ x, a x * ∑ y, conj ((χ.inner_product_equiv h x)⁻¹ y) * b y‖ := by
+    ∑ x, a x * ∑ y, b y * χ (IP x y) = l2Inner (Complex.ofReal ∘ a) (fun x => dft (b ·) (χ.inner_product_equiv h x)⁻¹)
+        := calc ∑ x, a x * ∑ y, b y * χ (IP x y)
+  _ = ∑ x, a x * ∑ y, b y * (χ.inner_product_equiv h x) y := rfl
+  _ = ∑ x, a x * ∑ y, (χ.inner_product_equiv h x) y * b y := by congr; ext; congr; ext; rw [mul_comm]
+  _ = ∑ x, a x * ∑ y, conj ((χ.inner_product_equiv h x)⁻¹ y) * b y := by
     congr; ext; congr; ext
     rw [AddChar.inv_apply, AddChar.map_neg_eq_conj, RingHomCompTriple.comp_apply, RingHom.id_apply]
-  _ = ‖ ∑ x, a x * (dft (b ·) (χ.inner_product_equiv h x)⁻¹)‖ := rfl
-  _ = ‖ l2Inner (Complex.ofReal ∘ a) (fun x => dft (b ·) (χ.inner_product_equiv h x)⁻¹)‖ := by
+  _ = ∑ x, a x * (dft (b ·) (χ.inner_product_equiv h x)⁻¹) := rfl
+  _ = l2Inner (Complex.ofReal ∘ a) (fun x => dft (b ·) (χ.inner_product_equiv h x)⁻¹) := by
     unfold l2Inner
     rcongr
     simp only [Function.comp_apply, Complex.ofReal_eq_coe, Complex.conj_ofReal]
@@ -90,16 +90,7 @@ theorem bourgain_extractor_aux_inner [Fintype α] [Field α] (a b : (α × α) �
 theorem bourgain_extractor_aux₀ [Fintype α] [Field α] (a b : (α × α) → ℝ) (χ : AddChar α ℂ) (h : χ.IsNontrivial) :
     ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖^2 ≤ (Fintype.card α)^2 * ‖a‖_[2]^2 * ‖b‖_[2]^2 :=
       calc ‖ ∑ x, a x * ∑ y, b y * χ (IP x y)‖^2
-  _ = ‖ ∑ x, a x * ∑ y, b y * (χ.inner_product_equiv h x) y‖^2 := rfl
-  _ = ‖ ∑ x, a x * ∑ y, (χ.inner_product_equiv h x) y * b y‖^2 := by congr; ext; congr; ext; rw [mul_comm]
-  _ = ‖ ∑ x, a x * ∑ y, conj ((χ.inner_product_equiv h x)⁻¹ y) * b y‖^2 := by
-    congr; ext; congr; ext
-    rw [AddChar.inv_apply, AddChar.map_neg_eq_conj, RingHomCompTriple.comp_apply, RingHom.id_apply]
-  _ = ‖ ∑ x, a x * (dft (b ·) (χ.inner_product_equiv h x)⁻¹)‖^2 := rfl
-  _ = ‖ l2Inner (Complex.ofReal ∘ a) (fun x => dft (b ·) (χ.inner_product_equiv h x)⁻¹)‖^2 := by
-    unfold l2Inner
-    rcongr
-    simp only [Function.comp_apply, Complex.ofReal_eq_coe, Complex.conj_ofReal]
+  _ = ‖ l2Inner (Complex.ofReal ∘ a) (fun x => dft (b ·) (χ.inner_product_equiv h x)⁻¹)‖^2 := by rw [bourgain_extractor_aux_inner]
   _ ≤ (‖(Complex.ofReal ∘ a)‖_[2] * ‖(fun x => dft (b ·) (χ.inner_product_equiv h x)⁻¹) ‖_[2])^2 := by
     gcongr
     apply norm_l2Inner_le_lpNorm_mul_lpNorm

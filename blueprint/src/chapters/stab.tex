@@ -9,7 +9,7 @@
 \end{definition}
 
 \begin{lemma}
-    \label{Stab_inv'}
+    \label{Stab_invt}
     \lean{Stab_inv'}
     \leanok
     \uses{Stab}
@@ -36,7 +36,7 @@
 \end{proof}
 
 \begin{lemma}
-    \label{Stab_neg'}
+    \label{Stab_negt}
     \lean{Stab_neg'}
     \uses{Stab}
     \leanok
@@ -60,12 +60,12 @@
 
 \begin{proof}
     \leanok
-    \uses{Stab_neg'}
-    Immediate from \ref{Stab_neg'}.
+    \uses{Stab_negt}
+    Immediate from \ref{Stab_negt}.
 \end{proof}
 
 \begin{lemma}
-    \label{Stab_add'}
+    \label{Stab_addt}
     \lean{Stab_add'}
     \leanok
     \uses{Stab}
@@ -89,8 +89,8 @@
 
 \begin{proof}
     \leanok
-    \uses{Stab_add'}
-    Immediate from \ref{Stab_add'}.
+    \uses{Stab_addt}
+    Immediate from \ref{Stab_addt}.
 \end{proof}
 
 \begin{lemma}
@@ -122,7 +122,7 @@
 \end{proof}
 
 \begin{lemma}
-    \label{Stab_mul'}
+    \label{Stab_mult}
     \lean{Stab_mul'}
     \leanok
     \uses{Stab}
@@ -131,10 +131,10 @@
 
 \begin{proof}
     \leanok
-    \uses{one_le_of_mem, card_of_inv, Stab_inv'}
+    \uses{one_le_of_mem, card_of_inv, Stab_invt}
     If $a = 0$ this is trivial with \ref{one_le_of_mem}. Otherwise, we have, by \ref{card_of_inv}
     $|A + a b A| = |a^{-1} A + b A|$. By the triangle inequality we have
-    $|a^{-1} A + b A| \leq \frac{|A + a^{-1} A| |A + b A|}{|A|}$, and using \ref{Stab_inv'} we get that this is
+    $|a^{-1} A + b A| \leq \frac{|A + a^{-1} A| |A + b A|}{|A|}$, and using \ref{Stab_invt} we get that this is
     $\leq K_1 K_2 |A|$.
 \end{proof}
 
@@ -148,12 +148,12 @@
 
 \begin{proof}
     \leanok
-    \uses{Stab_mul'}
-    Immediate from \ref{Stab_mul'}.
+    \uses{Stab_mult}
+    Immediate from \ref{Stab_mult}.
 \end{proof}
 
 \begin{lemma}
-    \label{Stab_le'}
+    \label{Stab_let}
     \lean{Stab_le'}
     \leanok
     \uses{Stab}
@@ -175,8 +175,8 @@
 
 \begin{proof}
     \leanok
-    \uses{Stab_le'}
-    Trivial from \ref{Stab_le'}
+    \uses{Stab_let}
+    Trivial from \ref{Stab_let}
 \end{proof}
 
 \begin{lemma}
@@ -224,8 +224,8 @@
 \end{proof}
 
 \begin{lemma}
-    \label{Stab_card_inc'}
-    \lean{Stab_card_inc'}
+    \label{Stab_card_inct}
+    \lean{Stab_card_inct}
     \leanok
     \uses{Stab}
     If $4 \leq |\Stab_K(A)|$, then $\min(|\Stab_K(A)|^{\frac32}, \frac p2) \leq |\Stab_{K^{374}}(A)|$.
@@ -248,8 +248,8 @@
 
 \begin{proof}
     \leanok
-    \uses{Stab_card_inc'}
-    By induction on \ref{Stab_card_inc'}.
+    \uses{Stab_card_inct}
+    By induction on \ref{Stab_card_inct}.
 \end{proof}
 
 \begin{definition}
@@ -260,7 +260,7 @@
 \end{definition}
 
 \begin{lemma}
-    \label{Stab_full'}
+    \label{Stab_fullt}
     \lean{Stab_full'}
     \leanok
     \uses{Stab, StabC_2}
@@ -293,7 +293,7 @@
 
 \begin{proof}
     \leanok
-    \uses{Stab_full', Stab_add}
+    \uses{Stab_fullt, Stab_add}
     By Cauchy-Davenport and \ref{Stab_add} after \ref{Stab_full'}.
 \end{proof}
 

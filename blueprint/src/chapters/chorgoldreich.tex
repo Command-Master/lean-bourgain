@@ -1,0 +1,145 @@
+\chapter{Lemmas about the Inner Product Extractor}
+\label{chapr:cr}
+
+\begin{proposition}
+    \label{AddChar.eq_iff}
+    \lean{AddChar.eq_iff}
+    \leanok
+    For a character $\chi$, $\chi(a) = \chi(b)$ iff $\chi(a-b) = 1$.
+\end{proposition}
+
+
+\begin{proposition}
+    \label{IP_comm}
+    \lean{IP_comm}
+    \leanok
+    The inner product is commutitive.
+\end{proposition}
+
+\begin{lemma}
+    \label{apply_inner_product_injective}
+    \lean{apply_inner_product_injective}
+    \leanok
+    If $\chi$ is a non-trivial character of a field $\mathbb{F}$, then there is an injective
+    function from elements of $\mathbb{F}^2$ ({\color{red} generalize this to any dimension}) to characters of it, 
+    defined by $f(x)(y) = \chi(x \cdot y)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{AddChar.eq_iff}
+    It's easy to see this maps values to additive characters.
+    For injectivity, we have some value $x$ such that $\chi(x) \neq 1$.
+    Now if $f((a_1, a_2)) = f((b_1, b_2))$, if they aren't equal, we can apply either
+    $\frac{x}{a_1 - b_1}$ or $\frac{x}{a_2 - b_2}$, and then we get $\chi(x) = 1$ by \ref{AddChar.eq_iff},
+    a contradiction.
+\end{proof}
+
+\begin{lemma}
+    \label{apply_inner_product_bijective}
+    \lean{apply_inner_product_bijective}
+    \leanok
+    The function in the previous lemma is actually a bijection.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{apply_inner_product_injective}
+    By \ref{apply_inner_product_injective} and the cardinality being equal.
+\end{proof}
+
+\begin{theorem}
+    \label{bourgain_extractor_aux_inner}
+    \lean{bourgain_extractor_aux_inner}
+    \leanok
+    \uses{apply_inner_product_bijective}
+
+    \textbf{Note: the inner product and DFT here aren't normalized.}
+    $$\sum_x{a(x)\sum_y{b(y) \chi(x \cdot y)}} = \langle a, P(\hat b) \rangle$$
+    where $P$ reorders $\hat b$ based on \ref{apply_inner_product_bijective}
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    TODO
+\end{proof}
+
+\begin{theorem}
+    \label{bourgain_extractor_aux₀}
+    \lean{bourgain_extractor_aux₀}
+    \leanok
+
+    $$|\sum_x{a(x)\sum_y{b(y) \chi(x \cdot y)}}|^2 \leq |A|^2 \lVert a \rVert_{\ell^2}^2 \lVert b \rVert_{\ell^2}^2$$
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{bourgain_extractor_aux_inner}
+    We use \ref{bourgain_extractor_aux_inner} to rewrite the sum, and then use Cauchy-Schwartz.
+    Then we can undo the reordering and use Parseval's theorem to get the desired result.
+\end{proof}
+
+\begin{theorem}
+    \label{bourgain_extractor_aux₀t}
+    \lean{bourgain_extractor_aux₀'}
+    \leanok
+
+    $$|\sum_x{a(x)\sum_y{b(y) \chi(x \cdot y)}}| \leq |A| \lVert a \rVert_{\ell^2} \lVert b \rVert_{\ell^2}$$
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{bourgain_extractor_aux₀}
+    Simplying apply a square root to \ref{bourgain_extractor_aux₀}.
+\end{proof}
+
+\begin{theorem}
+    \label{bourgain_extractor_aux₁}
+    \lean{bourgain_extractor_aux₁}
+    \leanok
+    For any bilinear form $F$ and character $\chi$,
+    $$|\sum_x{a(x) \sum_y{b(y) \chi(F(x, y))}}|^2 \leq |\sum_x{a(x) \sum_y{(b-b)(y) \chi(F(x, y))}}|$$
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \begin{align}
+        |\sum_x{a(x) \sum_y{b(y) \chi(F(x, y))}}|^2 &\leq& (\sum_x{a(x) |\sum_y{b(y) \chi(F(x, y))} | })^2 \\
+        &\leq& \sum_x{a(x) |\sum_y{b(y) \chi(F(x, y))} |^2}\\
+        &=&\sum_x{a(x) (\sum_y{b(y) \chi(F(x, y))}) \bar{(\sum_y{b(y) \chi(F(x, y))})}} \\
+        &=&\sum_x{a(x) \sum_y \sum_{y'}{b(y) b(y') \chi(F(x, y)) \chi(-F(x, y'))} } \\
+        &=&\sum_x{a(x) \sum_y \sum_{y'}{b(y) b(y') \chi(F(x, y - y'))} } \\
+        &=&\sum_x{a(x) \sum_y{(b-b)(y) \chi(F(x, y))} } \\
+    \end{align}
+\end{proof}
+
+\begin{theorem}
+    \label{bourgain_extractor_aux₁t}
+    \lean{bourgain_extractor_aux₁'}
+    \leanok
+    For any bilinear form $F$ and character $\chi$,
+    $$|\sum_x{a(x) \sum_y{b(y) \chi(F(x, y))}}| \leq \sqrt{|\sum_x{a(x) \sum_y{(b-b)(y) \chi(F(x, y))}}|}$$
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{bourgain_extractor_aux₁}
+    Trivial from \ref{bourgain_extractor_aux₁}.
+\end{proof}
+
+\begin{theorem}
+    \label{bourgain_extractor_aux₂}
+    \lean{bourgain_extractor_aux₂}
+    \leanok
+    If $a$ and $b$ are $\varepsilon$-close to $N$ entropy,
+    then 
+    $$|\sum_x{a(x) \sum_y{b(y) \chi(F(x, y))}}| \leq \frac{|A|}N + 2\varepsilon$$
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{bourgain_extractor_aux₀t, filter_neg_le_inv_card_le}
+    From the hypothesis and \ref{filter_neg_le_inv_card_le} we can look at $a'(x) = \begin{cases}a(x) & a(x) \leq \frac1N \\ 0 & \frac1N < a(x)\end{cases}$, and similarly
+    for $b'$, and the difference would be at most $2 \varepsilon$. Then we can apply \ref{bourgain_extractor_aux₀t} to get the result.
+\end{proof}
+

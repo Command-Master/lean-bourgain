@@ -26,8 +26,8 @@
 
 \begin{proof}
     \leanok
-    \uses{ST_prime_field_aux₂'}
-    We reduce this to \ref{ST_prime_field_aux₂'}, by removing all points contained in at most
+    \uses{ST_prime_field_aux₂t}
+    We reduce this to \ref{ST_prime_field_aux₂t}, by removing all points contained in at most
     $n^{\frac12 - \stpfone(\beta)}$ lines. This removes at most $n^{\frac32 - \stpfone(\beta)}$
     points, which is corrected for with $C = C_2 + 1$.
 \end{proof}
@@ -40,7 +40,7 @@
 \end{definition}
 
 \begin{theorem}
-    \label{ST_prime_field_aux₂'}
+    \label{ST_prime_field_aux₂t}
     \lean{ST_prime_field_aux₂'}
     \leanok
     Let there be a set $P$ of points and a set $L$ of lines over a prime field, 
