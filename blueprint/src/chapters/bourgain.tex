@@ -36,6 +36,12 @@
     $L(\Uniform(A'), \Uniform(B'))$ is $\frac{C}{|A'| |B'|} N^{3/2 - \stpfone(\beta)}$-close to $N$ entropy.
 \end{theorem}
 
+\begin{proof}
+    \leanok
+    \uses{ST_prime_field}
+    TODO
+\end{proof}
+
 \begin{theorem}
     \label{line_point_large_l2t}
     \lean{line_point_large_l2'}
@@ -44,6 +50,12 @@
     TODO
 \end{theorem}
 
+\begin{proof}
+    \leanok
+    \uses{line_point_large_l2_aux}
+    TODO
+\end{proof}
+
 \begin{theorem}
     \label{line_point_large_l2}
     \lean{line_point_large_l2}
@@ -51,6 +63,12 @@
     \uses{lapply}
     TODO
 \end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{line_point_large_l2t}
+    TODO
+\end{proof}
 
 \begin{definition}
     \label{lmap}
@@ -70,10 +88,132 @@
     \label{jurl}
     \lean{jurl}
     \leanok
+    \uses{lmap, transfer, lapply, decoder}
     $f \# (b \times b \times b) = D \# L(b, M \# (b \times b))$, with $f(x, y, z) = (x+y+z, x^2+y^2+z^2)$.
 \end{lemma}
 
 \begin{proof}
     \leanok
-    By direct calculation.
+    \uses{FinPMF.apply_mul, transfer_transfer, FinPMF.apply_swap}
+    By direct calculation with \ref{FinPMF.apply_mul}, \ref{transfer_transfer}, \ref{FinPMF.apply_swap}.
+\end{proof}
+
+\begin{lemma}
+    \label{max_val_of_apply_lmap}
+    \lean{max_val_of_apply_lmap}
+    \leanok
+    If the maximum value of $a$ is $\varepsilon$, the maximum value of $M \# (a \times a)$ is at most $2 \varepsilon^2$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    It suffices to show that every value can be obtained at most twice as an output of $M$.
+    Because the first value determines the second one, we can drop it, and then if want to get
+    $(x_1, x_2)$ we need $y_1 + y_2 = x_1, y_1 y_2 = x_1^2 + x_2 /2 $ (by calculation).
+    A calculation can further show that $(x_1, x_2) \to -x_1$ is a bijection from this to the set of roots of
+    $y^2 + x_1 y + (x_1^2 + x_2/2)$, which is easily of size at most 2.
+\end{proof}
+
+\begin{definition}
+    \label{bourgainβ}
+    \lean{bourgainβ}
+    \leanok
+    $\beta = \frac{35686629198734976}{35686629198734977}$.
+\end{definition}
+
+\begin{definition}
+    \label{bourgainα}
+    \lean{bourgainα}
+    \leanok
+    \uses{bourgainβ}
+    $\alpha = \stpfone(\beta)$
+\end{definition}
+
+\begin{lemma}
+    \label{bα_val}
+    \lean{bα_val}
+    \leanok
+    \uses{bourgainα, bourgainβ}
+    $\alpha = \frac{11}2(1 - \beta)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    By calculation.
+\end{proof}
+
+\begin{lemma}
+    \label{bourgain_extractor_aux₃}
+    \lean{bourgain_extractor_aux₃}
+    \leanok
+    For any source $a$ with maximum value at most $p^{-1/2 + 2/11 \alpha}$,
+    $D \# L(a, M \# (a \times a))$ is $8 C p^{-2/11 \alpha}$-close to $p^{1+2/11 \alpha}$ entropy.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{close_high_entropy_apply_equiv, line_point_large_l2, max_val_of_apply_lmap, transfer_ne_zero}
+    First, by \ref{close_high_entropy_apply_equiv}, we can get rid of the $D$.
+    Now we want to apply \ref{line_point_large_l2}.
+    We already have a bound for the maximum value of $a$, and using \ref{max_val_of_apply_lmap} we get a bound
+    for the maximum value of $M \# (a \times a)$.
+    The last two values of a triple in the support $M \# (a \times a)$ is an injective function
+    by \ref{transfer_ne_zero}, as the first value is half of the second value for triples in the domain of $M$.
+\end{proof}
+
+\begin{definition}
+    \label{bourgain_C}
+    \lean{bourgain_C}
+    \leanok
+    $C_b = \sqrt[64]{16C + 1}$.
+\end{definition}
+
+\begin{theorem}
+    \label{bourgain_extractor}
+    \lean{bourgain_extractor}
+    \leanok
+    For any two sources $a, b$ with maximum value at most $p^{-1/2 + 2/11 \alpha}$,
+    and any non-trivial character $\chi$,
+    $$ |\sum_x a(x) \sum_y b(y) \chi(xy + x^2y^2)| \leq C_b p^{-1/352 \alpha}$$
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{bourgain_extractor_aux₁t, bourgain_extractor_aux₂, bourgain_extractor_aux₃, FinPMFCommMonoid, FinPMF.apply_add, jurl}
+    First define $a' = f \# a, b' = f \# b$ for $f(x) = (x, x^2)$, then this is $|\sum_x a'(x) \sum_y b'(y) \chi(x \cdot y)|$
+    Applying \ref{bourgain_extractor_aux₁t} 3 times, then swapping $x, y$ and doing it three more times, we can bound this by
+    $ |\sum_x (b' + b' + b' + (b' - b' - b' - b' - b'))(x) \sum_y (a' + a' + a' + (a' - a' - a' - a' - a'))(y) \chi(x\cdot y)|^{1/64} $
+    Now we want to use \ref{bourgain_extractor_aux₂}.
+    By \ref{add_close_high_entropy}, it suffices to show that $b' + b' + b'$ and $a' + a' + a'$ are close to high entropy.
+    First, we can rewrite this by unfolding $a'$ and $b'$, using \ref{FinPMF.apply_add} and then \ref{jurl}.
+    Finally, what we want is \ref{bourgain_extractor_aux₃}.
+\end{proof}
+
+\begin{theorem}
+    \label{bourgain_extractor_finalt}
+    \lean{bourgain_extractor_final'}
+    \leanok
+    For any positive integer $m$ and two sources $a, b$ with maximum value at most $p^{-1/2 + 2/11 \alpha}$,
+    the statistical distance of $f \# (a \times b)$ with $f(x, y) = (xy + x^2 y^2 \bmod p) \bmod{m}$ to the uniform distribution
+    is at most $\varepsilon = C_b p^{-1/352 \alpha} \sqrt{m} (3 \ln(p) + 3) + \frac{m}{2p}$.
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{bourgain_extractor, generalized_XOR_lemma}
+    This is a simple application of \ref{generalized_XOR_lemma} with \ref{bourgain_extractor}
+\end{proof}
+
+\begin{theorem}
+    \label{bourgain_extractor_final}
+    \lean{bourgain_extractor_final}
+    \leanok
+    For any positive integer $m$, the function $f(x, y) = (xy + x^2 y^2 \bmod p) \bmod{m}$ is a two source extractor, with
+    $k = (1/2 - 2/11 \alpha) \log(p), \varepsilon = C_b p^{-1/352 \alpha} \sqrt{m} (3 \ln(p) + 3) + \frac{m}{2p}$.
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{bourgain_extractor_finalt}
+    This is a simple restatement of \ref{bourgain_extractor_finalt}
 \end{proof}

@@ -87,6 +87,20 @@ We can directly transfer all theorems on $f \# g$ to finite PMFs.
 \end{proof}
 
 \begin{lemma}
+    \label{FinPMF.apply_swap}
+    \lean{FinPMF.apply_swap}
+    \leanok
+    \uses{FinPMF, FinPMF.apply, instMulFinPMF}
+    We have $f \# (a \times b) = b \times a$ for $f(x, y) = (y, x)$.
+\end{lemma}
+
+\begin{proof}
+    \leanok
+    \uses{equiv_transfer}
+    Simple application of \ref{equiv_transfer}
+\end{proof}
+
+\begin{lemma}
     \label{FinPMF.apply_add}
     \lean{FinPMF.apply_add}
     \leanok

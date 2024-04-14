@@ -10,6 +10,7 @@
 \end{definition}
 
 \begin{definition}
+    \label{ST_prime_field_eps}
     \lean{ST_prime_field_eps}
     \leanok
     $\stpfone(\beta) = \stpftwo(\beta) / 3$
@@ -82,11 +83,30 @@
 \end{proof}
 
 \begin{theorem}
+    \label{ST_prime_field_proj}
+    \lean{ST_prime_field_proj}
+    \leanok
+    Let there be a set $P$ of points and a set $L$ of lines over a prime field, 
+    with $|P| \leq n, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$,
+    two different points $p_1, p_2$, which are both contained in at most $4 n^{\frac12 + \stpfone(\beta)}$ lines,
+    with no points in $P$ on the line $p_1 p_2$, and all points in $P$ on an intersection of some line from $p_1$ and some
+    line from $p_2$.
+    Then the number of intersections is at most $C' n^{\frac32 - \sgone(\beta)}$.
+\end{theorem}
+
+\begin{proof}
+    \leanok
+    \uses{projective_transform, ST_grid}
+    By \ref{projective_transform} we can reduce this to \ref{ST_grid}.
+    TODO.
+\end{proof}
+
+\begin{theorem}
     \label{ST_grid}
     \lean{ST_grid}
     \leanok
     Let there be two sets $A, B$ and a set $L$ of lines over a prime field, 
-    with $|A| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |B| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$.
+    with $|A| \leq 4n^{\frac12 + 2\stpfone(\beta)}, |B| \leq 4n^{\frac12 + 2\stpfone(\beta)}, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$.
     Then the number of intersections is at most $C' n^{\frac32 - \sgone(\beta)}$.
 \end{theorem}
 
@@ -101,7 +121,7 @@
     \lean{ST_grid_aux}
     \leanok
     Let there be two sets $A, B$ and a set $L$ of lines over a prime field, 
-    with $|A| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |B| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$.
+    with $|A| \leq 4n^{\frac12 + 2\stpfone(\beta)}, |B| \leq 4n^{\frac12 + 2\stpfone(\beta)}, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$.
     Additionally, suppose there are at least $n^{\frac12 - \sgone(\beta)}$ points on each line.
     Then the number of intersections is at most $C'_2 n^{\frac32 - \sgone(\beta)}$.
 \end{theorem}
@@ -118,7 +138,7 @@
     \lean{ST_grid_aux₂}
     \leanok
     Let there be two sets $A, B$ and a set $L$ of non-horizontal lines over a prime field, 
-    with $|A| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |B| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$.
+    with $|A| \leq 4n^{\frac12 + 2\stpfone(\beta)}, |B| \leq 4n^{\frac12 + 2\stpfone(\beta)}, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$.
     Additionally, suppose there are at least $n^{\frac12 - \sgone(\beta)}$ points on each line.
     Then the number of intersections is at most $C'_2 n^{\frac32 - \sgone(\beta)}$.
 \end{theorem}
@@ -142,13 +162,14 @@
     \lean{ST_grid_final}
     \leanok
     Let there be two sets $A, B$ and a set $L$ of non-horizontal lines over a prime field, 
-    with $|A| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |B| \leq 4n^{\frac12 + 2*\stpfone(\beta)}, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$.
+    with $|A| \leq 4n^{\frac12 + 2\stpfone(\beta)}, |B| \leq 4n^{\frac12 + 2\stpfone(\beta)}, |L| \leq n$ and $p^\beta \leq n \leq p^{2 - \beta}$.
     Suppose there are at least $n^{\frac12 - \sgone(\beta)}$ points on each line, and lastly,
-    suppose there are two values $b_1, b_2 \notin B$, .
+    suppose there are two values $b_1, b_2 \notin B$, TODO.
     Then $|B|$ is at most $C'_5 n^{1/2 - \sgtwo(\beta) - \sgone(\beta) - 4 \stpfone(\beta)}$.
 \end{theorem}
 
 \begin{proof}
     \leanok
+    \uses{Stab_small}
     TODO
 \end{proof}
