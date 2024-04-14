@@ -6,7 +6,7 @@ import Mathlib.LinearAlgebra.FiniteDimensional
 import Mathlib.Data.SetLike.Fintype
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 
-variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
+variable {α : Type*} [Field α] [DecidableEq α]
 
 open BigOperators Finset
 
@@ -319,7 +319,7 @@ theorem Line.uncurry_of_equation_injective : Function.Injective (Function.uncurr
   simp only [mul_one, eq_iff_iff, true_iff] at t2
   simp_all
 
-theorem point_intersect (i j : α × α) (oh : i ≠ j) :
+theorem point_intersect [Fintype α] (i j : α × α) (oh : i ≠ j) :
   (univ.filter (fun (x : Line α) => i ∈ x ∧ j ∈ x)).card = 1 := by
   rw [card_eq_one]
   exists Line.of i j oh
@@ -334,7 +334,7 @@ theorem point_intersect (i j : α × α) (oh : i ≠ j) :
   apply line_eq_of
   exact h
 
-theorem line_intersect (i j : Line α) (h : i ≠ j) :
+theorem line_intersect [Fintype α] (i j : Line α) (h : i ≠ j) :
   (univ.filter (fun (x : α × α) => x ∈ i ∧ x ∈ j)).card ≤ 1 := by
   by_contra! nh
   rw [Finset.one_lt_card] at nh
@@ -396,7 +396,7 @@ lemma lin_ST (P : Finset (α × α)) (L : Finset (Line α)):
     (Intersections P L).card ≤ (P ×ˢ L).card := Finset.card_filter_le _ _
     _ = P.card * L.card := by simp
 
-lemma CS_UB (P : Finset <| α × α) (L : Finset <| Line α):
+lemma CS_UB [Fintype α] (P : Finset <| α × α) (L : Finset <| Line α):
   (Intersections P L).card^2 ≤ L.card * P.card * (L.card + P.card) := by
   calc
     (Intersections P L).card^2 = (∑ x in P, (IntersectionsL x L).card)^2 := by rw [IntersectionsL_sum]
