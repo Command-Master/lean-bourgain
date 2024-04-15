@@ -1,6 +1,6 @@
 # Lean Bourgain
 
-The purpose of this repository is to formalize the Bourgain extractor, and as a part of that Szemeredi-Trotter in finite fields (\[BKT04\]),
+The purpose of this repository is to formalize the Bourgain extractor \[Bou05\], and as a part of that Szemeredi-Trotter in finite fields (\[BKT04\]),
 in Lean 4.
 
 ## The source
@@ -34,8 +34,10 @@ The infrastructure for the webpage was mostly taken from [LeanAPAP](https://yael
 
 ## Sources
 
-\[BKT04\]: Bourgain, J., Katz, N. & Tao, T. A sum-product estimate in finite fields, and applications. Geom. funct. anal. 14, 27–57 (2004). https://doi.org/10.1007/s00039-004-0451-1
+\[Bou05\]: Bourgain, J. (2005). MORE ON THE SUM-PRODUCT PHENOMENON IN PRIME FIELDS AND ITS APPLICATIONS. International Journal of Number Theory, 01, 1-32.
 
-\[Dvi12\]: Dvir, Zeev. Incidence Theorems and Their Applications , now, 2012, doi: 10.1561/0400000056.
+\[BKT04\]: Bourgain, J., Katz, N.H., & Tao, T. (2004). A sum-product estimate in finite fields, and applications. Geometric & Functional Analysis GAFA, 14, 27-57.
 
-\[Rao07\]: Rao, Anup. “An Exposition of Bourgain's 2-Source Extractor.” Electron. Colloquium Comput. Complex. TR07 (2007): n. pag.
+\[Dvi12\]: Dvir, Z. (2012). Incidence Theorems and Their Applications. Found. Trends Theor. Comput. Sci., 6, 257-393.
+
+\[Rao07\]: Rao, A. (2007). An Exposition of Bourgain's 2-Source Extractor. Electron. Colloquium Comput. Complex., TR07.
