@@ -1,4 +1,5 @@
 import Pseudorandom.Additive.Stab
+import Mathlib.Algebra.Order.Chebyshev
 import LeanAPAP.Extras.BSG
 
 open Finset Pointwise
@@ -7,9 +8,12 @@ variable (K : ℝ) (hK : 1 ≤ K) (p : ℕ) [inst : Fact (p.Prime)] (A : Finset 
 
 section general
 
-open BigOps
 
-lemma claim336 [DecidableEq α] (K : Finset β) (hK : K.Nonempty) (f : β → Finset α) (S : Finset α) (hS : S.Nonempty) (δ : ℝ) (hδ : 0 ≤ δ)
+open BigOperators
+
+variable {α β : Type*} [DecidableEq α]
+
+lemma claim336 (K : Finset β) (hK : K.Nonempty) (f : β → Finset α) (S : Finset α) (hS : S.Nonempty) (δ : ℝ) (hδ : 0 ≤ δ)
   (h : ∀ v ∈ K, (f v) ⊆ S ∧ δ * S.card ≤ (f v).card) :
   ∃ i ∈ K, δ^2/2 * K.card ≤ (K.filter (fun x => δ^2 /2 * S.card ≤ ((f x) ∩ (f i)).card)).card := by
   have : S.card ≠ 0 := by positivity
@@ -23,7 +27,7 @@ lemma claim336 [DecidableEq α] (K : Finset β) (hK : K.Nonempty) (f : β → Fi
       _ = ∑ j ∈ (K.filter (fun x => δ^2 /2 * S.card ≤ ((f x) ∩ (f i)).card)), ((f j) ∩ (f i)).card +
           ∑ j ∈ (K.filter (fun x => ¬δ^2 /2 * S.card ≤ ((f x) ∩ (f i)).card)), ((f j) ∩ (f i)).card := by
         simp only [Nat.cast_sum, sum_filter_add_sum_filter_not]
-      _ ≤ ∑ j ∈ (K.filter (fun x => δ^2 /2 * S.card ≤ ((f x) ∩ (f i)).card)), S.card +
+      _ ≤ ∑ __ ∈ (K.filter (fun x => δ^2 /2 * S.card ≤ ((f x) ∩ (f i)).card)), S.card +
           ∑ j ∈ (K.filter (fun x => ¬δ^2 /2 * S.card ≤ ((f x) ∩ (f i)).card)), δ^2/2 * S.card := by
         push_cast
         gcongr
@@ -72,7 +76,7 @@ lemma claim336 [DecidableEq α] (K : Finset β) (hK : K.Nonempty) (f : β → Fi
     _ = ∑ x ∈ S, ∑ i ∈ K, ∑ j ∈ K, (if x ∈ f i then 1 else 0) * (if x ∈ f j then 1 else 0) := by rw [sum_comm]
     _ = ∑ x ∈ S, (∑ i ∈ K, (if x ∈ f i then 1 else 0)) * (∑ j ∈ K, (if x ∈ f j then 1 else 0)) := by rcongr; simp only [sum_mul_sum]
     _ = ∑ x ∈ S, (∑ i ∈ K, (if x ∈ f i then 1 else 0))^2 := by simp [sq]
-    _ = (S.card : ℝ)⁻¹ * (S.card * ∑ x ∈ S, (∑ i ∈ K, (if x ∈ f i then 1 else 0))^2) := by field_simp; ring
+    _ = (S.card : ℝ)⁻¹ * (S.card * ∑ x ∈ S, (∑ i ∈ K, (if x ∈ f i then 1 else 0))^2) := by field_simp
     _ ≥ (S.card : ℝ)⁻¹ * (∑ x ∈ S, ∑ i ∈ K, (if x ∈ f i then 1 else 0))^2 := by
       gcongr
       apply sq_sum_le_card_mul_sum_sq
@@ -86,7 +90,7 @@ lemma claim336 [DecidableEq α] (K : Finset β) (hK : K.Nonempty) (f : β → Fi
       simp only [sum_ite_mem, sum_const, smul_eq_mul, mul_one]
       congr
       simpa using (h i hi).1
-    _ ≥ (S.card : ℝ)⁻¹ * (∑ i ∈ K, δ * S.card)^2 := by
+    _ ≥ (S.card : ℝ)⁻¹ * (∑ __ ∈ K, δ * S.card)^2 := by
       push_cast
       gcongr with i hi
       exact (h i hi).2
@@ -228,7 +232,7 @@ theorem Theorem335 (h : ∀ x ∈ T, K⁻¹ * A.card^3 ≤ E[A, x • A]) :
       (2 ^ 17)⁻¹ * (K^4 : ℝ)⁻¹ * A.card ≤ (X₂ ∩ X₁).card * (Y₂ ∩ Y₁).card / A.card := iL'
       _ ≤ X₁.card * (Y₂ ∩ Y₁).card / A.card := by gcongr; apply inter_subset_right
       _ ≤ A.card * (Y₂ ∩ Y₁).card / A.card := by gcongr
-      _ = (Y₂ ∩ Y₁).card := by field_simp; ring
+      _ = (Y₂ ∩ Y₁).card := by field_simp
 
     calc ((Y₁ + (s⁻¹ • v) • Y₁).card : ℝ)
       _ = (s • (Y₁ + (s⁻¹ • v) • Y₁)).card := by rw [card_of_inv _ s this]

@@ -2,7 +2,7 @@ import Pseudorandom.PMF
 import Pseudorandom.Extractor
 
 variable
-   {α : Type u1} [Nonempty α] [Fintype α]
+   {α : Type*} [Nonempty α] [Fintype α]
    (a : FinPMF α)
 
 open Finset BigOperators
@@ -162,7 +162,6 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
           card_filter_indexOf_lt l vals vnp (by assumption), nsmul_eq_mul, a'', ← add_div]
         rw [sub_add_eq_add_sub, sum_filter_add_sum_filter_not]
         field_simp
-        ring
       · intro x
         simp [a'']
         split
@@ -302,7 +301,6 @@ theorem split_to_flat_sources [DecidableEq α] (a : FinPMF α) (l : ℕ+) (h : m
     rename_i h₃
     simp [supp, h₃, Uniform]
     field_simp
-    rw [mul_comm]
     rfl
   · rename_i h₃
     exfalso

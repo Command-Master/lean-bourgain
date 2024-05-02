@@ -4,9 +4,10 @@ import Pseudorandom.FlatSources
 import Pseudorandom.ChorGoldreich
 import Pseudorandom.Incidence.Incidence
 
-open Finset BigOps ComplexConjugate
+open Finset BigOperators ComplexConjugate
 
 variable {p : ℕ} [fpprm : Fact p.Prime] [pnot2 : Fact (p ≠ 2)]
+  {γ γ₂ : Type*}
 
 local notation "α" => ZMod p
 
@@ -413,7 +414,7 @@ lemma max_val_of_apply_lmap (b : FinPMF α) : max_val ((b*b).apply lmap) ≤ (ma
           ext y
           have : (2 : α) ≠ 0 := fun h => by
             change ((2 : ℕ) : α) = 0 at h
-            rw [ZMod.nat_cast_zmod_eq_zero_iff_dvd, Nat.prime_dvd_prime_iff_eq] at h
+            rw [ZMod.natCast_zmod_eq_zero_iff_dvd, Nat.prime_dvd_prime_iff_eq] at h
             exact pnot2.out h
             exact fpprm.out
             exact Nat.prime_two
@@ -519,7 +520,7 @@ lemma bourgain_extractor_aux₃ (b : FinPMF α)
         exfalso
         rename_i h
         change ((2 : ℕ) : α) = 0 at h
-        rw [ZMod.nat_cast_zmod_eq_zero_iff_dvd, Nat.prime_dvd_prime_iff_eq] at h
+        rw [ZMod.natCast_zmod_eq_zero_iff_dvd, Nat.prime_dvd_prime_iff_eq] at h
         exact pnot2.out h
         exact fpprm.out
         exact Nat.prime_two
@@ -690,7 +691,7 @@ theorem bourgain_extractor_final' (a b : FinPMF α)
 
   unfold cft nl2Inner
   simp only [expect_univ, ZMod.card, ← nnratCast_smul_eq_nnqsmul ℝ, NNRat.cast_inv,
-    NNRat.cast_natCast, Complex.real_smul, Complex.ofReal_inv, Complex.ofReal_nat_cast, norm_mul,
+    NNRat.cast_natCast, Complex.real_smul, Complex.ofReal_inv, Complex.ofReal_natCast, norm_mul,
     norm_inv, Complex.norm_nat, Complex.norm_eq_abs, Real.coe_toNNReal', this]
   rw [Complex.abs_natCast, le_max_iff]
   left

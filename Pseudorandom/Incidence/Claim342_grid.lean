@@ -1,28 +1,16 @@
-import Mathlib.Data.Nat.Prime
-import Mathlib.Data.Fintype.Basic
-import Mathlib.Data.Finset.Powerset
-import Mathlib.Data.Finset.Image
-import Mathlib.Data.ZMod.Defs
-import Mathlib.Algebra.BigOperators.Basic
-import Mathlib.Analysis.SpecialFunctions.Log.Base
-import Mathlib.Analysis.InnerProductSpace.Basic
-import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.Algebra.Order.Chebyshev
-import LeanAPAP.Prereqs.Expect.Basic
-import Mathlib.LinearAlgebra.Projectivization.Basic
-import Mathlib.Data.SetLike.Fintype
+import Pseudorandom.Util
 import Pseudorandom.Geometry.Lines
 import Pseudorandom.Incidence.Constants
-import Pseudorandom.Util
+import LeanAPAP.Prereqs.Expect.Basic
+import Mathlib.Analysis.InnerProductSpace.Basic
 
-open Classical Real BigOps Finset
+open Classical Real BigOperators Finset
 
 variable {α : Type*} [Field α] [Fintype α]
 
 set_option maxHeartbeats 1000000
 
-theorem claim342_grid (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line α)) (n : ℕ+)
-  (hA : A.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ)) (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
+theorem claim342_grid (β : ℝ) (A B : Finset α) (L : Finset (Line α)) (n : ℕ+) (hB : B.card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
   (h₂ : L.card ≤ n)
   (nHoriz : ∀ l ∈ L, ¬l.horiz)
   -- (hC : ∀ l ∈ L, (n ^ (1/2 - SG_eps β) : ℝ) < (IntersectionsP (A ×ˢ B) l).card)
@@ -93,12 +81,12 @@ theorem claim342_grid (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Lin
       rw [expect_eq_single_of_mem x hx]
       simp only [↓reduceIte, and_self, sum_boole, ← nnratCast_smul_eq_nnqsmul ℝ, NNRat.cast_inv,
         NNRat.cast_natCast, smul_eq_mul]
-      intro j hj
+      intro j _
       simp_all only [one_div, ne_eq, and_self, sum_boole, ite_eq_right_iff, Nat.cast_eq_zero, card_eq_zero]
       intros
       tauto
     _ ≥ 𝔼 (b₁ ∈ B) (b₂ ∈ B), ∑ l ∈ L, (if (∃ a ∈ A, (a, b₁) ∈ l) ∧ ∃ a ∈ A, (a, b₂) ∈ l then 1 else 0) -
-        𝔼 (b₁ ∈ B), (B.card : ℝ)⁻¹ * L.card := by
+        𝔼 (__ ∈ B), (B.card : ℝ)⁻¹ * L.card := by
       gcongr
       simp only [sum_boole, Nat.cast_le]
       gcongr
@@ -186,7 +174,7 @@ theorem claim342_grid (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Lin
     _ = SG_C₃^2 * 16⁻¹ * (n^(-1 : ℝ) * (n^(-1/2 - 2*ST_prime_field_eps β + (3/2 - SG_eps β)))^2) -
         (B.card : ℝ)⁻¹ * n := by simp [←rpow_add]
     _ = SG_C₃^2 * 16⁻¹ * (n^(-1 : ℝ) * n^((-1/2 - 2*ST_prime_field_eps β + (3/2 - SG_eps β)) * 2)) -
-        (B.card : ℝ)⁻¹ * n := by simp only [←rpow_nat_cast (n := 2)]; rw [←rpow_mul]; congr; simp only [Nat.cast_nonneg]
+        (B.card : ℝ)⁻¹ * n := by simp only [←rpow_natCast (n := 2)]; rw [←rpow_mul]; congr; simp only [Nat.cast_nonneg]
     _ = SG_C₃^2 * 16⁻¹ * n^(-1 + (-1/2 - 2*ST_prime_field_eps β + (3/2 - SG_eps β)) * 2) -
         (B.card : ℝ)⁻¹ * n := by rw [←rpow_add]; simp
     _ = SG_C₃^2 * 16⁻¹ * n^(1 - 4*ST_prime_field_eps β - 2 * SG_eps β) -

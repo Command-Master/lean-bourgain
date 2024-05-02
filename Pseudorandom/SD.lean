@@ -3,15 +3,15 @@ import Mathlib.Analysis.RCLike.Basic
 import LeanAPAP.Prereqs.Discrete.DFT.Basic
 import Pseudorandom.PMF
 
-open Classical Finset BigOps
+open Classical Finset BigOperators
 
 attribute [local simp] Set.Finite.bddAbove Set.finite_range card_univ
 
 attribute [local aesop unsafe 20% apply] le_of_lt
 
 variable
-   {α : Type u1} [Nonempty α] [Fintype α]
-   {β : Type u2} [Nonempty β] [Fintype β]
+   {α : Type*} [Nonempty α] [Fintype α]
+   {β : Type*} [Nonempty β] [Fintype β]
    (a b : FinPMF α)
 
 -- Definition of statistical distance

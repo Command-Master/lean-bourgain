@@ -3,12 +3,13 @@ import LeanAPAP.Prereqs.Discrete.LpNorm.Compact
 variable
    {α : Type*} [αnonempty: Nonempty α] [Fintype α] [AddCommGroup α]
    {β : Type*} [Nonempty β] [Fintype β] [AddCommGroup β]
+   {𝕜 : Type*}
    [RCLike 𝕜]
    (a b : α → 𝕜)
 
 open Real Finset
 
-open scoped NNReal BigOps
+open scoped NNReal BigOperators
 
 theorem l1Norm_le_sqrt_card_mul_l2Norm :
   ‖a‖_[1] ≤ Real.sqrt (Fintype.card α) * ‖a‖_[2] := calc

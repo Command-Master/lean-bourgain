@@ -1,23 +1,27 @@
 import Pseudorandom.Transfer
-import LeanAPAP.Mathlib.Algebra.BigOperators.Basic
+-- import LeanAPAP.Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Algebra.BigOperators.Fin
-import Mathlib.Algebra.BigOperators.Order
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Data.Real.Basic
 import LeanAPAP.Prereqs.Discrete.Convolution.Basic
 
-open Finset BigOps
+open Finset BigOperators
 
 variable {α : Type*} [Fintype α] [DecidableEq α]
         {β : Type*} [Fintype β] [DecidableEq β]
-        (a : FinPMF α)
+        {x : α} {y : β}
+        {𝕜 : Type*} [RCLike 𝕜]
+        {γ γ₂ α' β' : Type*}
 
 section basic
 
 variable [Nonempty α]
 
 -- Definition of PMF over finite types
-def FinPMF (α : Type u) [Fintype α] : Type u :=
+def FinPMF (α : Type*) [Fintype α] : Type _ :=
   { f : α → ℝ // ∑ x, f x = 1 ∧ ∀ x, f x ≥ 0}
+
+variable (a : FinPMF α)
 
 instance instFunLike : FunLike (FinPMF α) α ℝ where
   coe p := p.1
@@ -74,6 +78,8 @@ theorem FinPMF.mul_val (b : FinPMF β) : (a * b) (x, y) = (a x) * (b y) := rfl
 
 end basic
 
+variable (a b : FinPMF α)
+
 section apply
 
 -- Applying some function to a random variable.
@@ -93,12 +99,12 @@ noncomputable def FinPMF.apply (a : FinPMF α) (f : α → β) : FinPMF β :=
     ⟩
 
 -- If B = g(A) then E[f(B)] = E[f(g(A))].
-lemma apply_weighted_sum [RCLike 𝕜] (g: α → β) (f : β → 𝕜) : ∑ x, ((a.apply g) x) * (f x) = ∑ y, (a y) * (f (g y)) := by
+lemma apply_weighted_sum (g: α → β) (f : β → 𝕜) : ∑ x, ((a.apply g) x) * (f x) = ∑ y, (a y) * (f (g y)) := by
   change ∑ x, (RCLike.ofRealAm ∘ (g # ↑a)) x * f x = ∑ x, (a x) * f (g x)
   simp_rw [comp_transfer]
   apply transfer_sum
 
-lemma FinPMF.apply_equiv (f : α ≃ β) : (a.apply f) x = a (f.symm x) := equiv_transfer ..
+lemma FinPMF.apply_equiv (f : α ≃ β) : (a.apply f) y = a (f.symm y) := equiv_transfer ..
 
 lemma FinPMF.apply_swap (b : FinPMF β) : (a*b).apply Prod.swap = b*a := by
   apply Subtype.ext

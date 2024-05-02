@@ -1,8 +1,7 @@
 import Pseudorandom.Additive.EnergyGrowth
 import Pseudorandom.Incidence.Claim342_grid
-set_option autoImplicit false
 
-open Real BigOps Finset Pointwise
+open Real BigOperators Finset Pointwise
 
 variable {p : ℕ} [instpprime : Fact p.Prime]
 
@@ -110,7 +109,7 @@ theorem ST_grid_final (β : ℝ) (h : 0 < β) (A B : Finset α) (n : ℕ+) (nh�
         gcongr
       _ = (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ)⁻¹ * (n^(2 - 2 * SG_eps₃ β)) := by
         congr 1
-        rw [←rpow_nat_cast, ←rpow_mul]
+        rw [←rpow_natCast, ←rpow_mul]
         ring_nf
         simp
       _ = 4⁻¹ * (n^(2 - 2 * SG_eps₃ β) / n^(1/2 + 2*ST_prime_field_eps β) : ℝ) := by
@@ -341,9 +340,9 @@ theorem ST_grid_aux₂ (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Li
   :
   (Intersections (A ×ˢ B) L).card ≤ (SG_C₃ * n ^ (3/2 - SG_eps β) : ℝ) := by
   by_contra! nh
-  have ⟨b₁, hb₁, b₂, hb₂, ⟨neq, large'⟩⟩ := claim342_grid β h A B L n hA hB h₂ hHoriz nh
+  have ⟨b₁, _, b₂, _, ⟨neq, large'⟩⟩ := claim342_grid β A B L n hB h₂ hHoriz nh
   let L' := L.filter (fun l => (∃ p ∈ A ×ˢ {b₁}, p ∈ l) ∧ ∃ p ∈ A ×ˢ {b₂}, p ∈ l)
-  have large : L'.card > (SG_C₄ * n^(1 - SG_eps₂ β) : ℝ) := large'
+  have : L'.card > (SG_C₄ * n^(1 - SG_eps₂ β) : ℝ) := large'
   have : b₂ - b₁ ≠ 0 := fun v => neq (eq_of_sub_eq_zero v).symm
   let JSS := (B.filter
         (fun b => ∑ v ∈ (A ×ˢ A), (if (b₂ - b) / (b₂ - b₁) * v.1 + (b - b₁) / (b₂ - b₁) * v.2 ∈ A then 1 else 0 : ℝ) ≤ n^(1 - SG_eps₃ β)))
@@ -354,7 +353,7 @@ theorem ST_grid_aux₂ (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Li
       rw [mul_assoc, ←rpow_add]
       ring_nf
       simp
-    _ ≤ ∑ l ∈ L', (n ^ (1/2 - SG_eps β) : ℝ) := by simp; gcongr
+    _ ≤ ∑ __ ∈ L', (n ^ (1/2 - SG_eps β) : ℝ) := by simp; gcongr
     _ ≤ ∑ l ∈ L', (IntersectionsP (A ×ˢ B) l).card := by
       simp only [Nat.cast_sum]
       apply sum_le_sum
@@ -368,7 +367,7 @@ theorem ST_grid_aux₂ (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Li
     _ ≤ ∑ b ∈ B, ∑ l ∈ ((A ×ˢ A).image (fun v => (Line.of (v.1, b₁) (v.2, b₂) (fun eq => neq (congrArg Prod.snd eq))))), ∑ a ∈ A,
         (if (a, b) ∈ l then 1 else 0) := by
       apply sum_le_sum
-      intro b hb
+      intro b _
       apply sum_le_sum_of_subset_of_nonneg
       rw [subset_iff]
       intro l hl
@@ -388,7 +387,7 @@ theorem ST_grid_aux₂ (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Li
       congr
       ext
       rw [sum_image]
-      intros x hx y hy eq
+      intros x _ y _ eq
       let l := Line.of (x.1, b₁) (x.2, b₂) (fun eq => neq (congrArg Prod.snd eq))
       have m1 : (x.1, b₁) ∈ l := by apply mem_line1
       have m2 : (x.2, b₂) ∈ l := by apply mem_line2
@@ -460,7 +459,7 @@ theorem ST_grid_aux₂ (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Li
         ∑ b ∈ JSS',
         ∑ v ∈ (A ×ˢ A), (if (b₂ - b) / (b₂ - b₁) * v.1 + (b - b₁) / (b₂ - b₁) * v.2 ∈ A then 1 else 0) := by
       rw [sum_filter_add_sum_filter_not]
-    _ ≤ ∑ b ∈ JSS, (n^(1 - SG_eps₃ β) : ℝ) +
+    _ ≤ ∑ __ ∈ JSS, (n^(1 - SG_eps₃ β) : ℝ) +
         ∑ b ∈ JSS', ∑ v ∈ (A ×ˢ A), 1 := by
       gcongr
       simp_all only [JSS, mem_filter]
@@ -522,8 +521,7 @@ theorem ST_grid_aux₂ (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Li
   suffices JSS''.card < (((SG_C₄ - 4) / 16 - 2) * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps β) : ℝ) by
     linarith
   convert_to JSS''.card < (SG_C₅ * n^(1/2 - SG_eps₂ β - SG_eps β - 4 * ST_prime_field_eps β) : ℝ)
-  · simp [SG_C₄]; left
-    ring_nf
+  · simp [SG_C₄]
   apply ST_grid_final β h A JSS'' n nhₗ nhᵤ hA _ b₁ _ b₂ _ _
   intros b hb
   simp only [filter_congr_decidable, not_le, mem_sdiff, mem_filter, mem_insert,
@@ -621,7 +619,7 @@ theorem ST_grid_aux (β : ℝ) (h : 0 < β) (A B : Finset α) (L : Finset (Line 
       simp [mul_pow]
       congr 1
       norm_num
-      rw [←rpow_nat_cast, ←rpow_mul]
+      rw [←rpow_natCast, ←rpow_mul]
       congr 1
       ring
       simp

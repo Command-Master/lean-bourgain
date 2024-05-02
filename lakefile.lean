@@ -2,6 +2,9 @@ import Lake
 open Lake DSL
 
 package «pseudorandom» {
+  leanOptions := #[
+  ⟨`autoImplicit, false⟩,
+  ⟨`relaxedAutoImplicit, false⟩]
   -- add any package configuration options here
 }
 

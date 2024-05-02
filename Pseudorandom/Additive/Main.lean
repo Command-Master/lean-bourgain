@@ -1,22 +1,13 @@
-import Mathlib.Data.Nat.Prime
-import Mathlib.Data.Fintype.Basic
-import Mathlib.Data.Finset.Powerset
-import Mathlib.Data.Finset.Image
-import Mathlib.Data.ZMod.Defs
-import Mathlib.Algebra.BigOperators.Basic
-import Mathlib.Analysis.SpecialFunctions.Log.Base
-import Mathlib.Analysis.InnerProductSpace.Basic
-import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.Algebra.Order.Chebyshev
-import LeanAPAP.Prereqs.Expect.Basic
-import Mathlib.LinearAlgebra.Projectivization.Basic
-import Mathlib.Data.SetLike.Fintype
+import Mathlib.Algebra.EuclideanDomain.Basic
 import Mathlib.Combinatorics.Additive.Energy
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
 import Mathlib.Combinatorics.Additive.RuzsaCovering
+import Mathlib.RingTheory.Localization.FractionRing
+import Mathlib.Analysis.Normed.Field.Basic
+import LeanAPAP.Prereqs.Expect.Basic
 import LeanAPAP.Mathlib.Combinatorics.Additive.Energy
 
-open NNRat Classical Real BigOps Finset Pointwise
+open NNRat Classical Real BigOperators Finset Pointwise
 
 variable {α : Type*} [Fintype α] [DecidableEq α]
   (A B C : Finset α)
@@ -201,7 +192,6 @@ lemma additive_mul_eq [Field α] (C : α) (h : C ≠ 0) : E[A, C • A] = ((((A 
       · rw [←mul_assoc]
         field_simp
         rw [ha.2]
-        ring
       · rw [←smul_assoc]
         field_simp
   _ = ((((A ×ˢ A) ×ˢ A ×ˢ A)).filter

@@ -4,9 +4,9 @@ import Pseudorandom.Additive.Growth
 import Mathlib.Combinatorics.SetFamily.CauchyDavenport
 
 variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
-  (A B C : Finset α)
+  (A B C : Finset α) {K K₁ K₂ : ℝ} {a b : α}
 
-open NNRat Real BigOps Finset Pointwise
+open NNRat Real BigOperators Finset Pointwise
 
 noncomputable def Stab (K : ℝ) (A : Finset α) := (univ : Finset α).filter fun a => (A + a • A).card ≤ K * A.card
 
@@ -103,7 +103,7 @@ lemma Stab_mul' (h₁ : a ∈ Stab K₁ A) (h₂ : b ∈ Stab K₂ A) : a * b �
     _ = (a⁻¹ • (A + (a * b) • A)).card := by rw [card_of_inv]; simp [h]
     _ = (a⁻¹ • A + a⁻¹ • (a * b) • A).card := by simp
     _ = (a⁻¹ • A + (a⁻¹ • (a * b)) • A).card := by rw [smul_assoc]
-    _ = (a⁻¹ • A + b • A).card := by congr; field_simp; apply mul_comm
+    _ = (a⁻¹ • A + b • A).card := by congr; field_simp
     _ = ((a⁻¹ • A + b • A).card * A.card) / A.card := by field_simp
     _ ≤ ((a⁻¹ • A + A).card * (A + b • A).card) / A.card := by
       gcongr ?X / _
@@ -218,7 +218,7 @@ lemma Stab_card_inc' (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) (h : 4 ≤
   rw [← min_div_div_right]
   apply min_le_min_right
   rw [← one_le_div]
-  rw [div_right_comm, ← rpow_nat_cast, ← rpow_sub]
+  rw [div_right_comm, ← rpow_natCast, ← rpow_sub]
   norm_num
   simp
   rw [one_le_div, le_rpow_inv_iff_of_pos]
@@ -307,7 +307,7 @@ lemma Stab_full' (βpos : 0 < β) (h : 4 ≤ (Stab K A).card) (h₂ : (p ^ β : 
       norm_num
       simp only [n]
       apply Nat.le_ceil
-    _ = β * (3/2) ^ n := by simp [Real.rpow_nat_cast]
+    _ = β * (3/2) ^ n := by simp [Real.rpow_natCast]
   simp
 
 lemma Stab_full (βpos : 0 < β) (h : 4 ≤ (Stab K A).card) (h₂ : (p ^ β : ℝ) ≤ (Stab K A).card) :

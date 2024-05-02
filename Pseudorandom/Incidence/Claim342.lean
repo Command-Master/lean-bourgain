@@ -1,21 +1,10 @@
-import Mathlib.Data.Nat.Prime
-import Mathlib.Data.Fintype.Basic
-import Mathlib.Data.Finset.Powerset
-import Mathlib.Data.Finset.Image
-import Mathlib.Data.ZMod.Defs
-import Mathlib.Algebra.BigOperators.Basic
-import Mathlib.Analysis.SpecialFunctions.Log.Base
-import Mathlib.Analysis.InnerProductSpace.Basic
-import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.Algebra.Order.Chebyshev
-import LeanAPAP.Prereqs.Expect.Basic
-import Mathlib.LinearAlgebra.Projectivization.Basic
-import Mathlib.Data.SetLike.Fintype
+import Pseudorandom.Util
 import Pseudorandom.Geometry.Lines
 import Pseudorandom.Incidence.Constants
-import Pseudorandom.Util
+import LeanAPAP.Prereqs.Expect.Basic
+import Mathlib.Analysis.InnerProductSpace.Basic
 
-open Classical Real BigOps Finset
+open Classical Real BigOperators Finset
 
 variable {α : Type*} [Field α] [Fintype α]
 
@@ -149,7 +138,7 @@ lemma claim_342 (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Lin
         else 0) := by
       apply expect_congr
       rfl
-      intro x hx
+      intro x _
       simp only []
       split
       congr
@@ -169,7 +158,7 @@ lemma claim_342 (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Lin
         else 0) := by
       rw [ge_iff_le]
       apply expect_le_expect
-      intro x hx
+      intro x _
       simp only []
       split
       gcongr
@@ -256,7 +245,7 @@ lemma claim_342 (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Lin
     _ ≥ 𝔼 (p₁ ∈ P) (p₂ ∈ P), (∑ q ∈ P, (L.filter (fun l => q ∈ l ∧ p₁ ∈ l)).card * (L.filter (fun l => q ∈ l ∧ p₂ ∈ l)).card)
         - (4 * n^(1/2 + 2*ST_prime_field_eps β) + 4 * n^(1/2 + 2*ST_prime_field_eps β)) -
         (P.card : ℝ)⁻¹ * 𝔼 (p₁ ∈ P), (∑ q ∈ P \ {p₁}, (1^2 : ℝ) + (IntersectionsL p₁ L).card^2 : ℝ) := by
-      gcongr with i hi j hj
+      gcongr with i _ j hj
       norm_cast
       calc (L.filter (fun l => j ∈ l ∧ i ∈ l)).card
         _ ≤ (univ.filter (fun (l : Line α) => j ∈ l ∧ i ∈ l)).card := by apply card_le_card; apply filter_subset_filter; simp
@@ -289,7 +278,7 @@ lemma claim_342 (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Lin
         - (4 * n^(1/2 + 2*ST_prime_field_eps β) + 4 * n^(1/2 + 2*ST_prime_field_eps β)) -
         (1 + (P.card : ℝ)⁻¹ * (16 * n^(1 + 4 * ST_prime_field_eps β))) := by
       congr
-      rw [mul_pow, ←rpow_nat_cast, ←rpow_nat_cast, ←rpow_mul]
+      rw [mul_pow, ←rpow_natCast, ←rpow_natCast, ←rpow_mul]
       norm_num
       congr
       ring
@@ -463,7 +452,7 @@ lemma claim_342 (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Lin
         - 8 * n^(1/2 + 2*ST_prime_field_eps β) - 1 -
         64 * ST_C₃⁻¹ * (n ^ (ST_prime_field_eps₂ β + 6 * ST_prime_field_eps β)) := by
       congr
-      rw [←rpow_nat_cast, ←rpow_nat_cast, ←rpow_neg, ←rpow_mul, ←rpow_add]
+      rw [←rpow_natCast, ←rpow_natCast, ←rpow_neg, ←rpow_mul, ←rpow_add]
       congr 1
       ring
       simp only [Nat.cast_pos, PNat.pos]
@@ -491,11 +480,10 @@ lemma claim_342 (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Lin
     _ = (ST_C₄ * n ^ (1 - ST_prime_field_eps₃ β) : ℝ) := by
       congr 2
       simp [ST_C₃]
-      rw [←rpow_nat_cast, ←rpow_mul]
+      rw [←rpow_natCast, ←rpow_mul]
       simp
       apply add_nonneg
       simp
       simp
       simp [ST_prime_field_eps₂]
       ring
-  -- }

@@ -9,9 +9,10 @@ open Classical Real Finset BigOperators RealInnerProductSpace
 attribute [local simp] Set.Finite.bddAbove Set.finite_range card_univ
 
 variable
-   {α : Type u1} [Nonempty α] [Fintype α]
-   {β : Type u2} [Nonempty β] [Fintype β]
+   {α : Type*} [Nonempty α] [Fintype α]
+   {β : Type*} [Nonempty β] [Fintype β]
    (a b : FinPMF α)
+   {x : α}
 
 noncomputable def max_val : ℝ :=
   ⨆ x : α, a x
@@ -110,6 +111,6 @@ lemma min_entropy_l2_norm (k : ℕ) (a : FinPMF α) (h : ↑k ≤ min_entropy a)
   each with min entropy at least k, the distance of the function from uniformity is
   at most ε.
 -/
-noncomputable def two_extractor {γ : Type u3} [Nonempty γ] [Fintype γ]
+noncomputable def two_extractor {γ : Type*} [Nonempty γ] [Fintype γ]
   (h : (α × β) → γ) (k : ℝ) (ε : ℝ) : Prop :=
   ∀ a, ∀ b, (min_entropy a ≥ k ∧ min_entropy b ≥ k) → (SD ((a * b).apply h) (Uniform ⟨univ, univ_nonempty⟩) ≤ ε)

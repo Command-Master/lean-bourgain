@@ -232,7 +232,7 @@ theorem final_theorem (β : ℝ) (h : 0 < β) (n : ℕ+) (p : ℕ) [instpprime :
         rhs
         lhs
         lhs
-        rw [← Real.rpow_nat_cast]
+        rw [← Real.rpow_natCast]
       gcongr
       simp [lemma10 β h]
       simp [instpprime.out.one_le]

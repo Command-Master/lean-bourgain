@@ -1,24 +1,8 @@
-import Mathlib.Data.Nat.Prime
-import Mathlib.Data.Fintype.Basic
-import Mathlib.Data.Finset.Powerset
-import Mathlib.Data.Finset.Image
-import Mathlib.Data.ZMod.Defs
-import Mathlib.Algebra.BigOperators.Basic
-import Mathlib.Analysis.SpecialFunctions.Log.Base
-import Mathlib.Analysis.InnerProductSpace.Basic
-import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.Algebra.Order.Chebyshev
-import LeanAPAP.Prereqs.Expect.Basic
-import Mathlib.LinearAlgebra.Projectivization.Basic
-import Mathlib.Data.SetLike.Fintype
-import Pseudorandom.Geometry.Lines
-import Pseudorandom.Incidence.Constants
-import Pseudorandom.Incidence.Claim342
 import Pseudorandom.Geometry.Projective
+import Pseudorandom.Incidence.Claim342
 import Pseudorandom.Incidence.IncidenceGrid
-set_option autoImplicit false
 
-open Real BigOps Finset
+open Real BigOperators Finset
 
 variable (p : ℕ) [Fact p.Prime]
 
@@ -27,7 +11,7 @@ local notation "α" => (ZMod p)
 set_option maxHeartbeats 700000
 
 theorem ST_prime_field_proj (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Line α)) (n : ℕ+)
-  (nhₗ : (p^β : ℝ) ≤ n) (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (h₁ : P.card ≤ n) (h₂ : L.card ≤ n)
+  (nhₗ : (p^β : ℝ) ≤ n) (nhᵤ : n ≤ (p^(2 - β) : ℝ)) (h₂ : L.card ≤ n)
     (p₁ p₂ : α × α) (neq : p₁ ≠ p₂) (nml₁ : (IntersectionsL p₁ L).card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
     (nml₂ : (IntersectionsL p₂ L).card ≤ (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ))
     (all_int : ∀ p ∈ P, (∃ l ∈ L, p ∈ l ∧ p₁ ∈ l) ∧ ∃ l ∈ L, p ∈ l ∧ p₂ ∈ l)
@@ -247,7 +231,7 @@ theorem ST_prime_field_aux (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : 
   clear large'
   have nh₂ := calc ((Intersections P' L).card : ℝ)
     _ = ∑ x ∈ P', (IntersectionsL x L).card := by norm_cast; apply IntersectionsL_sum
-    _ ≥ ∑ x ∈ P', (n^(1/2 - ST_prime_field_eps β) : ℝ) := by
+    _ ≥ ∑ __ ∈ P', (n^(1/2 - ST_prime_field_eps β) : ℝ) := by
       simp [-one_div, -sum_const]
       gcongr with i hi
       apply hc
@@ -342,10 +326,6 @@ theorem ST_prime_field_aux (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : 
     _ = SG_C * n ^ (3 / 2 - SG_eps β) := by simp [ST_C₄]
   suffices ((Intersections P'' L).card : ℝ) ≤ SG_C * n ^ (3 / 2 - SG_eps β) by linarith
   apply ST_prime_field_proj (p₁ := p₁) (p₂ := p₂) <;> try assumption
-  calc
-    P''.card ≤ P'.card := by gcongr; simp [P'']
-    _ ≤ P.card := by gcongr; simp [P']
-    _ ≤ n := by assumption
   apply hd
   assumption
   apply hd
@@ -426,12 +406,10 @@ theorem ST_prime_field_aux₂' (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (
           simp
         _ ≤ Real.sqrt (n * n * (n+n)) / (4 * n^(1/2 + 2*ST_prime_field_eps β) : ℝ) := by
           gcongr
-          apply sqrt_le_sqrt
-          gcongr
         _ = n^(1 - 2*ST_prime_field_eps β) * (Real.sqrt 2 / 4) := by
           simp [←mul_two, sqrt_eq_rpow]
           ring_nf
-          rw [mul_rpow, ←rpow_nat_cast, ←rpow_mul, ←rpow_neg]
+          rw [mul_rpow, ←rpow_natCast, ←rpow_mul, ←rpow_neg]
           ring_nf
           conv =>
             lhs
@@ -450,9 +428,9 @@ theorem ST_prime_field_aux₂' (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (
         _ ≥ (Intersections P L).card^2 / (2 * n * n) := by gcongr; norm_cast
         _ > (ST_C₂ * n ^ (3/2 - ST_prime_field_eps β))^2 / (2 * n * n) := by gcongr
         _ = n^(1 - 2*ST_prime_field_eps β) * (ST_C₂^2 / 2) := by
-          rw [←rpow_nat_cast, mul_rpow, ←rpow_mul]
+          rw [←rpow_natCast, mul_rpow, ←rpow_mul]
           ring_nf
-          rw [inv_pow, ←rpow_nat_cast, ←rpow_neg]
+          rw [inv_pow, ←rpow_natCast, ←rpow_neg]
           conv =>
             lhs
             lhs
@@ -484,7 +462,6 @@ theorem ST_prime_field_aux₂' (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (
       simp
       ring_nf
       simp [ST_prime_field_eps]
-      ring
   simp_all
 
 theorem ST_prime_field (β : ℝ) (h : 0 < β) (P : Finset (α × α)) (L : Finset (Line α)) (n : ℕ+)

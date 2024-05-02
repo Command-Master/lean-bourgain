@@ -10,7 +10,7 @@ import Mathlib.NumberTheory.Harmonic.Bounds
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
 import Mathlib.Data.Int.CardIntervalMod
 
-open Real Finset BigOps
+open Real Finset BigOperators
 
 variable {α : Type*} [αnonempty: Nonempty α] [Fintype α] [AddCommGroup α]
   {β : Type*} [Nonempty β] [Fintype β] [AddCommGroup β]
@@ -133,7 +133,7 @@ lemma range_eq_zmod_image : range ↑n = image (fun t => ZMod.val t) (univ : Fin
   constructor
   intro v
   exists x
-  simp only [ZMod.val_nat_cast]
+  simp only [ZMod.val_natCast]
   apply Nat.mod_eq_of_lt v
   rintro ⟨a, ha⟩
   rw [← ha]
@@ -327,11 +327,11 @@ theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : �
       convert_to ((AddChar.zmod n (t.val : ℤ)) (- x.val : ℤ) * (AddChar.zmod m (w.val : ℤ)) (x.val : ℤ) : circle) = (_ : ℂ)
       congr <;> simp
       simp only [AddChar.zmod_apply]
-      simp only [ZMod.nat_cast_val, ZMod.int_cast_cast, Int.cast_neg, mul_neg, ←
+      simp only [ZMod.natCast_val, ZMod.intCast_cast, Int.cast_neg, mul_neg, ←
         AddChar.map_add_mul]
       convert_to Circle.e (x.val * (w.val * n - t.val * m) / (n * m)) = (_ : ℂ)
       congr
-      simp only [ZMod.nat_cast_val]
+      simp only [ZMod.natCast_val]
       field_simp
       ring
       rfl
@@ -358,7 +358,7 @@ theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : �
     _ ≤ (n : ℝ)⁻¹ * ∑ t : α,
         (‖(Circle.e ((w.val * n / m - t.val) / n) : ℂ)^↑n - 1‖ + 1) /
         (‖(Circle.e ((w.val * n / m - t.val) / n) : ℂ) - 1‖ + 1 / n) := by
-      gcongr with t ht
+      gcongr with t _
       by_cases h : (Circle.e ((w.val * n / m - t.val) / n) : ℂ) = 1
       · rw [h]
         simp
@@ -372,7 +372,7 @@ theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : �
         simp
         rw [← this]
         convert norm_sum_le ..
-        convert_to ∑ i ∈ Finset.range n, (1 : ℝ) = _
+        convert_to ∑ __ ∈ Finset.range n, (1 : ℝ) = _
         simp
         apply sum_congr
         rfl
@@ -443,10 +443,10 @@ theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : �
       congr 7
       rw [Int.fract_eq_fract]
       field_simp
-      rw [← ZMod.nat_cast_val, ← ZMod.nat_cast_val, ← ZMod.nat_cast_val]
+      rw [← ZMod.natCast_val, ← ZMod.natCast_val, ← ZMod.natCast_val]
       norm_cast
       apply exists_eq_mul_left_of_dvd
-      rw [← ZMod.int_cast_zmod_eq_zero_iff_dvd]
+      rw [← ZMod.intCast_zmod_eq_zero_iff_dvd]
       simp
     _ = 3 * ∑ t : α,
         1 / (2*n - |4 * (n * Int.fract ((Int.fract (w.val * n / m : ℝ) + t.val) / n : ℝ)) - 2 * n| + 1) := by
@@ -479,7 +479,6 @@ theorem lemma44 (χ : AddChar β ℂ) : ‖cft (χ ∘ (fun x : α => (x.val : �
         1 / (2*n - |4 * (Int.fract (w.val * n / m : ℝ) + t.val) - 2 * n| + 1) := by
       rcongr
       field_simp
-      ring_nf
     _ = 3 * ∑ t ∈ Finset.range n,
         1 / (2*n - |4 * (Int.fract (w.val * n / m : ℝ) + t) - 2 * n| + 1) := by
       congr 1

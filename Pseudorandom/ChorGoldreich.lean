@@ -2,7 +2,9 @@ import Pseudorandom.Extractor
 import Pseudorandom.LpLemmas
 import Mathlib.LinearAlgebra.BilinearForm.Basic
 
-open BigOps ComplexConjugate Finset
+open BigOperators ComplexConjugate Finset
+
+variable {α β R : Type*} (a b : α)
 
 lemma AddChar.eq_iff [AddGroup α] [GroupWithZero R] (χ : AddChar α R) : χ a = χ b ↔ χ (a - b) = 1 := by
   simp [sub_eq_add_neg, AddChar.map_add_mul, AddChar.map_neg_inv]
@@ -11,13 +13,12 @@ lemma AddChar.eq_iff [AddGroup α] [GroupWithZero R] (χ : AddChar α R) : χ a 
   apply_fun (· * χ (-b))
   simp only [zero_mul, ne_eq, ← AddChar.map_add_mul, add_right_neg, map_zero_one, one_ne_zero, not_false_eq_true]
 
-def IP [CommSemiring α] : BilinForm α (α × α) := {
-  bilin := fun x y => (x.1*y.1 + x.2*y.2)
-  bilin_add_left := by intros; simp; ring_nf
-  bilin_add_right := by intros; simp; ring_nf
-  bilin_smul_left := by intros; simp; ring_nf
-  bilin_smul_right := by intros; simp; ring_nf
-}
+def IP [CommSemiring α] : LinearMap.BilinForm α (α × α) := LinearMap.mk₂
+  _ (fun x y => (x.1*y.1 + x.2*y.2))
+  (by intros; simp; ring_nf)
+  (by intros; simp; ring_nf)
+  (by intros; simp; ring_nf)
+  (by intros; simp; ring_nf)
 
 lemma IP_comm [CommSemiring α] (a b : α × α) : IP a b = IP b a := by
   unfold IP
@@ -115,7 +116,6 @@ theorem bourgain_extractor_aux₀ [Fintype α] [Field α] (a b : (α × α) → 
     congr 2
     rw [Finset.expect_univ, ← nnratCast_smul_eq_nnqsmul ℝ]
     field_simp
-    ring_nf
   _ = ‖(Complex.ofReal ∘ a)‖_[2]^2 * (Fintype.card (α × α) * ‖dft (b ·)‖ₙ_[2]^2) := by
     rw [nl2Norm_sq_eq_expect]
   _ = ‖(Complex.ofReal ∘ a)‖_[2]^2 * (Fintype.card (α × α) * ‖(Complex.ofReal ∘ b)‖_[2]^2) := by
@@ -138,7 +138,7 @@ theorem bourgain_extractor_aux₀' [Fintype α] [Field α] (a b : (α × α) →
   positivity
 
 theorem bourgain_extractor_aux₁ [Fintype α] [Field α] [Fintype β] [AddCommGroup β] [Module α β] [DecidableEq β]
-    (a b : FinPMF β) (χ : AddChar α ℂ) (F : BilinForm α β) :
+    (a b : FinPMF β) (χ : AddChar α ℂ) (F : LinearMap.BilinForm α β) :
     ‖ ∑ x, a x * ∑ y, b y * χ (F x y)‖^2 ≤ ‖ ∑ x, a x * ∑ y, (b - b) y * χ (F x y)‖ := by
   calc ‖ ∑ x, a x * ∑ y, b y * χ (F x y)‖^2
     _ ≤ (∑ x, ‖a x * ∑ y, b y * χ (F x y)‖)^2 := by
@@ -199,7 +199,7 @@ theorem bourgain_extractor_aux₁ [Fintype α] [Field α] [Fintype β] [AddCommG
       ring_nf
       rw [← AddChar.map_add_mul]
       congr
-      simp_rw [BilinForm.sub_right (B₁ := F) x y₁ y₂]
+      simp_rw [LinearMap.BilinForm.sub_right (B₁ := F) x y₁ y₂]
       ring_nf
     _ = ‖(∑ x, a x * (∑ y in univ ×ˢ univ, b y.1 * b y.2 * χ (F x (y.1 - y.2))) : ℂ)‖ := by
       congr with x
@@ -218,7 +218,7 @@ theorem bourgain_extractor_aux₁ [Fintype α] [Field α] [Fintype β] [AddCommG
       rfl
 
 theorem bourgain_extractor_aux₁' [Fintype α] [Field α] [Fintype β] [AddCommGroup β] [Module α β] [DecidableEq β]
-    (a b : FinPMF β) (χ : AddChar α ℂ) (F : BilinForm α β) :
+    (a b : FinPMF β) (χ : AddChar α ℂ) (F : LinearMap.BilinForm α β) :
     ‖ ∑ x, a x * ∑ y, b y * χ (F x y)‖ ≤ ‖ ∑ x, a x * ∑ y, (b - b) y * χ (F x y)‖^(2⁻¹ : ℝ) := by
   rw [Real.le_rpow_inv_iff_of_pos, Real.rpow_two]
   apply bourgain_extractor_aux₁ a b χ F
@@ -334,9 +334,6 @@ theorem bourgain_extractor_aux₂ (ε : ℝ) (hε : 0 < ε) (n : ℝ) (hn : 0 < 
   _ ≤ (Fintype.card α) * Real.sqrt ((∑ x, a x) * (1/n))
       * Real.sqrt ((∑ y, b y) * (1 / n)) + 2*ε := by
     gcongr
-    repeat {
-    apply Real.sqrt_le_sqrt
-    gcongr
     · simp
     · split
       simp [abs_of_nonneg]
@@ -347,7 +344,17 @@ theorem bourgain_extractor_aux₂ (ε : ℝ) (hε : 0 < ε) (n : ℝ) (hn : 0 < 
       split
       simp_all only [one_div, Real.norm_eq_abs, ge_iff_le, FinPMF.nonneg, abs_of_nonneg]
       simp [le_of_lt hn]
-    }
+
+    · simp
+    · split
+      simp [abs_of_nonneg]
+      simp
+    · rw [linftyNorm_eq_ciSup]
+      apply ciSup_le
+      intro
+      split
+      simp_all only [one_div, Real.norm_eq_abs, ge_iff_le, FinPMF.nonneg, abs_of_nonneg]
+      simp [le_of_lt hn]
   _ = (Fintype.card α) * (Real.sqrt (1/n) * Real.sqrt (1 / n)) + 2*ε := by simp [mul_assoc]
   _ = (Fintype.card α) * (1 / n) + 2*ε := by rw [← sq]; simp [le_of_lt hn]
   _ = Fintype.card α / n + 2 * ε := by ring

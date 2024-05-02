@@ -2,9 +2,9 @@ import Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Algebra.BigOperators.Ring
 import LeanAPAP.Prereqs.Expect.Basic
 
-open Finset BigOps
+open Finset BigOperators
 
-variable {α β γ : Type*} [Fintype α] [DecidableEq β]
+variable {α β γ γ₂ G : Type*} [Fintype α] [DecidableEq β]
 
 noncomputable def transfer [AddCommMonoid γ] (f : α → β) (g : α → γ) : (β → γ) :=
   (fun x => ∑ y in univ.filter (fun y => f y = x), g y)

@@ -1,28 +1,11 @@
-import Mathlib.Data.Nat.Prime
-import Mathlib.Data.Fintype.Basic
-import Mathlib.Data.Finset.Powerset
-import Mathlib.Data.Finset.Image
-import Mathlib.Data.ZMod.Defs
-import Mathlib.Algebra.BigOperators.Basic
-import Mathlib.Analysis.SpecialFunctions.Log.Base
-import Mathlib.Analysis.InnerProductSpace.Basic
-import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.Algebra.Order.Chebyshev
-import LeanAPAP.Prereqs.Expect.Basic
-import LeanAPAP.Mathlib.Combinatorics.Additive.Energy
-import Mathlib.LinearAlgebra.Projectivization.Basic
-import Mathlib.Data.SetLike.Fintype
-import Mathlib.Combinatorics.Additive.Energy
-import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
-import Mathlib.Combinatorics.Additive.RuzsaCovering
-import Pseudorandom.Additive.Main
 import Mathlib.Algebra.IsPrimePow
+import Pseudorandom.Additive.Main
 import Mathlib.FieldTheory.Finite.Basic
 
 variable {α : Type*} [Field α] [Fintype α] [DecidableEq α]
   (A B C : Finset α)
 
-open NNRat Real BigOps Finset Pointwise
+open NNRat Real BigOperators Finset Pointwise
 
 lemma card_field_prime_pow : IsPrimePow (Fintype.card α) := by
   have ⟨p, n, h⟩ := FiniteField.card' α
@@ -386,7 +369,6 @@ theorem GUS (p : ℕ) [Fact (p.Prime)] (A : Finset (ZMod p)) : (3 • A^2 - 3 �
         rw [← smul_assoc]
         congr 1
         field_simp
-        ring
       _ ≤ ((c - d) • A + ((a - b) • A + (c - d) • A)).card := by
         gcongr
         apply add_subset_add_left
