@@ -67,7 +67,7 @@
   {"url": "https://github.com/YaelDillies/LeanAPAP.git",
    "type": "git",
    "subDir": null,
-   "rev": "3ec222d26ac935cbda2e2a88e2c42cb6a208a6d5",
+   "rev": "ff5ae592fc73de179b382c49f1f6c700587f99f8",
    "name": "LeanAPAP",
    "manifestFile": "lake-manifest.json",
    "inputRev": null,
